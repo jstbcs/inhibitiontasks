@@ -4,7 +4,7 @@
 #
 # Date                                     Descriptions of Change
 # ====          ================           ======================
-# 10-02-2023    Madlen Hoffstadt          Read in whitehead, 2020 (Exp 2 data)
+# 10-02-2023    Madlen Hoffstadt      Read in whitehead, 2020 (Exp 2 data) & Snijder
 
 
 library(dplyr)
@@ -97,10 +97,8 @@ dataset39 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/
                          accuracy == 0 | # exclude inaccurate responses
                          rt < .2 | rt > 2, 0, 1)) # exclude outlier response times
   
-  
 
-# Dataset 40 (data from https://osf.io/evuhg)
-dataset40 <- read.csv("destroop-raw.csv")
+
 
 
 
