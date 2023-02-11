@@ -1,5 +1,12 @@
+# no project-specific R-files
 .Rhistory
 .Rproj.user
 .Rhistory
 
+# Renv is used for package maintenance, don't need the actual library folder
+renv/
+
+# Anything with notes / testing is just internal note-taking
 notes*.R
+testing*.R
+testing*.db
