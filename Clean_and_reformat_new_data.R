@@ -4,16 +4,18 @@
 #
 # Date                                     Descriptions of Change
 # ====          ================           ======================
-# 10-02-2023    Madlen Hoffstadt      Read in whitehead, 2020 (Exp 2 data) & Snijder
+# 10-02-2023    Madlen Hoffstadt      Read in whitehead, 2020 (Exp 2 data) 
+# 13-02-2023    Madlen Hoffstadt      Read in Snijder et al., 2022 & Chetverikov, 2017
 
 
 library(dplyr)
-library(osfr)
 
 
 ########## Overview of datasets ########## 
-# - Whitehead et al.(2020): datset 35 - 39
-# - Snijer et al. (2022)
+# - Whitehead et al.(2020):     dataset 35 - 40
+# - Snijder et al. (2022):      dataset 41
+# - Chetverikov et al. (2017):  dataset 42
+# - Stahl et al. (2014):        dataset 43 - 45 
 #########################
 
 
@@ -98,10 +100,52 @@ dataset39 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/
                          rt < .2 | rt > 2, 0, 1)) # exclude outlier response times
   
 
+# Dataset 40 (Whitehead et al., 2020; StroopExp 3)
 
 
 
+# Dataset 41 (Snijder et al., 2022); data online at https://osf.io/evuhg
+dataset41 <- read.csv("destroop-raw.csv") %>%
+  mutate(datasetid = 41,
+         # create subject variable starting at 1
+         subject = rep(seq_along(rle(ID)$lengths), times = rle(ID)$lengths),
+         subject = as.factor(subject),
+         # block = ,
+         # trial = ,
+         cond = ifelse(grepl("incon", trialCode), 0, 1),
+         accuracy = ACC, 
+         # agegroup = ,
+         rt = RT / 1000) %>%
+  select(datasetid, subject, cond, accuracy, rt) %>% # add agegroup, trial & block
+ # Add incl
 
 
 
+# Dataset 42 (Chetverikov et al., 2017); data online at https://osf.io/7rb48
+dataset42 <- read.csv("flanker_data.csv") %>%
+  mutate(datasetid = 42,
+         subject = as.factor(uid),
+         block = apply(dataset42["blockf"], 1, function(i) as.numeric(strsplit(i, " ")[[1]][2])),
+         trial = trialN + 1, # Note: check if trialN 0 is practice trial
+         cond = ifelse(grepl("Incompatible", compf), 0, 1), # Note: check concept of compatibility
+         accuracy = corr, 
+         agegroup = ifelse(age < 35, 1, 3)) %>% # cutoff for age?
+  mutate(incl = ifelse(trial %in% 1:5 | # exclude first 5 trials
+                         accuracy == 0 | # exclude inaccurate responses
+                         missing == 1 | is.na(rt) | # exclude missing responses
+                         rt < .2 | rt > 2, 0, 1)) %>% # exclude outlier response times
+  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt, incl)
+  
+
+
+# Dataset 43: Stahl et al. (2014); Stroop task 
+dataset43 <- read.delim("stroop.dat", header = FALSE, sep = " ")
+
+# v10 = target meaning 
+# v09 = probe meaning 
+# v08 = condition 
+#     - neutral (target is QQQQ)
+#     - congruent (target color = target meaning)
+#     - incongruent (target color != target meaning)
+# v 05 = block --> exclude uebung?
 
