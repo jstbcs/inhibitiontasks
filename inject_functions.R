@@ -1,16 +1,12 @@
 # This is a library of functions used for structure testing and injecting new data 
 # into the database
-# Depends on: stringr, dbplyr, DBI, RSQLite
+# Depends on: stringr, dbplyr, DBI, RSQLite, utils
 
 # Regex patterns
 regex_matches_study_code <- "^[a-zA-Z]+_[12][0-9][0-9][0-9]_[a-zA-Z]+$"
 
-# Returns the name of a given object, do this better
-get_name_quotes <- function(x){
-  paste(rlang::get_expr(rlang::enquo(x)))
-} # enquote the name of object (for use in paste)
-
 # Require user input to confirm something
+# Returns the pressed key
 require_warning_input <- function(message){
   utils::menu(
     choices = c("Yes, I want to continue anyways", "No. That is not what I want"),
@@ -18,18 +14,17 @@ require_warning_input <- function(message){
   )
 }
 
+# Stop function if warning input is 'STOP'
 continue_after_warning <- function(message){
   answer = require_warning_input(message)
   if (answer == 2)
   {
     stop("Process cancelled")
-  } else
-  {
-    return(TRUE)
   }
 }
 
 # Loop check vector of column names in data frame
+# Returns TRUE/FALSE if all column names are in that object
 do_elements_exist <- function(colnames, object){
   vec = c()
   for (i in seq_along(colnames))
@@ -43,7 +38,8 @@ do_elements_exist <- function(colnames, object){
   return(all(vec))
 }
 
-# requires user input
+# Informs user about columns not present in object
+# Requires input to continue
 confirm_columns_not_specified <- function(colnames, object){
   vec = c()
   for (i in seq_along(colnames))
@@ -58,13 +54,10 @@ confirm_columns_not_specified <- function(colnames, object){
     "\ndo you want to continue adding the data anyway? \nNULL will be entered into the database in columns not specified"
   )
   continue_after_warning(message)
-  } 
-  else 
-  {
-    return(TRUE)
   }
 }
 
+# This is a loop with stop conditions based on various elements wrong in the object
 which_element_wrong_study <- function(object){
   names = names(object)
   length = length(object)
@@ -106,6 +99,22 @@ which_element_wrong_study <- function(object){
     stop(error_message)
   } 
 }
+
+# Helper stopping functions that make sure object is specified at the right depth
+stop_if_not_top_level <- function(object){
+  if (do_elements_exist(c("study"), object) == FALSE)
+  {
+    stop("This function takes the overall list as input. \nMake sure the object passed to it is on highest level and not a data-sublist object")
+  }
+}
+
+stop_if_not_data_level <- function(object){
+  if (do_elements_exist(c("data", "overview"), object) == FALSE)
+  {
+    stop("This function takes the sub-lists: data_NUMBER as input. \nMake sure the object passed to it is on data-level and not the grand object")
+  }
+}
+
 # Object entries - this is for checking the list name, if they contain proper structure
 check_object_elements <- function(object){
   names = names(object)
@@ -114,10 +123,6 @@ check_object_elements <- function(object){
   if(!all(names == c("study", paste0("data_", 1:(length-1)))))
   {
     which_element_wrong_study(object)
-  }
-  else
-  {
-    return(TRUE)
   }
 }
 
@@ -133,7 +138,9 @@ check_study_info_structure <- function(object){
   if (do_elements_exist(c("study_code", "authors"), object$study) == FALSE){
     stop("Need to have variables: study_code, authors present")
   }
+  
   confirm_columns_not_specified(c("added", "conducted", "country", "contact"), object$study)
+  
   if (stringr::str_detect(get_study_code(object),
                                regex_matches_study_code,
                                negate = TRUE))
@@ -142,14 +149,11 @@ check_study_info_structure <- function(object){
                get_study_code(object),
                "is not valid. Study codes should follow the principle AUTHOR_YEAR_FIRSTWORD"))
   }
-  else {
-    return(TRUE)
-  }
 }
 
 # Make two: Check raw data, check overview structure
 
-# Check data list structure
+# Check data list structue
 check_data_structure <- function(object){
   # Check if all other (not study) objects are lists containing two 1 items
   overview_names = c("task_name", "keywords", "data_exclusions", "codebook", 
@@ -189,11 +193,13 @@ check_data_structure <- function(object){
       stop(paste0("Error in structure of data_", i - 1, ":", " Overview must have correct columns specified"))
     } 
     confirm_columns_not_specified(overview_names, object[[i]]$overview)
-  }
+  } # TODO: Talk about which elemens have to exist in overview, and which are optional
+  # Right now all columns in $data are required, but only task_name and keywords for overview
 }
 
-# Check object structure
+# Check object structure, parent function
 check_object_structure <- function(object){
+  stop_if_not_top_level(object)
   if (inherits(object, "list") == FALSE)
   {
     stop("Object not a list")
@@ -206,6 +212,7 @@ check_object_structure <- function(object){
 
 # Returns vector of study code specified in object
 get_study_code <- function(object){
+  stop_if_not_top_level(object) # defined below
   study_code = c()
   study_code = object$study$study_code
   return(study_code)
@@ -239,7 +246,7 @@ which_elements_exist <- function(colnames, object){
   return(colnames[which(vec == TRUE)])
 }
 
-# Create SQL insertion query
+# Create SQL insertion query, not used in code right now. Returns insert query
 write_sql_insert <- function(table, columns){
   n_cols = length(columns)
   insert = paste0(
@@ -257,6 +264,7 @@ write_sql_insert <- function(table, columns){
 
 # Add a study variable to database
 add_study_info <- function(conn, object){ # add more study variables here
+  stop_if_not_top_level(object)
   study_columns = c("study_code", "authors", "conducted", "added", "country", "contact")
   insert_study_info = object$study[which_elements_exist(study_columns, object$study)]
   dbWriteTable(
@@ -269,6 +277,7 @@ add_study_info <- function(conn, object){ # add more study variables here
 
 # Find study id of table for a given code
 find_study_id <- function(conn, object){
+  stop_if_not_top_level(object)
   code = get_study_code(object)
   study_table = tbl(conn, "study")
   study_id = study_table %>% 
@@ -279,14 +288,10 @@ find_study_id <- function(conn, object){
 
 # Finds the study id in table of that code
 return_study_id <- function(conn, object){
+  stop_if_not_top_level(object)
   if (does_study_id_exist(conn, object) == FALSE) 
   {
     continue_after_warning("This study code does not currently exist. Want to add it to the study-table?")
-    # TODO: Make person confirm this? Show them the info that's added
-    # do this via utils::menu
-    # choices are Yes/No
-    # title should output the current study info and maybe a representation of how it would look
-    # after the study info is added
     add_study_info(conn, object)
     find_study_id(conn, object)
   } else 
@@ -297,10 +302,7 @@ return_study_id <- function(conn, object){
 
 # Returns vector of task names found in inject object
 get_task_names <- function(object){
-  if (do_elements_exist(c("data", "overview"), object) == FALSE)
-  {
-    stop("This function takes the sub-lists: data_NUMBER as input. \nMake sure the object passed to it is on data-level and not the grand object")
-  }
+  stop_if_not_data_level(object)
   task_names = c()
   for (i in 2:length(object)){
     task_names[i - 1] = object$overview$task_name
@@ -308,30 +310,26 @@ get_task_names <- function(object){
   return(task_names)
 }
 # Checks to see if a given task_name exists in task-lookup table
+# Returns TRUE/FALSE if task ID exsits
 does_task_id_exist <- function(conn, object){
-  names = get_task_names(object)
+  name = get_task_names(object)
   task_table = tbl(conn, "task")
-  vec = c()
-  for (i in seq_along(names))
-  {
-    temp_task_name = names[i]
-    task_id = task_table %>% 
-      filter(task_name == temp_task_name) %>% 
-      pull(task_id)
-    length = length(task_id)
-    if (length == 0){
-      vec[i] = FALSE
-      stop(paste("Task Name:", temp_task_name, "not found in database"))
-    } else if (length == 1){
-      vec[i] = TRUE
-    } else {
-      stop("This task name was already found twice in the database. Please investigate what went wrong here.")
-    }
+  task_id = task_table %>% 
+    filter(task_name == name) %>% 
+    pull(task_id)
+  length = length(task_id)
+  if (length == 0){
+    return(FALSE)
+    stop(paste("Task Name:", name, "not found in database"))
+  } else if (length == 1){
+    return(TRUE)
+  } else {
+    stop("This task name was already found twice in the database. Please investigate what went wrong here.")
   }
-  return(all(vec))
 }
 
 # Option to add new task?
+# TODO
 
 # Find task id of table for a given code, returns data_frame of 
 find_task_id <- function(conn, object){
@@ -352,22 +350,11 @@ find_task_id <- function(conn, object){
 
 # Finds the task id in table of that code
 return_task_id <- function(conn, object){
-  does_task_id_exist(conn, object)
+  if (does_task_id_exist(conn, object) == FALSE)
+  {
+    stop("This task was not found in our task-database. Please considers adding it")
+  }
   find_task_id(conn, object)
-}
-
-stop_if_not_top_level <- function(object){
-  if (do_elements_exist(c("study"), object) == FALSE)
-  {
-    stop("This function takes the overall list as input. \nMake sure the object passed to it is on highest level and not a data-sublist object")
-  }
-}
-
-stop_if_not_data_level <- function(object){
-  if (do_elements_exist(c("data", "overview"), object) == FALSE)
-  {
-    stop("This function takes the sub-lists: data_NUMBER as input. \nMake sure the object passed to it is on data-level and not the grand object")
-  }
 }
 
 # Returns the next free elements in overview table as data_ids that are assigned
@@ -410,6 +397,7 @@ add_task_id_overview <- function(conn, object){
 }
 
 prepare_object_ids <- function(conn, object){
+  stop_if_not_top_level(object)
   n_data = length(object) - 1
   names = paste0("data_", 1:n_data)
   study_add = add_study_id_overview(conn, object)
@@ -460,6 +448,8 @@ add_raw_data_table <- function(conn, object){
 }
 
 add_object_to_database <- function(conn, object){
+  stop_if_not_top_level(object)
+  
   n_data = length(object) - 1
   
   data_names = paste0("data_", 1:n_data)
@@ -483,3 +473,4 @@ add_object_to_database <- function(conn, object){
 }
 
 # TODO: Add 'overwrite' option to enable overwriting existing data easily
+# TODO: Have unique constraints for data_overview so that something won't get added twice even after executing same command
