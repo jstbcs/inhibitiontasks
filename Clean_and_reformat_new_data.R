@@ -59,7 +59,7 @@ dataset35 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/
 # Dataset 36 (Whitehead et al., 2020; FlankerExp3)
 dataset36 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/FlankerExp3.csv") %>% 
   mutate(
-    datasetid = 37,
+    datasetid = 36,
     cond = factor(Congruency),
     subject = factor(Subject - 100),
     agegroup = 1, # TODO: CHeck in original paper
@@ -109,7 +109,7 @@ dataset37 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
 # Dataset 38 (Whitehead et al., 2020; SimonExp 3)
 dataset38 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/SimonExp3.csv") %>%
   mutate(cond = as.factor(Congruency),
-         datasetid = 37,
+         datasetid = 38,
          subject = as.factor(Subject - 100),
          agegroup = 1, # Note: check in original paper
          block = 1, # Note: check in original paper whether just 1 block
@@ -147,7 +147,7 @@ dataset39 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/
 # Dataset 40 (Whitehead et al., 2020; StroopExp 3)
 dataset40 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/StroopExp3.csv") %>% 
   mutate(cond = as.factor(Congruency),
-         datasetid = 39, 
+         datasetid = 40, 
          subject = as.factor(Subject - 100),
          agegroup = 1, 
          block = 1, 
