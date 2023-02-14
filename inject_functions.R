@@ -54,20 +54,22 @@ confirm_columns_not_specified <- function(colnames, object){
     "\ndo you want to continue adding the data anyway? \nNULL will be entered into the database in columns not specified"
   )
   continue_after_warning(message)
-  } else 
+  } 
+  else 
   {
     return(TRUE)
   }
 }
 
-# Object entries - this is for checking the list name, if they contain proper structure
-check_object_elements <- function(object){
+which_element_wrong_study <- function(object){
   names = names(object)
+  length = length(object)
   no_study = names[which(names != "study")]
   if (!"study" %in% names)
   {
     stop("Object needs to have a 'study' element")
-  } else if (!all(stringr::str_detect(names, "^data_[0-9]+$|study")))
+  } 
+  else if (!all(stringr::str_detect(names, "^data_[0-9]+$|study")))
   { # TODO: Maybe doesnt matter, but should give warning nonetheless
     error_name = names[which(stringr::str_detect(names, "^data_[0-9]+$|study", negate = TRUE))]
     error_message = paste(
@@ -77,7 +79,8 @@ check_object_elements <- function(object){
       "Elements can only be named 'study' or 'data_[NUMBER]"
     )
     stop(error_message)
-  } else if (!any(stringr::str_detect(no_study, "^data_[0-9]+$")))
+  } 
+  else if (!any(stringr::str_detect(no_study, "^data_[0-9]+$")))
   { 
     error_name = names
     error_message = paste(
@@ -86,7 +89,8 @@ check_object_elements <- function(object){
       error_name
     )
     stop(error_message) 
-  } else if (any(duplicated(names)))
+  } 
+  else if (any(duplicated(names)))
   {
     error_name = names[which(duplicated(names))]
     error_message = paste(
@@ -96,7 +100,18 @@ check_object_elements <- function(object){
       "Elements in object must be uniquely named."
     )
     stop(error_message)
-  }# TODO: Hard check names 'study', 'data_1', 'data_2' depending on length of list
+  } 
+}
+# Object entries - this is for checking the list name, if they contain proper structure
+check_object_elements <- function(object){
+  names = names(object)
+  length = length(object)
+  no_study = names[which(names != "study")]
+  if(!all(names == c("study", paste0("data_", 1:(length-1)))))
+  {
+    which_element_wrong_study(object)
+  }
+  else
   {
     return(TRUE)
   }
@@ -114,7 +129,7 @@ check_study_info_structure <- function(object){
   else if (do_elements_exist(c("study_code", "authors"), object$study) == FALSE){
     stop("Need to have variables: study_code, authors present")
   }
-  else if (confirm_columns_not_specified(c("added", "conducted", "country", "contact")) == FALSE)
+  else if (confirm_columns_not_specified(c("added", "conducted", "country", "contact"), object$study) == FALSE)
   {
     stop("Process cancelled")
   }
@@ -143,13 +158,13 @@ check_data_structure <- function(object){
     } else if(length(object[[i]]) != 2)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Data entry in object must be a list of two elements (data, overview)"))
-    } else if (!do_elements_exist(c("data", "overview"), object[[i]]))
+    } else if (do_elements_exist(c("data", "overview"), object[[i]]) == FALSE)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Data entry in object must be a list of two elements (data, overview)"))
-    } else if(!is.data.frame(object[[i]]$data))
+    } else if(is.data.frame(object[[i]]$data) == FALSE)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Raw data must be a data frame"))
-    } else if(!is.data.frame(object[[i]]$overview))
+    } else if(is.data.frame(object[[i]]$overview) == FALSE)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Overview must be a data frame"))
     } else if (do_elements_exist(c("subject", "trial", "accuracy", "rt", "block", "congruency", "age_group"), object[[i]]$data) == FALSE)
@@ -159,7 +174,7 @@ check_data_structure <- function(object){
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Overview must have correct columns specified"))
     } 
-    else if (confirm_columns_not_specified(c("mean_age", "percentage_male", "country", "contact")) == FALSE)
+    else if (confirm_columns_not_specified(c("mean_age", "percentage_male", "country", "contact"), object[[i]]$overview) == FALSE)
     {# TODO: Finish this, clean else conditions
       stop("Process cancelled")
     }  
@@ -181,14 +196,6 @@ check_object_structure <- function(object){
   check_data_structure(object)
 }
 
-# Returns vector of task names found in inject object
-get_task_names <- function(object){
-  task_names = c()
-  for (i in 2:length(object)){
-    task_names[i] = object[[i]]$overview$task_name
-  }
-  return(task_names)
-}
 
 # Returns vector of study code specified in object
 get_study_code <- function(object){
@@ -214,17 +221,42 @@ does_study_id_exist <- function(conn, object){
   }
 }
 
+# Helper function, which columns exist?
+# Returns elements of colnames that exist in specified object
+which_elements_exist <- function(colnames, object){
+  vec = c()
+  for (i in seq_along(colnames))
+  {
+    vec[i] = exists(colnames[i], object)
+  }
+  return(colnames[which(vec == TRUE)])
+}
+
+# Create SQL insertion query
+write_sql_insert <- function(table, columns){
+  n_cols = length(columns)
+  insert = paste0(
+    "INSERT INTO ",
+    table,
+    " (",
+    paste(columns, collapse = ", "),
+    ") ",
+    "VALUES (",
+    paste(rep("?", n_cols), collapse = ", "),
+    ");"
+  )
+  return(insert)
+}
 # Add a study variable to database
 add_study_info <- function(conn, object){ # add more study variables here
-  insert_study_info = list(
-    object$study$study_code, 
-    object$study$study_info
-  )
+  study_columns = c("study_code", "authors", "conducted", "added", "country", "contact")
+  insert_study_info = object$study[which_elements_exist(study_columns, object$study)]
   return(
-    dbSendQuery(
-      conn,
-      'INSERT INTO study (study_code, study_info) VALUES (?, ?);',
-      insert_study_info
+    dbWriteTable(
+      conn = conn,
+      name = "study",
+      value = insert_study_info,
+      append = TRUE
     )
   )
 }
@@ -243,7 +275,7 @@ find_study_id <- function(conn, object){
 return_study_id <- function(conn, object){
   if (does_study_id_exist(conn, object) == FALSE) 
   {
-    warning("This study information does not currently exist, adding it to the study-table")
+    continue_after_warning("This study code does not currently exist. Want to add it to the study-table?")
     # TODO: Make person confirm this? Show them the info that's added
     # do this via utils::menu
     # choices are Yes/No
@@ -257,7 +289,18 @@ return_study_id <- function(conn, object){
   }
 }
 
-
+# Returns vector of task names found in inject object
+get_task_names <- function(object){
+  if (do_elements_exist(c("data", "overview"), object) == FALSE)
+  {
+    stop("This function takes the sub-lists: data_NUMBER as input.")
+  }
+  task_names = c()
+  for (i in 2:length(object)){
+    task_names[i - 1] = object$overview$task_name
+  }
+  return(task_names)
+}
 # Checks to see if a given task_name exists in task-lookup table
 does_task_id_exist <- function(conn, object){
   names = get_task_names(object)
@@ -284,7 +327,7 @@ does_task_id_exist <- function(conn, object){
 
 # Option to add new task?
 
-# Find study id of table for a given code, returns data_frame of 
+# Find task id of table for a given code, returns data_frame of 
 find_task_id <- function(conn, object){
   names = get_task_names(object)
   task_table = tbl(conn, "task")
@@ -306,5 +349,6 @@ return_task_id <- function(conn, object){
   does_task_id_exist(conn, object)
   find_task_id(conn, object)
 }
+
 
 # TODO: Add 'overwrite' option to enable overwriting existing data easily
