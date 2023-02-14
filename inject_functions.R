@@ -5,6 +5,10 @@
 # Regex patterns
 regex_matches_study_code <- "^[a-zA-Z]+_[12][0-9][0-9][0-9]_[a-zA-Z]+$"
 
+# Returns the name of a given object, do this better
+get_name_quotes <- function(x){
+  paste(rlang::get_expr(rlang::enquo(x)))
+} # enquote the name of object (for use in paste)
 
 # Require user input to confirm something
 require_warning_input <- function(message){
@@ -69,7 +73,7 @@ which_element_wrong_study <- function(object){
   {
     stop("Object needs to have a 'study' element")
   } 
-  else if (!all(stringr::str_detect(names, "^data_[0-9]+$|study")))
+  if (!all(stringr::str_detect(names, "^data_[0-9]+$|study")))
   { # TODO: Maybe doesnt matter, but should give warning nonetheless
     error_name = names[which(stringr::str_detect(names, "^data_[0-9]+$|study", negate = TRUE))]
     error_message = paste(
@@ -80,7 +84,7 @@ which_element_wrong_study <- function(object){
     )
     stop(error_message)
   } 
-  else if (!any(stringr::str_detect(no_study, "^data_[0-9]+$")))
+  if (!any(stringr::str_detect(no_study, "^data_[0-9]+$")))
   { 
     error_name = names
     error_message = paste(
@@ -90,7 +94,7 @@ which_element_wrong_study <- function(object){
     )
     stop(error_message) 
   } 
-  else if (any(duplicated(names)))
+  if (any(duplicated(names)))
   {
     error_name = names[which(duplicated(names))]
     error_message = paste(
@@ -123,17 +127,14 @@ check_study_info_structure <- function(object){
   {# check study info is data frame
     stop("Study-Info is not a dataframe")
   } 
-  else if (nrow(object$study) != 1){# check the number of rows in that dataframe, should be 1
+  if (nrow(object$study) != 1){# check the number of rows in that dataframe, should be 1
     stop("Study-Info contains more than one row")
   } 
-  else if (do_elements_exist(c("study_code", "authors"), object$study) == FALSE){
+  if (do_elements_exist(c("study_code", "authors"), object$study) == FALSE){
     stop("Need to have variables: study_code, authors present")
   }
-  else if (confirm_columns_not_specified(c("added", "conducted", "country", "contact"), object$study) == FALSE)
-  {
-    stop("Process cancelled")
-  }
-  else if (stringr::str_detect(get_study_code(object),
+  confirm_columns_not_specified(c("added", "conducted", "country", "contact"), object$study)
+  if (stringr::str_detect(get_study_code(object),
                                regex_matches_study_code,
                                negate = TRUE))
   {#does study code match regex pattern
@@ -151,37 +152,43 @@ check_study_info_structure <- function(object){
 # Check data list structure
 check_data_structure <- function(object){
   # Check if all other (not study) objects are lists containing two 1 items
+  overview_names = c("task_name", "keywords", "data_exclusions", "codebook", 
+                     "n_participants", "n_blocks", "n_trials", 
+                     "mean_effect", "sd_effect", "neutral_trials",
+                     "percentage_incongruent", "feedback",
+                     "fixation_cross", "time_limit",
+                     "mean_age", "percentage_female", "percentage_male"
+                     )
   for (i in 2:length(object)){
     if(inherits(object[[i]], "list") == FALSE)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Data entry in object must be a list of two elements (data, overview)"))
-    } else if(length(object[[i]]) != 2)
+    }
+    if(length(object[[i]]) != 2)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Data entry in object must be a list of two elements (data, overview)"))
-    } else if (do_elements_exist(c("data", "overview"), object[[i]]) == FALSE)
+    }
+    if (do_elements_exist(c("data", "overview"), object[[i]]) == FALSE)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Data entry in object must be a list of two elements (data, overview)"))
-    } else if(is.data.frame(object[[i]]$data) == FALSE)
+    } 
+    if(is.data.frame(object[[i]]$data) == FALSE)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Raw data must be a data frame"))
-    } else if(is.data.frame(object[[i]]$overview) == FALSE)
+    } 
+    if(is.data.frame(object[[i]]$overview) == FALSE)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Overview must be a data frame"))
-    } else if (do_elements_exist(c("subject", "trial", "accuracy", "rt", "block", "congruency", "age_group"), object[[i]]$data) == FALSE)
+    } 
+    if (do_elements_exist(c("subject", "trial", "accuracy", "rt", "block", "congruency", "age_group"), object[[i]]$data) == FALSE)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Raw data must have correct columns specified"))
-    } else if (do_elements_exist(c("task_name", "keywords"), object[[i]]$overview) == FALSE)
+    } 
+    if (do_elements_exist(c("task_name", "keywords"), object[[i]]$overview) == FALSE)
     {
       stop(paste0("Error in structure of data_", i - 1, ":", " Overview must have correct columns specified"))
     } 
-    else if (confirm_columns_not_specified(c("mean_age", "percentage_male", "country", "contact"), object[[i]]$overview) == FALSE)
-    {# TODO: Finish this, clean else conditions
-      stop("Process cancelled")
-    }  
-    else
-    {
-      return(TRUE)
-    }
+    confirm_columns_not_specified(overview_names, object[[i]]$overview)
   }
 }
 
@@ -247,17 +254,16 @@ write_sql_insert <- function(table, columns){
   )
   return(insert)
 }
+
 # Add a study variable to database
 add_study_info <- function(conn, object){ # add more study variables here
   study_columns = c("study_code", "authors", "conducted", "added", "country", "contact")
   insert_study_info = object$study[which_elements_exist(study_columns, object$study)]
-  return(
-    dbWriteTable(
-      conn = conn,
-      name = "study",
-      value = insert_study_info,
-      append = TRUE
-    )
+  dbWriteTable(
+    conn = conn,
+    name = "study",
+    value = insert_study_info,
+    append = TRUE
   )
 }
 
@@ -293,7 +299,7 @@ return_study_id <- function(conn, object){
 get_task_names <- function(object){
   if (do_elements_exist(c("data", "overview"), object) == FALSE)
   {
-    stop("This function takes the sub-lists: data_NUMBER as input.")
+    stop("This function takes the sub-lists: data_NUMBER as input. \nMake sure the object passed to it is on data-level and not the grand object")
   }
   task_names = c()
   for (i in 2:length(object)){
@@ -329,19 +335,19 @@ does_task_id_exist <- function(conn, object){
 
 # Find task id of table for a given code, returns data_frame of 
 find_task_id <- function(conn, object){
-  names = get_task_names(object)
-  task_table = tbl(conn, "task")
-  df = data.frame(task_id = c(), task_name = c())
-  for (i in seq_along(names))
+  name = get_task_names(object)
+  if (length(name) != 1)
   {
-    temp_task_name = names[i]
-    task_id = task_table %>% 
-      filter(task_name == temp_task_name) %>% 
-      select(task_id, task_name) %>% 
-      as_tibble()
-    df = rbind(df, task_id)
+    error_message = paste0(
+      "get_task_names returned more than 1 output, suggesting more than one entry in .$overview$task_name. Please go investigate"
+    )
+    stop(error_message)
   }
-  return(df)
+  task_table = tbl(conn, "task")
+  task_id = task_table %>% 
+    filter(task_name == name) %>% 
+    pull(task_id)
+  return(task_id)
 }
 
 # Finds the task id in table of that code
@@ -350,5 +356,130 @@ return_task_id <- function(conn, object){
   find_task_id(conn, object)
 }
 
+stop_if_not_top_level <- function(object){
+  if (do_elements_exist(c("study"), object) == FALSE)
+  {
+    stop("This function takes the overall list as input. \nMake sure the object passed to it is on highest level and not a data-sublist object")
+  }
+}
+
+stop_if_not_data_level <- function(object){
+  if (do_elements_exist(c("data", "overview"), object) == FALSE)
+  {
+    stop("This function takes the sub-lists: data_NUMBER as input. \nMake sure the object passed to it is on data-level and not the grand object")
+  }
+}
+
+# Returns the next free elements in overview table as data_ids that are assigned
+return_next_free_data_id <- function(conn){
+  overview = tbl(conn, "data_overview")
+  last_id = overview %>% 
+    summarize(max = max(data_id)) %>% 
+    pull(max)
+  if (is.na(last_id)){
+    last_id = 0
+  }
+  next_free = last_id + 1
+  return(next_free)
+}
+
+add_data_id <- function(conn, object){
+  stop_if_not_data_level(object)
+  data_id = return_next_free_data_id(conn) - 1 # because we want the id of the last added overview
+  object$data$data_id = data_id
+  return(object)
+}
+
+# add the returned task id and study id to overview column
+add_study_id_overview <- function(conn, object){
+  stop_if_not_top_level(object)
+  study_id = return_study_id(conn, object)
+  names = names(object)[which(names(object) != "study")]
+  for (i in names)
+  {
+    object[[i]]$overview$study_id = study_id
+  }
+  return(object)
+}
+
+add_task_id_overview <- function(conn, object){
+  stop_if_not_data_level(object)
+  task_id = return_task_id(conn, object)
+  object$overview$task_id = task_id
+  return(object)
+}
+
+prepare_object_ids <- function(conn, object){
+  n_data = length(object) - 1
+  names = paste0("data_", 1:n_data)
+  study_add = add_study_id_overview(conn, object)
+  for (i in names)
+  {
+    study_add[[i]] = add_task_id_overview(conn, study_add[[i]])
+  }
+  return(study_add)
+}
+
+add_overview_table <- function(conn, object){
+  stop_if_not_data_level(object)
+  if (do_elements_exist(c("study_id", "task_id"), object$overview) == FALSE)
+  {
+    stop("Variables 'study_id' and 'task_id' need to be present in overview")
+  }
+  overview_columns = c("study_id", "task_id", "keywords", "data_exclusions", "codebook", 
+                     "n_participants", "n_blocks", "n_trials", 
+                     "mean_effect", "sd_effect", "neutral_trials",
+                     "percentage_incongruent", "feedback",
+                     "fixation_cross", "time_limit",
+                     "mean_age", "percentage_female", "percentage_male"
+  )
+  overview_inject = object$overview[which_elements_exist(overview_columns, object$overview)]
+  dbWriteTable(
+    conn = conn,
+    name = "data_overview",
+    value = overview_inject,
+    append = TRUE
+  )
+}
+
+add_raw_data_table <- function(conn, object){
+  stop_if_not_data_level(object)
+  if (do_elements_exist("data_id", object$data) == FALSE)
+  {
+    stop("Variable 'data_id' needs to be present in data")
+  }
+  data_columns = c("data_id", "rt", "accuracy", "congruency",
+                   "subject", "block", "trial", "age_group")
+  data_inject = object$data[which_elements_exist(data_columns, object$data)]
+  dbWriteTable(
+    conn = conn,
+    name = "data",
+    value = data_inject,
+    append = TRUE
+  )
+}
+
+add_object_to_database <- function(conn, object){
+  n_data = length(object) - 1
+  
+  data_names = paste0("data_", 1:n_data)
+  
+  check_object_structure(object)
+  
+  prep = prepare_object_ids(conn, object)
+  
+  for (i in data_names)
+  {
+    free_data_id = return_next_free_data_id(conn)
+    add_overview_table(conn, prep[[i]])
+    
+    if (free_data_id != return_next_free_data_id(conn) - 1)
+    {
+      stop("Looks like there was no overview row added. Check the SQL Database")
+    }
+    prep[[i]] = add_data_id(conn, prep[[i]])
+    add_raw_data_table(conn, prep[[i]])
+  }
+}
 
 # TODO: Add 'overwrite' option to enable overwriting existing data easily
