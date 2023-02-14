@@ -6,7 +6,7 @@
 # ====          ================           ======================
 # 10-02-2023    Madlen Hoffstadt      Read in whitehead, 2020 (Exp 2 data) 
 # 13-02-2023    Madlen Hoffstadt      Read in Snijder et al., 2022 & Chetverikov, 2017
-
+# 14-02-2023    Sven Lesche           Read in Exp3 data of Whitehead, 2020
 
 library(dplyr)
 
@@ -57,10 +57,57 @@ dataset35 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/
 
 
 # Dataset 36 (Whitehead et al., 2020; FlankerExp3)
+dataset36 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/FlankerExp3.csv") %>% 
+  mutate(
+    datasetid = 37,
+    cond = factor(Congruency),
+    subject = factor(Subject - 100),
+    agegroup = 1, # TODO: CHeck in original paper
+    block = 1, # TODO: Check in original paper
+    rt = StimSlideFlanker.RT / 1000,
+    accuracy = StimSlideFlanker.ACC
+  ) %>% 
+  filter(!is.na(cond) & !is.na(rt)) %>% 
+  group_by(subject) %>% 
+  mutate(
+    trial = ifelse(PracExp == "Exp", row_number(), "practice")
+  ) %>% 
+  ungroup() %>% 
+  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>% 
+  mutate(incl = ifelse(
+      trial %in% 1:5 |
+      trial == "practice" |
+      accuracy == 0 |
+      rt < 0.2 |
+      rt > 2,
+    0,
+    1
+  ))
 
 
 # Dataset 37 (Whitehead et al., 2020; SimonExp2)
-dataset37 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/SimonExp3.csv") %>%
+dataset37 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/SimonExp2.csv") %>%
+  mutate(cond = as.factor(Congruency),
+         datasetid = 37,
+         subject = as.factor(Subject - 100),
+         agegroup = 1, # Note: check in original paper
+         block = BlockNum, # Note: check in original paper whether just 1 block
+         rt = StimSlideSimon.RT / 1000,
+         accuracy = StimSlideSimon.ACC) %>%
+  filter(!is.na(cond) & !is.na(rt)) %>%   # remove failed trials
+  # add trial number/ "Prac" (Note: group by blocks if there are several)
+  group_by(subject, block) %>%
+  mutate(trial = row_number()) %>%
+  ungroup() %>% 
+  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
+  # add column to indicate whether to include row in analysis
+  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | # exclude first 5 and practice trials
+                         accuracy == 0 | # inaccurate responses
+                         rt < .2 | rt > 2, 0, 1)) # outlier response times
+
+
+# Dataset 38 (Whitehead et al., 2020; SimonExp 3)
+dataset38 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/SimonExp3.csv") %>%
   mutate(cond = as.factor(Congruency),
          datasetid = 37,
          subject = as.factor(Subject - 100),
@@ -76,9 +123,6 @@ dataset37 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/
   mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | # exclude first 5 and practice trials
                          accuracy == 0 | # inaccurate responses
                          rt < .2 | rt > 2, 0, 1)) # outlier response times
-
-
-# Dataset 38 (Whitehead et al., 2020; SimonExp 3)
 
 
 
@@ -101,7 +145,23 @@ dataset39 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/
   
 
 # Dataset 40 (Whitehead et al., 2020; StroopExp 3)
-
+dataset40 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/StroopExp3.csv") %>% 
+  mutate(cond = as.factor(Congruency),
+         datasetid = 39, 
+         subject = as.factor(Subject - 100),
+         agegroup = 1, 
+         block = 1, 
+         rt = StimSlideStroop.RT / 1000,
+         accuracy = StimSlideStroop.ACC) %>%
+  filter(!is.na(cond) & !is.na(rt)) %>%   # remove failed trials
+  group_by(subject) %>% # group by block if existed
+  mutate(trial = ifelse(PracExp == "Prac", "practice", row_number())) %>% 
+  ungroup() %>% # add trial column
+  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
+  # add column to indicate whether to include row in analysis
+  mutate(incl = ifelse(trial %in% 1:5 |  # exclude first 5 trials
+                         accuracy == 0 | # exclude inaccurate responses
+                         rt < .2 | rt > 2, 0, 1))
 
 
 # Dataset 41 (Snijder et al., 2022); data online at https://osf.io/evuhg
