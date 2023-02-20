@@ -5,7 +5,7 @@
 # Date                                     Descriptions of Change
 # ====          ================           ======================
 # 10-02-2023    Madlen Hoffstadt      Read in whitehead, 2020 (Exp 2 data) 
-# 13-02-2023    Madlen Hoffstadt      Read in Snijder et al., 2022 & Chetverikov, 2017
+# 13-02-2023    Madlen Hoffstadt      Read in Snijder et al., 2022 & start Chetverikov, 2017
 # 14-02-2023    Sven Lesche           Read in Exp3 data of Whitehead, 2020
 
 library(dplyr)
@@ -197,15 +197,24 @@ dataset42 <- read.csv("flanker_data.csv") %>%
   select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt, incl)
   
 
-
 # Dataset 43: Stahl et al. (2014); Stroop task 
-dataset43 <- read.delim("stroop.dat", header = FALSE, sep = " ")
+dataset43 <- read.delim("stroop.dat", header = FALSE, sep = " ") %>%
+  select(-V14) 
+colnames(dataset43) <- c("subj", "subj_code", "date", "time", "block", "trial_no", 
+                        "trial_type", "condition", "color", "word", "exp_resp", "latency", "error", "V14")
 
-# v10 = target meaning 
-# v09 = probe meaning 
-# v08 = condition 
-#     - neutral (target is QQQQ)
-#     - congruent (target color = target meaning)
-#     - incongruent (target color != target meaning)
-# v 05 = block --> exclude uebung?
+dataset43 <- dataset43 %>%
+  mutate(datasetid = 43,
+         subject = rep(seq_along(rle(subj)$lengths), times = rle(subj)$lengths),
+         # block,
+         trial = trial_no,
+         cond = ifelse(condition == "con" | condition == "ident", 1, 
+                       ifelse(condition == "incon", 2, 3)),
+         accuracy = error,
+         # group,
+         # within,
+         rt = latency / 1000)
+
+
+
 
