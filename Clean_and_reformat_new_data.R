@@ -9,6 +9,7 @@
 # 14-02-2023    Sven Lesche           Read in Exp3 data of Whitehead, 2020
 # 20-02-2023    Madlen Hoffstadt      Implement structural changes (add group and within, remove incl)
 # 22-02-2023    Madlen Hoffstadt      Added Stahl et al. (2014)
+# 24-02-2023    Madlen Hoffstadt      Adjustments to Chetverikov et al. data
 
 library(dplyr)
 library(data.table)
@@ -166,18 +167,18 @@ dataset41 <- data.table::fread("destroop-raw.csv") %>%
 
 
 # Dataset 42 (Chetverikov et al., 2017); data online at https://osf.io/7rb48
-dataset42 <- data.table::fread("flanker_data.csv") 
-dataset42 <- dataset42 %>%
+dataset42 <- data.table::fread("flanker_data.csv") %>%
   mutate(
     datasetid = 42,
     subject = as.factor(uid),
     block = lapply(blockf, function(i) as.numeric(strsplit(i, " ")[[1]][2])),
-    trial = trialN + 1, # Note: check if trialN 0 is practice trial
-    group = ifelse(age < 35, 1, 3), # NOTE: change later; this is agegroup
+    trial = trialN + 1, 
+    group = ifelse(age < 35, 1, 3), # NOTE: change later; this is agegroup + add gender?
     within = NA, 
-    cond = ifelse(grepl("Incompatible", compf), 0, 1), # Note: check concept of compatibility
+    cond = ifelse(grepl("Incompatible", compf), 2, 1), 
     accuracy = corr) %>% 
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
+
   
 
 # Dataset 43: Stahl et al. (2014): Stroop task 
