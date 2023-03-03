@@ -10,17 +10,14 @@ dataset1 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/d
          cond = as.factor(cond),
          datasetid = 1,
          subject = as.factor(ID),
-         agegroup = 1,
+         group = NA,
+         within = NA,
          block = 1,
          rt = RT/1000) # rt data in seconds
 ntrial <- length(dataset1 [dataset1$ID == dataset1$ID[1], 1])
 nsub <- length(unique(dataset1$ID))
 dataset1$trial <- rep(1:ntrial, nsub) # add subject and trial numbers
-dataset1 <- dataset1 %>% select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+dataset1 <- dataset1 %>% select(datasetid, subject, block, trial, cond, accuracy, group, rt) 
 
 # Dataset 2 (Pratte et al.)
 dataset2 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/PratteAPP2010/allsi2.dat", sep = " ")
@@ -32,12 +29,9 @@ dataset2 <- dataset2 %>% filter(exp == 1) %>% # keep Stroop task data
          subject = as.factor(subject),
          cond = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
          cond = as.factor(cond),
-         agegroup = 1) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+         group = NA,
+         within = NA) %>%
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 # Dataset 3 (Pratte et al.)
 dataset3 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/PratteAPP2010/allsi7.dat", sep = " ")
@@ -45,52 +39,42 @@ colnames(dataset3) <- c("subject","blk","blktype","trial","word","location","con
 dataset3 <- dataset3 %>% filter(blktype == 1) %>% # keep Stroop task data
   mutate(datasetid = 3,
          block = (blk+2)/2,
-         trial = trial+1,
+         trial = trial,
          subject = as.factor(subject),
          cond = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
          cond = as.factor(cond),
-         agegroup = 1) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+         group = NA, 
+         within = NA) %>%
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 # Dataset 4 (Rey-Mermet et al.)
 dataset4 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/ReyMermetJEPLMC2018/merged/numStroop.dat", sep = " ") %>% mutate(id = row_number())
-trialnumber <- dataset4 %>% filter(block != "practice" & trialType != "warm-up") %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
+trialnumber <- dataset4 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset4 <- left_join(dataset4, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
   mutate(cond = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
          cond = as.factor(cond),
-         block = ifelse(block == "practice", 0, substring(block ,nchar(block))),
-         trial = ifelse(block == "practice", "practice", ifelse(trialType == "warm-up", "warm-up", trial)),
+         block = ifelse(block == "practice", -999, substring(block ,nchar(block))),
          datasetid = 4,
-         subject = as.factor(sub),
+         subject =  sub - 100, 
+         subject = as.factor(subject),
          accuracy = acc,
-         agegroup = ageGroup) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+         group = ageGroup,        
+         within = NA) %>%
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 # Dataset 5 (Rey-Mermet et al.)
 dataset5 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/ReyMermetJEPLMC2018/merged/colStroop.dat", sep = " ") %>% mutate(id = row_number())
-trialnumber <- dataset5 %>% filter(block != "practice" & trialType != "warm-up") %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
+trialnumber <- dataset5 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset5 <- left_join(dataset5, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
   mutate(cond = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
          cond = as.factor(cond),
-         block = ifelse(block == "practice", 0, substring(block ,nchar(block))),
-         trial = ifelse(block == "practice", "practice", ifelse(trialType == "warm-up", "warm-up", trial)),
+         block = ifelse(block == "practice", -999, substring(block ,nchar(block))),
          datasetid = 5,
-         subject = as.factor(sub),
+         subject = as.factor(sub - 100),
          accuracy = acc,
-         agegroup = ageGroup) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+         group = ageGroup,
+         within = NA) %>%
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
 
 # Dataset 6 (Hedge et al.)
 study <- 1:2
@@ -131,16 +115,13 @@ dataset7 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/d
          datasetid = 7,
          block = 1,
          subject = as.factor(ID),
-         agegroup = 1,
+         group = NA, 
+         within = NA,
          rt = RT/1000) # rt data in seconds
 ntrial <- length(dataset7[dataset7$ID == dataset7$ID[1], 1])
 nsub <- length(unique(dataset7$ID))
 dataset7$trial <- rep(1:ntrial, nsub) # add subject and trial numbers
-dataset7 <- dataset7 %>% select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+dataset7 <- dataset7 %>% select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 # Dataset 8 (Pratte et al.)
 dataset8 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/PratteAPP2010/allsi2.dat", sep = " ")
@@ -148,16 +129,13 @@ colnames(dataset8) <- c("exp", "subject", "blk", "trial", "color", "distract", "
 dataset8 <- dataset8 %>% filter(exp == 0) %>% # keep classic Simon task data
   mutate(datasetid = 8,
          block = blk+1,
-         trial = trial+1,
+         trial = trial,
          subject = as.factor(subject),
          cond = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
          cond = as.factor(cond),
-         agegroup = 1) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+         group = NA, 
+         within = NA) %>%
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 # Dataset 9 (Pratte et al.)
 dataset9 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/PratteAPP2010/allsi7.dat", sep = " ")
@@ -169,12 +147,9 @@ dataset9 <- dataset9 %>% filter(blktype == 0) %>% # keep lateral Simon task data
          subject = as.factor(subject),
          cond = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
          cond = as.factor(cond),
-         agegroup = 1) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+         group = NA, 
+         within = NA) %>%
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 # Dataset 10 (Von Bastian et al.)
 dataset10 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/vonBastianJEPG2015/LEF_flanker.csv", sep = ";") %>%
@@ -183,61 +158,48 @@ dataset10 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/
          datasetid = 10,
          block = 1,
          subject = as.factor(ID),
-         agegroup = 1,
+         group = NA,
+         within = NA,
          rt = RT/1000) # rt data in seconds
 ntrial <- length(dataset10[dataset10$ID == dataset10$ID[1], 1])
 nsub <- length(unique(dataset10$ID))
 dataset10$trial <- rep(1:ntrial, nsub) # add subject and trial numbers
-dataset10 <- dataset10 %>% select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+dataset10 <- dataset10 %>% 
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)  
 
 # Dataset 11 (Rey-Mermet et al.)
 dataset11 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/ReyMermetJEPLMC2018/merged/arrowFlanker.dat", sep = " ") %>% mutate(id = row_number())
-trialnumber <- dataset11 %>% filter(block != "practice" & trialType != "warm-up") %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
+trialnumber <- dataset11 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset11 <- left_join(dataset11, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
   mutate(cond = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
          cond = as.factor(cond),
-         block = ifelse(block == "practice", 0, substring(block ,nchar(block))),
-         trial = ifelse(block == "practice", "practice", ifelse(trialType == "warm-up", "warm-up", trial)),
+         block = ifelse(block == "practice", -999, substring(block ,nchar(block))),
          datasetid = 11,
-         subject = as.factor(sub),
+         subject = as.factor(sub - 100),
          accuracy = acc,
-         agegroup = ageGroup) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+         group = ageGroup,   
+         within = NA) %>%
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 # Dataset 12 (Rey-Mermet et al.)
 dataset12 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/ReyMermetJEPLMC2018/merged/letFlanker.dat", sep = " ") %>% mutate(id = row_number())
-trialnumber <- dataset12 %>% filter(block != "practice" & trialType != "warm-up") %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
+trialnumber <- dataset12 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset12 <- left_join(dataset12, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
   mutate(cond = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
          cond = as.factor(cond),
-         block = ifelse(block == "practice", 0, substring(block ,nchar(block))),
-         trial = ifelse(block == "practice", "practice", ifelse(trialType == "warm-up", "warm-up", trial)),
+         block = ifelse(block == "practice", -999, substring(block ,nchar(block))),
          datasetid = 12,
-         subject = as.factor(sub),
+         subject = as.factor(sub - 100),
          accuracy = acc,
-         agegroup = ageGroup) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+         group = ageGroup,   
+         within = NA) %>%
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)  
 
 # Dataset 13 (Hedge et al.)
 dataset13 <- hedge_data %>% filter(direction != 0) %>% # keep flanker task data
   mutate(datasetid = 13) %>%
   select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt)  %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+ 
 
 # Dataset 14-34 (Many Labs studies from https://osf.io/n8xa7/)
 manylabs <- read.csv("StroopCleanSet.csv")
@@ -251,17 +213,15 @@ for(i in 1:21){
                   cond = ifelse(congruent == "Congruent", 1, ifelse(congruent == "Incongruent", 2, NA)), 
                   cond = as.factor(cond),
                   accuracy = trial_error,
-                  agegroup = 1,
+                  group = NA,
+                  within = NA,
                   rt = trial_latency/1000) %>% 
-           select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt)  %>%
-           # add column that indicates if row should be included in analysis
-           mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                                  accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                                  cond == 3 | rt < .2 | rt > 2, 0, 1)) %>% # neutral trials and very slow and fast responses
+           select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) %>%
            group_by(subject) %>%
            arrange(trial, .by_group = TRUE) %>%
            ungroup())
 }
+
 
 # Add new datasets here:
 
