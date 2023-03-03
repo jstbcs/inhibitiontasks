@@ -54,7 +54,9 @@ dataset35 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
     within = NA,
     rt = StimSlideFlanker.RT / 1000,
     accuracy = StimSlideFlanker.ACC) %>%
-  group_by(subject, block) %>% mutate(trial = row_number()) %>% ungroup() %>% # code trial number
+  group_by(subject, block) %>%  # add trial number
+  mutate(trial = row_number()) %>% 
+  ungroup() %>% 
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 
@@ -67,14 +69,12 @@ dataset36 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
     subject = factor(Subject - 100),
     group = NA,
     within = NA,
-    block = 1, # Todo: Check in original paper
+    block = ifelse(PracExp == "Exp", 1, -999), # Todo: Check in original paper
     rt = StimSlideFlanker.RT / 1000,
     accuracy = StimSlideFlanker.ACC
   ) %>% 
   group_by(subject) %>% 
-  mutate(
-    trial = ifelse(PracExp == "Exp", row_number(), "practice")
-  ) %>% 
+  mutate(trial = row_number()) %>% 
   ungroup() %>% 
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
@@ -88,7 +88,7 @@ dataset37 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
     subject = as.factor(Subject - 100),
     group = NA, 
     within = NA,
-    block = BlockNum, # Note: check in original paper whether just 1 block
+    block = BlockNum, 
     rt = StimSlideSimon.RT / 1000,
     accuracy = StimSlideSimon.ACC) %>%
   # add trial number/ "Prac" (Note: group by blocks if there are several)
@@ -107,11 +107,13 @@ dataset38 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
     subject = as.factor(Subject - 100),
     group = NA, 
     within = NA,
-    block = 1, # Note: check in original paper whether just 1 block
+    block = ifelse(PracExp == "Exp", 1, -999), # Todo: Check in original paper
     rt = StimSlideSimon.RT / 1000,
     accuracy = StimSlideSimon.ACC) %>%
   # add trial number/ "Prac" (Note: group by blocks if there are several)
-  group_by(subject) %>% mutate(trial = ifelse(PracExp == "Exp", row_number(), "practice")) %>% ungroup() %>% 
+  group_by(subject) %>% 
+  mutate(trial = row_number()) %>% 
+  ungroup() %>% 
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 
@@ -127,7 +129,9 @@ dataset39 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
     block = BlockNum, 
     rt = StimSlideStroop.RT / 1000,
     accuracy = StimSlideStroop.ACC) %>%
-  group_by(subject, block) %>% mutate(trial = row_number()) %>% ungroup() %>% # add trial column
+  group_by(subject, block) %>% 
+  mutate(trial = row_number()) %>% 
+  ungroup() %>%
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
 
 
@@ -140,11 +144,11 @@ dataset40 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
     subject = as.factor(Subject - 100),
     group = NA, 
     within = NA, 
-    block = 1, 
+    block = ifelse(PracExp == "Exp", 1, -999), # Todo: Check in original paper 
     rt = StimSlideStroop.RT / 1000,
     accuracy = StimSlideStroop.ACC) %>%
-  group_by(subject) %>% # group by block if existed
-  mutate(trial = ifelse(PracExp == "Prac", "practice", row_number())) %>% 
+  group_by(subject, block) %>% # group by block if existed
+  mutate(trial = row_number()) %>% 
   ungroup() %>% # add trial column
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
@@ -187,7 +191,6 @@ dataset43 <- read.delim("stroop.dat", header = FALSE, sep = " ") %>%
 colnames(dataset43) <- c("subj", "subj_code", "date", "time", "block", "trial_no", 
                         "trial_type", "condition", "color", "word", "exp_resp", 
                         "latency", "error")
-
 dataset43 <- dataset43 %>%
   mutate(
     datasetid = 43,
@@ -195,14 +198,18 @@ dataset43 <- dataset43 %>%
     subject = as.factor(subject),
     block = ifelse(grepl("tst", block), 
                    apply(dataset43["block"], 1, function(i) as.numeric(strsplit(i, "tst")[[1]][2])),
-                   block),
-    trial = trial_no,
+                   ifelse(grepl("mix", block),
+                          -999,
+                          block)),
     cond = ifelse(condition == "con" | condition == "ident", 1, 
                        ifelse(condition == "incon", 2, 3)),
     accuracy = error,
     group = NA, 
     within = NA,
     rt = latency / 1000) %>%
+  group_by(subject, block) %>% # change trial number to include warm-ups
+  mutate(trial = row_number()) %>% 
+  ungroup() %>%
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
 
 
@@ -210,7 +217,6 @@ dataset43 <- dataset43 %>%
 dataset44 <- read.delim("simon.dat", header = FALSE, sep = " ") 
 colnames(dataset44) <- c("subj", "subjcode", "date", "time", "part", 
                          "trial_no", "trial_type", "response", "latency")
-
 dataset44 <- dataset44 %>%
   mutate(
     datasetid = 44, 
@@ -225,13 +231,13 @@ dataset44 <- dataset44 %>%
     rt = latency / 1000
   )
 
+
 # Dataset 45: Stahl et al. (2014); Flanker task
 dataset45 <- read.delim("flanker.dat", header = FALSE, sep= " ") %>%
   select(-V14)
 colnames(dataset45) <- c("subj", "subjcode", "date", "time", "block", 
                             "trial_no", "trial_type", "condition", "targ",
                             "dist", "exp_resp", "latency", "err")
-
 dataset45 <- dataset45 %>%
   mutate(
     datasetid = 45, 
@@ -239,8 +245,10 @@ dataset45 <- dataset45 %>%
     subject = as.factor(subject), 
     block = ifelse(grepl("tst", block), 
                    apply(dataset45["block"], 1, function(i) as.numeric(strsplit(i, "tst")[[1]][2])),
-                   block),
-    trial = trial_no,
+                   block),  # extract block number
+    block = ifelse(grepl("mix", block), 
+                   -999,
+                   block),   # encode practice block
     cond = ifelse(condition == "congr" | condition == "ident", 1, 
                   ifelse(condition == "incon", 2, 3)),
     accuracy = err,
@@ -248,6 +256,9 @@ dataset45 <- dataset45 %>%
     within = NA, # code match/ mismatch of target & distractor (i.e., identical)?
     rt = latency / 1000
   ) %>%
+  group_by(subject, block) %>% # change trial number to include warm-ups
+  mutate(trial = row_number()) %>% 
+  ungroup() %>%
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
 
 
