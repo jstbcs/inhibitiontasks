@@ -10,36 +10,33 @@
 # 20-02-2023    Madlen Hoffstadt      Implement structural changes (add group and within, remove incl)
 # 22-02-2023    Madlen Hoffstadt      Added Stahl et al. (2014)
 # 24-02-2023    Madlen Hoffstadt      Adjustments to Chetverikov et al. data
+# 04-03-2023    Madlen Hoffstadt      Recoded practice blocks and warm-up trials
+# 06-03-2023    Madlen Hoffstadt      Added Whitehead Experiment1 (datasets 46-48)
+
 
 library(dplyr)
 library(data.table)
 
 
-########## Overview of datasets ########## 
-# - Whitehead et al.(2020):     dataset 35 - 40
+########## Overview of datasets ####################################
+# - Whitehead et al.(2020):     dataset 35 - 40 and dataset 46 - 48
 # - Snijder et al. (2022):      dataset 41
 # - Chetverikov et al. (2017):  dataset 42
 # - Stahl et al. (2014):        dataset 43 - 45
-#########################
+#####################################
 
 
 ########## Overview over variables of each data frame  ##########
 # - datasetid (numeric): constant for all rows
 # - subject (factor)
-# - block (numeric): starting at 1
+# - block (numeric): starting at 1 (-999 for practice blocks)
 # - trial: trial number for each subject in each block
 # - cond (factor): 1 -> congruent; 2 -> incongruent; 3 -> neutral 
 # - accuracy (numeric): 0 or 1
 # - group
 # - within
 # - rt (numeric): in seconds
-# - incl (numeric): variable indicating whether to include in analysis (1) or not (0)
-#     - exclude first 5 trials; practice and warm-up trials
-#     - exclude inaccurate responses (accuracy 0)
-#     - exclude neutral condition 
-#     - exclude very fast/ slow reaction times ( < .20 or > 2)
 ##########################################
-
 
 
 # Dataset 35 (Whitehead et al., 2020; FlankerExp2)
@@ -260,6 +257,60 @@ dataset45 <- dataset45 %>%
   mutate(trial = row_number()) %>% 
   ungroup() %>%
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
+
+
+# Dataset 46: Whitehead et al. (2020): Simon task from Experiment1
+dataset46 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/Experiment1.csv") %>% 
+  filter(StimSlideSimon.RT != "NA") %>%  # choose simon task entries
+  mutate(datasetid = 46, 
+         cond = ifelse(Congruency == 0, 2, Congruency),
+         cond = as.factor(cond),
+         subject = as.factor(Subject - 505),
+         block = BlockNum, 
+         group = NA, 
+         within = NA,
+         rt = StimSlideSimon.RT / 1000,
+         accuracy = StimSlideSimon.ACC) %>%
+  group_by(subject, block) %>%  # add trial number
+  mutate(trial = row_number()) %>% 
+  ungroup() %>% 
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+
+
+# Dataset 47: Whitehead et al. (2020): Flanker task from Experiment1
+dataset47 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/Experiment1.csv") %>% 
+  filter(StimSlideFlanker.RT != "NA") %>%  # choose Flanker task entries
+  mutate(datasetid = 47, 
+         cond = ifelse(Congruency == 0, 2, Congruency),
+         cond = as.factor(cond),
+         subject = as.factor(Subject - 505),
+         block = BlockNum, 
+         group = NA, 
+         within = NA,
+         rt = StimSlideFlanker.RT / 1000,
+         accuracy = StimSlideFlanker.ACC) %>%
+  group_by(subject, block) %>%  # add trial number
+  mutate(trial = row_number()) %>% 
+  ungroup() %>% 
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+
+
+# Dataset 48: Whitehead et al. (2020): Stroop task from Experiment1
+dataset48 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/Experiment1.csv") %>% 
+  filter(StimSlideStroop.RT != "NA") %>%  # choose Stroop task entries
+  mutate(datasetid = 48, 
+         cond = ifelse(Congruency == 0, 2, Congruency),
+         cond = as.factor(cond),
+         subject = as.factor(Subject - 505),
+         block = BlockNum, 
+         group = NA, 
+         within = NA,
+         rt = StimSlideStroop.RT / 1000,
+         accuracy = StimSlideStroop.ACC) %>%
+  group_by(subject, block) %>%  # add trial number
+  mutate(trial = row_number()) %>% 
+  ungroup() %>% 
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
 
 
 
