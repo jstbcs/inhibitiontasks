@@ -76,6 +76,7 @@ dataset5 <- left_join(dataset5, trialnumber, by = c("id", "sub", "ageGroup", "bl
          within = NA) %>%
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
 
+
 # Dataset 6 (Hedge et al.)
 study <- 1:2
 idx <- list(matrix(c(rep(rep(c(1:5, 7:16, 18:36, 38:50), each = 2),2), # no data of participants 6, 17 and 37 (no second session)
@@ -86,7 +87,7 @@ urls <- list(vector(), vector())
 hedge <- list(list(), list())
 for(i in 1:length(study)){
   for(j in 1:nrow(idx[[i]])){
-    urls[[i]][j] <- paste("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/hedge/RawData/Study", paste(study[i]), "-",
+    urls[[i]][j] <- paste("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Hedge2018/RawData/Study", paste(study[i]), "-",
                           idx[[i]][j,3], "/Study", paste(study[i]), "_P", idx[[i]][j,1], idx[[i]][j,3], idx[[i]][j,2], ".csv", sep = "")
     hedge[[i]][[j]] <- read.csv(urls[[i]][j]) %>% mutate(subject = paste(idx[[i]][j,1]),
                                                          session = paste(idx[[i]][j,2]),
@@ -98,15 +99,13 @@ hedge_data <- bind_rows(hedge[[1]], hedge[[2]]) %>%
   mutate(cond = ifelse(cond == 0, 1, ifelse(cond == 2, 2, ifelse(cond == 1, 3, NA))),
          cond = as.factor(cond),
          block = ifelse(session == 1, block, block + 5),
-         agegroup = 1,
+         group = NA,
+         within = NA,
          subject = as.factor(as.numeric(study)*100 + as.numeric(participant))) # add subject numbers
 dataset6 <- hedge_data %>% filter(direction == 0) %>% # keep Stroop task data
   mutate(datasetid = 6) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt) %>%
-  # add column that indicates if row should be included in analysis
-  mutate(incl = ifelse(trial %in% 1:5 | trial == "practice" | trial == "warm-up" | # first 5 and practice trials
-                         accuracy == 0 | accuracy == 97 | accuracy == 99 | # inaccurate responses
-                         cond == 3 | rt < .2 | rt > 2, 0, 1)) # neutral trials and very slow and fast responses
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
+
 
 # Dataset 7 (Von Bastian et al.)
 dataset7 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/vonBastianJEPG2015/LEF_simon.csv", sep = ";") %>%
@@ -195,10 +194,11 @@ dataset12 <- left_join(dataset12, trialnumber, by = c("id", "sub", "ageGroup", "
          within = NA) %>%
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)  
 
+
 # Dataset 13 (Hedge et al.)
 dataset13 <- hedge_data %>% filter(direction != 0) %>% # keep flanker task data
   mutate(datasetid = 13) %>%
-  select(datasetid, subject, block, trial, cond, accuracy, agegroup, rt)  %>%
+  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
  
 
 # Dataset 14-34 (Many Labs studies from https://osf.io/n8xa7/)
