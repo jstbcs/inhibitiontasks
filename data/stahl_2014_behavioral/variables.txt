@@ -1,0 +1,12 @@
+Variable names
+
+flanker:  	subj subjcode date time part block trial_no trial_type condition targ dist exp_resp latency err
+gonogo:  	subj subjcode date time part block trial_no trial_type response latency
+gonogo_a:  	subj subjcode date time part block trial_no trial_type response latency
+prime_nl: 	subj subjcode date time part trial_no windowcenter trial_type prime target exp_resp response err errsum latency inwindow inwindowsum x y z
+prime_go: 	subj subjcode date time part trial_no windowcenter trial_type prime target exp_resp response err errsum latency inwindow inwindowsum x y z
+simon:  	subj subjcode date time part trial_no trial_type response latency
+stopsignal: subj subjcode date time part block trial_no trial_type response latency stop_soa
+stroop:		subj subjcode date time block trial_no trial_type condition color word exp_resp latency err
+switch_nl:	subj subjcode date time block_no block_type trial_no position task stim exp_resp latency err
+switch_go:	subj subjcode date time block trial_no task cat stim exp_resp latency err
