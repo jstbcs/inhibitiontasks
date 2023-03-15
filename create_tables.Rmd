@@ -22,11 +22,15 @@ conn <- dbConnect(RSQLite::SQLite(), "pilot.db")
 
 ```{r list structure}
 data_enty <- list(
+  # top level
   publication = list(
+    # publication level
     study1 = list(
+      # study level
       study_table,
       group_info,
       data1 = list(
+        # Data level
         task = task_name,
         overview = dataset_overview,
         data = data_table,
