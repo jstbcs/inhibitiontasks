@@ -166,6 +166,7 @@ dataset10$trial <- rep(1:ntrial, nsub) # add subject and trial numbers
 dataset10 <- dataset10 %>% 
   select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)  
 
+# Young: 18-24, old: 65-75
 # Dataset 11 (Rey-Mermet et al.)
 dataset11 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/ReyMermetJEPLMC2018/merged/arrowFlanker.dat", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset11 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()

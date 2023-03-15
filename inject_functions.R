@@ -1,9 +1,11 @@
 # This is a library of functions used for structure testing and injecting new data 
 # into the database
 # Depends on: stringr, dbplyr, DBI, RSQLite, utils
+library(stringr)
 
 # Regex patterns
-regex_matches_study_code <- "^[a-zA-Z]+_[12][0-9][0-9][0-9]_[a-zA-Z]+$"
+regex_matches_publication_code <- "^[a-zA-Z]+_[12][0-9][0-9][0-9]_[a-zA-Z]+$"
+regex_matches_study_names <- "^study([1-9][0-9]?)$"
 
 # Require user input to confirm something
 # Returns the pressed key
@@ -57,17 +59,25 @@ confirm_columns_not_specified <- function(colnames, object){
   }
 }
 
-# This is a loop with stop conditions based on various elements wrong in the object
+# This function checks whether element on study level contains:
+# 1. "study_info"
+# 2. "group_info"
+# 3. at least one data[NUMBER] element, e.g. data1
 which_element_wrong_study <- function(object){
   names = names(object)
   length = length(object)
   no_study = names[which(names != "study")]
-  if (!"study" %in% names)
+  if (!"study_info" %in% names)
   {
-    stop("Object needs to have a 'study' element")
+    stop("Object needs to have a 'study_info' element")
   } 
-  if (!all(stringr::str_detect(names, "^data_[0-9]+$|study")))
-  { # TODO: Maybe doesnt matter, but should give warning nonetheless
+  if (!"group_info" %in% names)
+  {
+    stop("Object needs to have a 'group_info' element")
+  }
+  
+  if (!all(stringr::str_detect(names, "^data_[0-9]+$|study_info|group_info")))
+  {
     error_name = names[which(stringr::str_detect(names, "^data_[0-9]+$|study", negate = TRUE))]
     error_message = paste(
       "Element-name:",
@@ -102,9 +112,15 @@ which_element_wrong_study <- function(object){
 
 # Helper stopping functions that make sure object is specified at the right depth
 stop_if_not_top_level <- function(object){
-  if (do_elements_exist(c("study"), object) == FALSE)
+  if (do_elements_exist(c("publication"), object) == FALSE)
   {
     stop("This function takes the overall list as input. \nMake sure the object passed to it is on highest level and not a data-sublist object")
+  }
+}
+
+stop_if_not_study_level <- function(object){
+  if (!all(str_detect(colnames(object), regex_matches_study_names))){
+    stop("This function takes the study-specific info as input. \nMake sure the object is passed to it on study-level.")
   }
 }
 
@@ -142,7 +158,7 @@ check_study_info_structure <- function(object){
   confirm_columns_not_specified(c("added", "conducted", "country", "contact"), object$study)
   
   if (stringr::str_detect(get_study_code(object),
-                               regex_matches_study_code,
+                               regex_matches_publication_code,
                                negate = TRUE))
   {#does study code match regex pattern
     stop(paste("Study code:",

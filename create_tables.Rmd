@@ -1,0 +1,174 @@
+---
+editor_options:
+  chunk_output_type: console
+---
+```{r setup}
+# Library Calls
+library(dplyr)
+library(dbplyr)
+library(DBI)
+library(RSQLite)
+library(lubridate)
+```
+
+```{r functions}
+# Custom functions
+
+```
+
+```{r connection}
+conn <- dbConnect(RSQLite::SQLite(), "pilot.db")
+```
+
+```{r list structure}
+data_enty <- list(
+  publication = list(
+    study1 = list(
+      study_table,
+      group_info,
+      data1 = list(
+        task = task_name,
+        overview = dataset_overview,
+        data = data_table,
+        within = within_description
+      ),
+      data2 = list(
+        task = task_name,
+        overview = dataset_overview,
+        data = data_table,
+        within = within_description
+      )
+    ),
+    study2 = list(
+      study_table,
+      group_info,
+      data1 = list(
+        task = task_name,
+        overview = dataset_overview,
+        data = data_table,
+        within = within_description
+      )
+    )
+  )
+)
+
+inject(data_entry)
+
+```
+
+```{r creating tables}
+# Publication table
+dbExecute(
+  conn,
+  "CREATE TABLE publication (
+  publication_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  authors VARCHAR(10000),
+  conducted DATE,
+  added DATE,
+  country VARCHAR(255),
+  contact VARCHAR(10000),
+  apa_reference VARCHAR(10000),
+  publication_code VARCHAR(255) UNIQUE
+  );"
+)
+
+dbExecute(
+  conn,
+  "CREATE TABLE study (
+  study_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  publication_id INTEGER,
+  n_groups INTEGER,
+  n_tasks INTEGER,
+  comment VARCHAR(10000),
+  FOREIGN KEY (publication_id) REFERENCES publication(publication_id)
+  );"
+)
+
+dbExecute(
+  conn,
+  "CREATE TABLE group_table (
+  group_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  study_id INTEGER,
+  mean_age FLOAT,
+  percentage_female FLOAT,
+  n_nembers INTEGER,
+  group_description VARCHAR(10000),
+  FOREIGN KEY (study_id) REFERENCES study(study_id)
+  );"
+)
+
+dbExecute(
+  conn,
+  "CREATE TABLE task (
+  task_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  task_name VARCHAR(255),
+  task_description VARCHAR(10000)
+  );"
+)
+
+dbExecute(
+  conn,
+  "CREATE TABLE dataset_overview (
+  dataset_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  study_id INTEGER,
+  task_id INTEGER,
+  data_excl VARCHAR(10000),
+  n_participants INTEGER,
+  n_blocks INTEGER,
+  n_trials INTEGER,
+  neutral_trials BOOLEAN,
+  fixation_cross VARCHAR(255),
+  time_limit INTEGER,
+  github VARCHAR(1000),
+  FOREIGN KEY (study_id) REFERENCES study(study_id),
+  FOREIGN KEY (task_id) REFERENCES task(task_id)
+  );"
+)
+
+dbExecute(
+  conn,
+  "CREATE TABLE within (
+  within_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  dataset_id INTEGER,
+  within_description VARCHAR(10000),
+  FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id)
+  );"
+)
+
+dbExecute(
+  conn,
+  "CREATE TABLE condition (
+  dataset_id INTEGER,
+  group_id INTEGER,
+  within_id INTEGER,
+  percentage_congruent FLOAT,
+  percentage_neutral FLOAT,
+  n_obs INTEGER,
+  mean_obs_per_participant INTEGER,
+  PRIMARY KEY (dataset_id, group_id, within_id),
+  FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id),
+  FOREIGN KEY (group_id) REFERENCES group_table(group_id),
+  FOREIGN KEY (within_id) REFERENCES within(within_id)
+  );"
+)
+
+dbExecute(
+  conn,
+  "CREATE TABLE data (
+  dataset_id INTEGER,
+  subject INTEGER,
+  block INTEGER,
+  trial INTEGER,
+  group_id INTEGER,
+  within_id INTEGER,
+  congruency INTEGER,
+  accuracy BOOLEAN,
+  rt FLOAT,
+  FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id),
+  FOREIGN KEY (group_id) REFERENCES group_table(group_id),
+  FOREIGN KEY (within_id) REFERENCES within(within_id),
+  PRIMARY KEY (dataset_id, subject, block, trial, group_id, within_id)
+  );"
+)
+```
+
