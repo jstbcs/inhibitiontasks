@@ -12,6 +12,7 @@
 # 24-02-2023    Madlen Hoffstadt      Adjustments to Chetverikov et al. data
 # 04-03-2023    Madlen Hoffstadt      Recoded practice blocks and warm-up trials
 # 06-03-2023    Madlen Hoffstadt      Added Whitehead Experiment1 (datasets 46-48)
+# 17-03-2023    Madlen Hoffstadt      Changed name of cond column to congr
 
 
 library(dplyr)
@@ -43,8 +44,8 @@ library(data.table)
 dataset35 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/FlankerExp2.csv") %>%
   mutate(
     datasetid = 35,
-    cond = ifelse(Congruency == 0, 2, Congruency),
-    cond = as.factor(cond),
+    congr = ifelse(Congruency == 0, 2, Congruency),
+    congr = as.factor(congr),
     subject = as.factor(Subject - 100),
     block = BlockNum,
     group = NA,
@@ -54,15 +55,15 @@ dataset35 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
   group_by(subject, block) %>%  # add trial number
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
 
 # Dataset 36 (Whitehead et al., 2020; FlankerExp3)
 dataset36 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/FlankerExp3.csv") %>% 
   mutate(
     datasetid = 36,
-    cond = ifelse(Congruency == 0, 2, Congruency),
-    cond = as.factor(cond),
+    congr = ifelse(Congruency == 0, 2, Congruency),
+    congr = as.factor(congr),
     subject = factor(Subject - 100),
     group = NA,
     within = NA,
@@ -73,15 +74,15 @@ dataset36 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
   group_by(subject) %>% 
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
 
 # Dataset 37 (Whitehead et al., 2020; SimonExp2)
 dataset37 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/SimonExp2.csv") %>%
   mutate(
     datasetid = 37,
-    cond = ifelse(Congruency == 0, 2, Congruency),
-    cond = as.factor(cond),
+    congr = ifelse(Congruency == 0, 2, Congruency),
+    congr = as.factor(congr),
     subject = as.factor(Subject - 100),
     group = NA, 
     within = NA,
@@ -92,15 +93,15 @@ dataset37 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
   group_by(subject, block) %>%
   mutate(trial = row_number()) %>%
   ungroup() %>% 
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
 
 # Dataset 38 (Whitehead et al., 2020; SimonExp 3)
 dataset38 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/SimonExp3.csv") %>%
   mutate(
     datasetid = 38,
-    cond = ifelse(Congruency == 0, 2, Congruency),
-    cond = as.factor(cond),
+    congr = ifelse(Congruency == 0, 2, Congruency),
+    congr = as.factor(congr),
     subject = as.factor(Subject - 100),
     group = NA, 
     within = NA,
@@ -111,15 +112,15 @@ dataset38 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
   group_by(subject) %>% 
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
 
 # Dataset 39 (Whitehead et al., 2020; StroopExp 2)
 dataset39 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/StroopExp2.csv") %>% 
   mutate(
     datasetid = 39, 
-    cond = ifelse(Congruency == 0, 2, Congruency),
-    cond = as.factor(cond),
+    congr = ifelse(Congruency == 0, 2, Congruency),
+    congr = as.factor(congr),
     subject = as.factor(Subject - 100),
     group = NA, 
     within = NA, 
@@ -129,15 +130,15 @@ dataset39 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
   group_by(subject, block) %>% 
   mutate(trial = row_number()) %>% 
   ungroup() %>%
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 
 # Dataset 40 (Whitehead et al., 2020; StroopExp 3)
 dataset40 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/StroopExp3.csv") %>% 
   mutate(
     datasetid = 40,
-    cond = ifelse(Congruency == 0, 2, Congruency),
-    cond = as.factor(cond),
+    congr = ifelse(Congruency == 0, 2, Congruency),
+    congr = as.factor(congr),
     subject = as.factor(Subject - 100),
     group = NA, 
     within = NA, 
@@ -147,7 +148,7 @@ dataset40 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
   group_by(subject, block) %>% # group by block if existed
   mutate(trial = row_number()) %>% 
   ungroup() %>% # add trial column
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
 
 # Dataset 41 (Snijder et al., 2022); data online at https://osf.io/evuhg
@@ -157,14 +158,14 @@ dataset41 <- data.table::fread("destroop-raw.csv") %>%
     # create subject variable starting at 1
     subject = rep(seq_along(rle(ID)$lengths), times = rle(ID)$lengths),
     subject = as.factor(subject),
-    #block = ,
+    # block = ,
     trial = trialNum,
     group = NA, 
     within = NA,   # baseline/ reactive/ proactive condition
-    cond = ifelse(grepl("incon", trialCode), 2, 1),
+    congr = ifelse(grepl("incon", trialCode), 2, 1),
     accuracy = ACC,
     rt = RT / 1000)  %>%
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 
 # Dataset 42 (Chetverikov et al., 2017); data online at https://osf.io/7rb48
@@ -177,11 +178,9 @@ dataset42 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
     group = NA, # NOTE: change later; this is agegroup + add gender?
     # max age is 31
     within = NA, 
-    cond = ifelse(grepl("Incompatible", compf), 2, 1), 
+    congr = ifelse(grepl("Incompatible", compf), 2, 1), 
     accuracy = corr) %>% 
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
-
-  
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 # Dataset 43: Stahl et al. (2014): Stroop task 
 dataset43 <- read.delim("stroop.dat", header = FALSE, sep = " ") %>%
@@ -199,8 +198,9 @@ dataset43 <- dataset43 %>%
                    ifelse(grepl("mix", block),
                           -999,
                           block)),
-    cond = ifelse(condition == "con" | condition == "ident", 1, 
+    congr = ifelse(condition == "con" | condition == "ident", 1, 
                        ifelse(condition == "incon", 2, 3)),
+    congr = as.factor(congr),
     accuracy = error,
     group = NA, 
     within = NA,
@@ -208,7 +208,7 @@ dataset43 <- dataset43 %>%
   group_by(subject, block) %>% # change trial number to include warm-ups
   mutate(trial = row_number()) %>% 
   ungroup() %>%
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 
 # Dataset 44: Stahl et al. (2014); Simon task
@@ -247,8 +247,9 @@ dataset45 <- dataset45 %>%
     block = ifelse(grepl("mix", block), 
                    -999,
                    block),   # encode practice block
-    cond = ifelse(condition == "congr" | condition == "ident", 1, 
+    congr = ifelse(condition == "congr" | condition == "ident", 1, 
                   ifelse(condition == "incon", 2, 3)),
+    congr = as.factor(congr),
     accuracy = err,
     group = NA,
     within = NA, # code match/ mismatch of target & distractor (i.e., identical)?
@@ -257,15 +258,15 @@ dataset45 <- dataset45 %>%
   group_by(subject, block) %>% # change trial number to include warm-ups
   mutate(trial = row_number()) %>% 
   ungroup() %>%
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 
 # Dataset 46: Whitehead et al. (2020): Simon task from Experiment1
 dataset46 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/Experiment1.csv") %>% 
   filter(StimSlideSimon.RT != "NA") %>%  # choose simon task entries
   mutate(datasetid = 46, 
-         cond = ifelse(Congruency == 0, 2, Congruency),
-         cond = as.factor(cond),
+         congr = ifelse(Congruency == 0, 2, Congruency),
+         congr = as.factor(congr),
          subject = as.factor(Subject - 505),
          block = BlockNum, 
          group = NA, 
@@ -275,15 +276,15 @@ dataset46 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
   group_by(subject, block) %>%  # add trial number
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
 
 # Dataset 47: Whitehead et al. (2020): Flanker task from Experiment1
 dataset47 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/Experiment1.csv") %>% 
   filter(StimSlideFlanker.RT != "NA") %>%  # choose Flanker task entries
   mutate(datasetid = 47, 
-         cond = ifelse(Congruency == 0, 2, Congruency),
-         cond = as.factor(cond),
+         congr = ifelse(Congruency == 0, 2, Congruency),
+         congr = as.factor(congr),
          subject = as.factor(Subject - 505),
          block = BlockNum, 
          group = NA, 
@@ -293,15 +294,15 @@ dataset47 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
   group_by(subject, block) %>%  # add trial number
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
 
 # Dataset 48: Whitehead et al. (2020): Stroop task from Experiment1
 dataset48 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/Experiment1.csv") %>% 
   filter(StimSlideStroop.RT != "NA") %>%  # choose Stroop task entries
   mutate(datasetid = 48, 
-         cond = ifelse(Congruency == 0, 2, Congruency),
-         cond = as.factor(cond),
+         congr = ifelse(Congruency == 0, 2, Congruency),
+         congr = as.factor(congr),
          subject = as.factor(Subject - 505),
          block = BlockNum, 
          group = NA, 
@@ -311,7 +312,7 @@ dataset48 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
   group_by(subject, block) %>%  # add trial number
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, cond, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
 
 
