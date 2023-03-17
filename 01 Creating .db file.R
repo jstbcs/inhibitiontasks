@@ -4,8 +4,8 @@ library(tidyr)
 
 ########## Read in and format the datasets ########## 
 
-# Dataset 1 (Von Bastian et al.)
-dataset1 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/vonBastianJEPG2015/LEF_stroop.csv", sep = ";") %>%
+# Dataset 1 (Von Bastian et al.) Stroop task 
+dataset1 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/vonbastian_2015_evidence/LEF_stroop.csv", sep = ";") %>%
   mutate(congr = ifelse(congruency == "congruent", 1, ifelse(congruency == "incongruent", 2, ifelse(congruency == "neutral", 3, NA))),
          congr = as.factor(congr),
          datasetid = 1,
@@ -21,7 +21,7 @@ dataset1 <- dataset1 %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)  
 
 # Dataset 2 (Pratte et al.)
-dataset2 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/PratteAPP2010/allsi2.dat", sep = " ")
+dataset2 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi2.dat.txt", sep = " ")
 colnames(dataset2) <- c("exp", "subject", "blk", "trial", "color", "distract", "cond", "resp", "accuracy", "rt", "errorTotal", "unused")
 dataset2 <- dataset2 %>% filter(exp == 1) %>% # keep Stroop task data
   mutate(datasetid = 2,
@@ -34,8 +34,8 @@ dataset2 <- dataset2 %>% filter(exp == 1) %>% # keep Stroop task data
          within = NA) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
-# Dataset 3 (Pratte et al.)
-dataset3 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/PratteAPP2010/allsi7.dat", sep = " ")
+# Dataset 3 (Pratte et al.); Stroop
+dataset3 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi7.dat.txt", sep = " ")
 colnames(dataset3) <- c("subject","blk","blktype","trial","word","location","cond","resp","accuracy","rt","errorTotal", "unused")
 dataset3 <- dataset3 %>% filter(blktype == 1) %>% # keep Stroop task data
   mutate(datasetid = 3,
@@ -48,8 +48,8 @@ dataset3 <- dataset3 %>% filter(blktype == 1) %>% # keep Stroop task data
          within = NA) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
-# Dataset 4 (Rey-Mermet et al.)
-dataset4 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/ReyMermetJEPLMC2018/merged/numStroop.dat", sep = " ") %>% mutate(id = row_number())
+# Dataset 4 (Rey-Mermet et al.); numStroop
+dataset4 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/mermet_2018_should/numStroop.dat.txt", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset4 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset4 <- left_join(dataset4, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
   mutate(congr = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
@@ -63,8 +63,8 @@ dataset4 <- left_join(dataset4, trialnumber, by = c("id", "sub", "ageGroup", "bl
          within = NA) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
-# Dataset 5 (Rey-Mermet et al.)
-dataset5 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/ReyMermetJEPLMC2018/merged/colStroop.dat", sep = " ") %>% mutate(id = row_number())
+# Dataset 5 (Rey-Mermet et al.); colStroop
+dataset5 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/mermet_2018_should/colStroop.dat.txt", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset5 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset5 <- left_join(dataset5, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
   mutate(congr = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
@@ -78,7 +78,7 @@ dataset5 <- left_join(dataset5, trialnumber, by = c("id", "sub", "ageGroup", "bl
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 
-# Dataset 6 (Hedge et al.)
+# Dataset 6 (Hedge et al.); Stroop task
 study <- 1:2
 idx <- list(matrix(c(rep(rep(c(1:5, 7:16, 18:36, 38:50), each = 2),2), # no data of participants 6, 17 and 37 (no second session)
                      rep(c(1,2), 94), rep(c("Stroop", "Flanker"), each = 94)), ncol = 3),
@@ -88,7 +88,7 @@ urls <- list(vector(), vector())
 hedge <- list(list(), list())
 for(i in 1:length(study)){
   for(j in 1:nrow(idx[[i]])){
-    urls[[i]][j] <- paste("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Hedge2018/RawData/Study", paste(study[i]), "-",
+    urls[[i]][j] <- paste("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/hedge_2018_reliability/Study", paste(study[i]), "-",
                           idx[[i]][j,3], "/Study", paste(study[i]), "_P", idx[[i]][j,1], idx[[i]][j,3], idx[[i]][j,2], ".csv", sep = "")
     hedge[[i]][[j]] <- read.csv(urls[[i]][j]) %>% mutate(subject = paste(idx[[i]][j,1]),
                                                          session = paste(idx[[i]][j,2]),
@@ -109,8 +109,8 @@ dataset6 <- hedge_data %>% filter(direction == 0) %>% # keep Stroop task data
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 
-# Dataset 7 (Von Bastian et al.)
-dataset7 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/vonBastianJEPG2015/LEF_simon.csv", sep = ";") %>%
+# Dataset 7 (Von Bastian et al.); simon task 
+dataset7 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/vonbastian_2015_evidence/LEF_simon.csv", sep = ";") %>%
   mutate(congr = ifelse(congruency == "congruent", 1, ifelse(congruency == "incongruent", 2, ifelse(congruency == "neutral", 3, NA))),
          congr = as.factor(congr),
          datasetid = 7,
@@ -124,8 +124,8 @@ nsub <- length(unique(dataset7$ID))
 dataset7$trial <- rep(1:ntrial, nsub) # add subject and trial numbers
 dataset7 <- dataset7 %>% select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
-# Dataset 8 (Pratte et al.)
-dataset8 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/PratteAPP2010/allsi2.dat", sep = " ")
+# Dataset 8 (Pratte et al.); classic simon task
+dataset8 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi2.dat.txt", sep = " ")
 colnames(dataset8) <- c("exp", "subject", "blk", "trial", "color", "distract", "cond", "resp", "accuracy", "rt", "errorTotal", "unused")
 dataset8 <- dataset8 %>% filter(exp == 0) %>% # keep classic Simon task data
   mutate(datasetid = 8,
@@ -138,8 +138,8 @@ dataset8 <- dataset8 %>% filter(exp == 0) %>% # keep classic Simon task data
          within = NA) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
-# Dataset 9 (Pratte et al.)
-dataset9 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/PratteAPP2010/allsi7.dat", sep = " ")
+# Dataset 9 (Pratte et al.); lateral simon task
+dataset9 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi7.dat.txt", sep = " ")
 colnames(dataset9) <- c("subject","blk","blktype","trial","word","location","cond","resp","accuracy","rt","errorTotal", "unused")
 dataset9 <- dataset9 %>% filter(blktype == 0) %>% # keep lateral Simon task data
   mutate(datasetid = 9,
@@ -152,8 +152,8 @@ dataset9 <- dataset9 %>% filter(blktype == 0) %>% # keep lateral Simon task data
          within = NA) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
-# Dataset 10 (Von Bastian et al.)
-dataset10 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/vonBastianJEPG2015/LEF_flanker.csv", sep = ";") %>%
+# Dataset 10 (Von Bastian et al.); flanker task
+dataset10 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/vonbastian_2015_evidence/LEF_flanker.csv", sep = ";") %>%
   mutate(congr = ifelse(congruency == "congruent", 1, ifelse(congruency == "incongruent", 2, ifelse(congruency == "neutral", 3, NA))),
          congr = as.factor(congr),
          datasetid = 10,
@@ -169,8 +169,8 @@ dataset10 <- dataset10 %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)  
 
 # Young: 18-24, old: 65-75
-# Dataset 11 (Rey-Mermet et al.)
-dataset11 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/ReyMermetJEPLMC2018/merged/arrowFlanker.dat", sep = " ") %>% mutate(id = row_number())
+# Dataset 11 (Rey-Mermet et al.); arrow flanker task
+dataset11 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/mermet_2018_should/arrowFlanker.dat.txt", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset11 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset11 <- left_join(dataset11, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
   mutate(congr = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
@@ -183,8 +183,8 @@ dataset11 <- left_join(dataset11, trialnumber, by = c("id", "sub", "ageGroup", "
          within = NA) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
-# Dataset 12 (Rey-Mermet et al.)
-dataset12 <- read.csv("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/ReyMermetJEPLMC2018/merged/letFlanker.dat", sep = " ") %>% mutate(id = row_number())
+# Dataset 12 (Rey-Mermet et al.); letflanker task
+dataset12 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/mermet_2018_should/letFlanker.dat.txt", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset12 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset12 <- left_join(dataset12, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
   mutate(congr = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
@@ -198,14 +198,14 @@ dataset12 <- left_join(dataset12, trialnumber, by = c("id", "sub", "ageGroup", "
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)  
 
 
-# Dataset 13 (Hedge et al.)
+# Dataset 13 (Hedge et al.); flanker
 dataset13 <- hedge_data %>% filter(direction != 0) %>% # keep flanker task data
   mutate(datasetid = 13) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
  
 
 # Dataset 14-34 (Many Labs studies from https://osf.io/n8xa7/)
-manylabs <- read.csv("StroopCleanSet.csv")
+manylabs <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/ebersole_2016_many/StroopCleanSet.csv")
 for(i in 1:21){
   assign(paste("dataset", i+13, sep = ""), 
          manylabs %>% filter(study_name == unique(manylabs$study_name)[i]) %>% 
