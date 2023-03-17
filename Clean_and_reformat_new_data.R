@@ -12,7 +12,7 @@
 # 24-02-2023    Madlen Hoffstadt      Adjustments to Chetverikov et al. data
 # 04-03-2023    Madlen Hoffstadt      Recoded practice blocks and warm-up trials
 # 06-03-2023    Madlen Hoffstadt      Added Whitehead Experiment1 (datasets 46-48)
-# 17-03-2023    Madlen Hoffstadt      Changed name of cond column to congr
+# 17-03-2023    Madlen Hoffstadt      Changed name of cond column to congr and point to files on our repo
 
 
 library(dplyr)
@@ -32,7 +32,7 @@ library(data.table)
 # - subject (factor)
 # - block (numeric): starting at 1 (-999 for practice blocks)
 # - trial: trial number for each subject in each block
-# - cond (factor): 1 -> congruent; 2 -> incongruent; 3 -> neutral 
+# - congr (factor): 1 -> congruent; 2 -> incongruent; 3 -> neutral 
 # - accuracy (numeric): 0 or 1
 # - group
 # - within
@@ -41,7 +41,7 @@ library(data.table)
 
 
 # Dataset 35 (Whitehead et al., 2020; FlankerExp2)
-dataset35 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/FlankerExp2.csv") %>%
+dataset35 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/FlankerExp2.csv") %>%
   mutate(
     datasetid = 35,
     congr = ifelse(Congruency == 0, 2, Congruency),
@@ -59,7 +59,7 @@ dataset35 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
 
 
 # Dataset 36 (Whitehead et al., 2020; FlankerExp3)
-dataset36 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/FlankerExp3.csv") %>% 
+dataset36 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/FlankerExp3.csv") %>% 
   mutate(
     datasetid = 36,
     congr = ifelse(Congruency == 0, 2, Congruency),
@@ -78,7 +78,7 @@ dataset36 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
 
 
 # Dataset 37 (Whitehead et al., 2020; SimonExp2)
-dataset37 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/SimonExp2.csv") %>%
+dataset37 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/SimonExp2.csv") %>%
   mutate(
     datasetid = 37,
     congr = ifelse(Congruency == 0, 2, Congruency),
@@ -97,7 +97,7 @@ dataset37 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
 
 
 # Dataset 38 (Whitehead et al., 2020; SimonExp 3)
-dataset38 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/SimonExp3.csv") %>%
+dataset38 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/SimonExp3.csv") %>%
   mutate(
     datasetid = 38,
     congr = ifelse(Congruency == 0, 2, Congruency),
@@ -116,7 +116,7 @@ dataset38 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
 
 
 # Dataset 39 (Whitehead et al., 2020; StroopExp 2)
-dataset39 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/StroopExp2.csv") %>% 
+dataset39 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/StroopExp2.csv") %>% 
   mutate(
     datasetid = 39, 
     congr = ifelse(Congruency == 0, 2, Congruency),
@@ -134,7 +134,7 @@ dataset39 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
 
 
 # Dataset 40 (Whitehead et al., 2020; StroopExp 3)
-dataset40 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/StroopExp3.csv") %>% 
+dataset40 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/StroopExp3.csv") %>% 
   mutate(
     datasetid = 40,
     congr = ifelse(Congruency == 0, 2, Congruency),
@@ -152,7 +152,7 @@ dataset40 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
 
 
 # Dataset 41 (Snijder et al., 2022); data online at https://osf.io/evuhg
-dataset41 <- data.table::fread("destroop-raw.csv") %>%
+dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/tang_2022_dual/destroop-raw.csv") %>%
   mutate(
     datasetid = 41,
     # create subject variable starting at 1
@@ -183,7 +183,7 @@ dataset42 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 # Dataset 43: Stahl et al. (2014): Stroop task 
-dataset43 <- read.delim("stroop.dat", header = FALSE, sep = " ") %>%
+dataset43 <- read.delim("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/stahl_2014_behavioral/stroop.dat", header = FALSE, sep = " ") %>%
   select(-V14) 
 colnames(dataset43) <- c("subj", "subj_code", "date", "time", "block", "trial_no", 
                         "trial_type", "condition", "color", "word", "exp_resp", 
@@ -212,7 +212,7 @@ dataset43 <- dataset43 %>%
 
 
 # Dataset 44: Stahl et al. (2014); Simon task
-dataset44 <- read.delim("simon.dat", header = FALSE, sep = " ") 
+dataset44 <- read.delim("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/stahl_2014_behavioral/simon.dat", header = FALSE, sep = " ") 
 colnames(dataset44) <- c("subj", "subjcode", "date", "time", "part", 
                          "trial_no", "trial_type", "response", "latency")
 dataset44 <- dataset44 %>%
@@ -231,7 +231,7 @@ dataset44 <- dataset44 %>%
 
 
 # Dataset 45: Stahl et al. (2014); Flanker task
-dataset45 <- read.delim("flanker.dat", header = FALSE, sep= " ") %>%
+dataset45 <- read.delim("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/stahl_2014_behavioral/flanker.dat", header = FALSE, sep= " ") %>%
   select(-V14)
 colnames(dataset45) <- c("subj", "subjcode", "date", "time", "block", 
                             "trial_no", "trial_type", "condition", "targ",
@@ -262,7 +262,7 @@ dataset45 <- dataset45 %>%
 
 
 # Dataset 46: Whitehead et al. (2020): Simon task from Experiment1
-dataset46 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/Experiment1.csv") %>% 
+dataset46 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/Experiment1.csv") %>% 
   filter(StimSlideSimon.RT != "NA") %>%  # choose simon task entries
   mutate(datasetid = 46, 
          congr = ifelse(Congruency == 0, 2, Congruency),
@@ -280,7 +280,7 @@ dataset46 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
 
 
 # Dataset 47: Whitehead et al. (2020): Flanker task from Experiment1
-dataset47 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/Experiment1.csv") %>% 
+dataset47 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/Experiment1.csv") %>% 
   filter(StimSlideFlanker.RT != "NA") %>%  # choose Flanker task entries
   mutate(datasetid = 47, 
          congr = ifelse(Congruency == 0, 2, Congruency),
@@ -298,7 +298,7 @@ dataset47 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCogn
 
 
 # Dataset 48: Whitehead et al. (2020): Stroop task from Experiment1
-dataset48 <- data.table::fread("https://raw.githubusercontent.com/PerceptionCognitionLab/data0/master/inhibitionTasks/Whitehead2020/Experiment1.csv") %>% 
+dataset48 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/Experiment1.csv") %>% 
   filter(StimSlideStroop.RT != "NA") %>%  # choose Stroop task entries
   mutate(datasetid = 48, 
          congr = ifelse(Congruency == 0, 2, Congruency),
