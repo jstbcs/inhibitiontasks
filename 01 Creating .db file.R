@@ -183,7 +183,7 @@ dataset11 <- left_join(dataset11, trialnumber, by = c("id", "sub", "ageGroup", "
          within = NA) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
-# Dataset 12 (Rey-Mermet et al.); letflanker task
+# Dataset 12 (Rey-Mermet et al.); letter flanker task
 dataset12 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/mermet_2018_should/letFlanker.dat.txt", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset12 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset12 <- left_join(dataset12, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
