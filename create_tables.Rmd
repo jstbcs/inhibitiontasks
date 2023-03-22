@@ -124,6 +124,7 @@ dbExecute(
   fixation_cross VARCHAR(255),
   time_limit INTEGER,
   github VARCHAR(1000),
+  comment VARCHAR(10000),
   FOREIGN KEY (study_id) REFERENCES study(study_id),
   FOREIGN KEY (task_id) REFERENCES task(task_id)
   );"
