@@ -27,7 +27,7 @@ data_enty <- list(
     # publication level
     study1 = list(
       # study level
-      study_table,
+      study_info,
       group_info,
       data1 = list(
         # Data level
@@ -44,7 +44,7 @@ data_enty <- list(
       )
     ),
     study2 = list(
-      study_table,
+      study_info,
       group_info,
       data1 = list(
         task = task_name,
