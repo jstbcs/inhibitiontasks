@@ -5,7 +5,9 @@ library(stringr)
 
 # Regex patterns
 regex_matches_publication_code <- "^[a-zA-Z]+_[12][0-9][0-9][0-9]_[a-zA-Z]+$"
+regex_matches_publication_names <- "^publication([1-9][0-9]?)$"
 regex_matches_study_names <- "^study([1-9][0-9]?)$"
+regex_matches_data_names <- "^data([1-9][0-9]?)$"
 
 # Require user input to confirm something
 # Returns the pressed key
@@ -59,44 +61,37 @@ confirm_columns_not_specified <- function(colnames, object){
   }
 }
 
-# This function checks whether element on study level contains:
-# 1. "study_info"
-# 2. "group_info"
-# 3. at least one data[NUMBER] element, e.g. data1
-which_element_wrong_study <- function(object){
-  names = names(object)
-  length = length(object)
-  no_study = names[which(names != "study")]
-  if (!"study_info" %in% names)
+
+
+# Helper stopping functions that make sure object is specified at the right depth
+stop_if_not_top_level <- function(object){
+  if (do_elements_exist(c("publication"), object) == FALSE)
   {
-    stop("Object needs to have a 'study_info' element")
-  } 
-  if (!"group_info" %in% names)
-  {
-    stop("Object needs to have a 'group_info' element")
+    stop("This function takes the overall list as input. \nMake sure the object passed to it is on highest level and not a data-sublist object")
   }
-  
-  if (!all(stringr::str_detect(names, "^data_[0-9]+$|study_info|group_info")))
+}
+
+stop_if_not_publication_level <- function(object){
+  if (!all(str_detect(colnames(object), regex_matches_study_names))){
+    stop("This function takes a publication-level object")
+  }
+}
+
+stop_if_not_study_level <- function(object){
+  if(do_elements_exist(c("study_info", "group_info", "data1"), object) == FALSE)
   {
-    error_name = names[which(stringr::str_detect(names, "^data_[0-9]+$|study", negate = TRUE))]
-    error_message = paste(
-      "Element-name:",
-      error_name,
-      "invalid.",
-      "Elements can only be named 'study' or 'data_[NUMBER]"
-    )
-    stop(error_message)
-  } 
-  if (!any(stringr::str_detect(no_study, "^data_[0-9]+$")))
-  { 
-    error_name = names
-    error_message = paste(
-      "Object must contain at least one data element named 'data_[NUMBER].",
-      "Current names:",
-      error_name
-    )
-    stop(error_message) 
-  } 
+    stop("This function takes a study-level object")
+  }
+}
+
+stop_if_not_data_level <- function(object){
+  if (do_elements_exist(c("task", "overview", "data", "within"), object) == FALSE)
+  {
+    stop("This function takes a data-level object")
+  }
+}
+
+stop_if_names_duplicated <- function(names){
   if (any(duplicated(names)))
   {
     error_name = names[which(duplicated(names))]
@@ -107,67 +102,140 @@ which_element_wrong_study <- function(object){
       "Elements in object must be uniquely named."
     )
     stop(error_message)
-  } 
+  }
 }
 
-# Helper stopping functions that make sure object is specified at the right depth
-stop_if_not_top_level <- function(object){
-  if (do_elements_exist(c("publication"), object) == FALSE)
+# This function checks elements on top level
+check_top_level_structure <- function(object){
+  stop_if_not_top_level(object)
+  stop_if_names_duplicated(object)
+  if (!all(str_detect(names, regex_matches_publication_names)))
   {
-    stop("This function takes the overall list as input. \nMake sure the object passed to it is on highest level and not a data-sublist object")
+    "Names can only be publication[number]"
   }
 }
 
-stop_if_not_study_level <- function(object){
-  if (!all(str_detect(colnames(object), regex_matches_study_names))){
-    stop("This function takes the study-specific info as input. \nMake sure the object is passed to it on study-level.")
-  }
-}
-
-stop_if_not_data_level <- function(object){
-  if (do_elements_exist(c("data", "overview"), object) == FALSE)
+# This function checks elements on publication level
+check_publication_level_structure <- function(object){
+  names = names(object)
+  stop_if_not_publication_level(object)
+  stop_if_names_duplicated(names)
+  if (!all(str_detect(names, regex_matches_study_names)))
   {
-    stop("This function takes the sub-lists: data_NUMBER as input. \nMake sure the object passed to it is on data-level and not the grand object")
+    "Names can only be study[NUMBER]"
   }
 }
 
-# Object entries - this is for checking the list name, if they contain proper structure
-check_object_elements <- function(object){
+
+# This function checks whether element on study level contains:
+# 1. "study_info"
+# 2. "group_info"
+# 3. at least one data[NUMBER] element, e.g. data1
+# 4. no duplicated names
+which_element_wrong_study <- function(object){
+  stop_if_not_study_level(object)
   names = names(object)
   length = length(object)
-  no_study = names[which(names != "study")]
-  if(!all(names == c("study", paste0("data_", 1:(length-1)))))
+  if (!"study_info" %in% names)
+  {
+    stop("Object needs to have a 'study_info' element")
+  } 
+  if (!"group_info" %in% names)
+  {
+    stop("Object needs to have a 'group_info' element")
+  }
+  # This if checks if all names are valid
+  if (!all(stringr::str_detect(names,
+                               paste(
+                                 regex_matches_data_names,
+                                 "study_info",
+                                 "group_info",
+                                 sep = "|")
+                               )
+           )
+      )
+  {
+    error_name = names[which(stringr::str_detect(names,
+                                                 paste(
+                                                   regex_matches_data_names, 
+                                                   "study_info",
+                                                   "group_info",
+                                                   sep = "|"
+                                                 ),
+                                                 negate = TRUE)
+                             )]
+    error_message = paste(
+      "Element-name:",
+      error_name,
+      "invalid.",
+      "Elements can only be named 'study_info', 'group_info' or 'data_[NUMBER]"
+    )
+    stop(error_message)
+  }
+  
+  # This if checks if there is at least one data entry
+  if (!any(stringr::str_detect(names, regex_matches_data_names)))
+  { 
+    error_name = names
+    error_message = paste(
+      "Object must contain at least one data element named 'data_[NUMBER].",
+      "Current names:",
+      error_name
+    )
+    stop(error_message) 
+  }
+  
+  stop_if_names_duplicated(names)
+}
+
+# This function checks the entries on study level to see if they have proper structure
+# Former: check_object_elements
+check_study_level_structure <- function(object){
+  stop_if_not_study_level(object)
+  names = names(object)
+  length = length(object)
+  # This speed up processing if all elements are in correct order
+  if (names != c("study_info", "group_info", paste0("data", 1:(length-2))))
   {
     which_element_wrong_study(object)
   }
+  
+  # Check the study info element
+  check_study_info_structure(object$study_info)
+  
+  # Check group
+  check_group_info_structure(object$group_info)
 }
 
 # check study info structure
-check_study_info_structure <- function(object){
-  if(is.data.frame(object$study) == FALSE)
+check_study_info_structure <- function(study_info){
+  if(is.data.frame(study_info) == FALSE)
   {# check study info is data frame
     stop("Study-Info is not a dataframe")
   } 
-  if (nrow(object$study) != 1){# check the number of rows in that dataframe, should be 1
+  if (nrow(study_info != 1)){# check the number of rows in that dataframe, should be 1
     stop("Study-Info contains more than one row")
   } 
-  if (do_elements_exist(c("study_code", "authors"), object$study) == FALSE){
-    stop("Need to have variables: study_code, authors present")
-  }
   
-  confirm_columns_not_specified(c("added", "conducted", "country", "contact"), object$study)
+  # No need for n_groups. n_tasks and comment to be specified for entry
   
-  if (stringr::str_detect(get_study_code(object),
-                               regex_matches_publication_code,
-                               negate = TRUE))
-  {#does study code match regex pattern
-    stop(paste("Study code:",
-               get_study_code(object),
-               "is not valid. Study codes should follow the principle AUTHOR_YEAR_FIRSTWORD"))
-  }
+  confirm_columns_not_specified(c("n_groups", "n_tasks", "commend"), study_info)
 }
 
-# Make two: Check raw data, check overview structure
+
+# This checks structure of study$group_info
+check_group_info_structure <- function(group_info){
+  if(is.data.frame(group_info) == FALSE)
+  {
+    stop("Group-Info is not a dataframe")
+  }
+  if(nrow(group_info != 1))
+  {
+    stop("Group-Info contains more than one row")
+  }
+  confirm_columns_not_specified(c("mean_age", "percentage_female",
+                                  "n_participants", "group_description"))
+}
 
 # Check data list structue
 check_data_structure <- function(object){
@@ -220,18 +288,22 @@ check_object_structure <- function(object){
   {
     stop("Object not a list")
   } 
-  check_object_elements(object)
-  check_study_info_structure(object)
+  check_publication_level_structure(object)
+  
+  # TODO: for loop over all studies here
+  check_study_level_structure(object)
+  
+  # For loop for all data structures in all studies here
   check_data_structure(object)
 }
 
 
 # Returns vector of study code specified in object
-get_study_code <- function(object){
-  stop_if_not_top_level(object) # defined below
-  study_code = c()
-  study_code = object$study$study_code
-  return(study_code)
+get_publication_code <- function(object){
+  stop_if_not_publication_level(object) # defined below
+  publication_code = c()
+  publication_code = object$publication_code
+  return(publication_code)
 }
 
 # Checks to see if a given study_code exists in study-lookup table

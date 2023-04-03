@@ -153,15 +153,26 @@ dataset40 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
 
 # Dataset 41 (Snijder et al., 2022); data online at https://osf.io/evuhg
 dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/tang_2022_dual/destroop-raw.csv") %>%
+test <- dataset41 %>% 
+  mutate(itemType = ifelse(
+    .$itemType == 2, 
+    "PC50",
+    ifelse(
+      .$itemType == 1 & .$session != "baseline",
+      "MI",
+      "MC"
+      )
+    )
+  ) %>% 
   mutate(
     datasetid = 41,
     # create subject variable starting at 1
     subject = rep(seq_along(rle(ID)$lengths), times = rle(ID)$lengths),
     subject = as.factor(subject),
-    # block = ,
+    block = NA,
     trial = trialNum,
     group = NA, 
-    within = NA,   # baseline/ reactive/ proactive condition
+    within = factor(interaction(phase, session, itemType)),   # baseline/ reactive/ proactive condition and test setting
     congr = ifelse(grepl("incon", trialCode), 2, 1),
     accuracy = ACC,
     rt = RT / 1000)  %>%
