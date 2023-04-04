@@ -152,8 +152,7 @@ dataset40 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
 
 
 # Dataset 41 (Snijder et al., 2022); data online at https://osf.io/evuhg
-dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/tang_2022_dual/destroop-raw.csv") %>%
-test <- dataset41 %>% 
+dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/tang_2022_dual/destroop-raw.csv")  %>% 
   mutate(itemType = ifelse(
     .$itemType == 2, 
     "PC50",
