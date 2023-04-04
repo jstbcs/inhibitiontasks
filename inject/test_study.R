@@ -1,5 +1,5 @@
 # CHECK STRUCTURE OF INSERTED ELEMENT ON STUDY LEVEL  
-
+source("./inject/helper_functions.R")
 # Overview: study element is list; has following structure: 
 #data1 = list(
 #  task_info = task_name,
@@ -8,178 +8,114 @@
 #  within_info = within_description
 #),
 
-source("helper_functions.R")
-
-
-# This function checks whether an element on the data-level consists of one task element,
-# one overview element, one data element, and one within element
-
-correct_elements_in_data_list <- function(object){
+# This function checks whether element on study level contains:
+# 1. "study_info"
+# 2. "group_info"
+# 3. at least one data[NUMBER] element, e.g. data1
+# 4. no duplicated names
+which_element_wrong_study <- function(object){
+  stop_if_not_study_level(object)
   names = names(object)
-  
-  # check if duplicates
-  stop_if_names_duplicated(names)
-  
-  # give warning if more than 4 elements in object
-  if(length(names) > 4){
-    warning("The study object contains more than 4 elements. Only the task, overview, data, and within
-            element will be extracted")
-  }
-  # error if not all required objects are present
-  names_should <- c("task_info", "overview_info", "data", "within_info")
-  for(element in names_should){
-    if(!(element %in% names)){
-      stop(c(element, " element is required but missing in data_NUMBER list"))
-    }
-  }
-}
-
-
-# This function checks whether all required columns of the task_info table are provided
-correct_cols_in_task_info <- function(task_info){
-  colnames = colnames(task_info)
-  
-  # check if object is data frame 
-  if(!is.data.frame(task_info)){
-    stop("task_info must be a dataframe")
-  }
-  # check if object contains more than 1 entry
-  if(nrow(task_info) > 1){
-    stop("The task_info data frame can only contain 1 row")
-  }
-  
-  # stop if required column names are not present
-  names_should <- c("task", "task_description" )
-  missing_cols <- c()
-  for(element in names_should){
-    if(!(element %in% colnames)){
-      missing_cols <- c(missing_cols, element)
-    }
-  } 
-  if (length(missing_cols) > 0){
-    stop(c("Columnname(s) missing from task_info data frame: ", paste(missing_cols, collapse = ", ")))
-  }
-}
-
-
-# TODO: distinguish between mandatory cols (error) and optional cols (warning)
-# This function checks whether all required columns of the overview_info table are provided 
-correct_cols_in_overview_info <- function(overview_info){
-  colnames = colnames(overview_info)
-  
-  # check if object is data frame 
-  if(!is.data.frame(overview_info)){
-    stop("overview_info must be a dataframe")
-  }
-  # check if object contains more than 1 entry
-  if(nrow(overview_info) > 1){
-    stop("The overview_info data frame can only contain 1 row")
-  }
-  
-  # stop if required column names are not present
-  names_should <- c("data_excl", "n_participants", "n_blocks", "n_trials", 
-                    "neutral_trials", "fixation_cross", "time_limit", "github")
-  missing_cols <- c()
-  for(element in names_should){
-    if(!(element %in% colnames)){
-      missing_cols <- c(missing_cols, element)
-    }
-  } 
-  if (length(missing_cols) > 0){
-    stop(c("Columnname(s) missing from overview_info data frame: ", paste(missing_cols, collapse = ", ")))
-  }
-}
-
-
-# This function checks whether all required columns of the data table are provided 
-correct_cols_in_data <- function(data_df){
-  colnames = colnames(data_df)
-  
-  # check if object is data frame 
-  if(!is.data.frame(data_df)){
-    stop("Data table must be a dataframe")
-  }
-  
-  # stop if required column names are not present
-  names_should <- c("subject", "block", "trial", "group",
-                    "within", "congr", "accuracy", "rt")
-  missing_cols <- c()
-  for(element in names_should){
-    if(!(element %in% colnames)){
-      missing_cols <- c(missing_cols, element)
-    }
-  } 
-  if (length(missing_cols) > 0){
-    stop(c("Columnname(s) missing from data table: ", paste(missing_cols, collapse = ", ")))
-  }
-}
-
-
-# This function checks whether all required columns of the within_info table are provided 
-correct_cols_in_within_info <- function(within_info){
-  colnames = colnames(within_info)
-  
-  # check if object is data frame 
-  if(!is.data.frame(within_info)){
-    stop("Within_info must be a dataframe")
-  }
-  
-  # stop if required column names are not present
-  names_should <- c("within_id", "within_description")
-  missing_cols <- c()
-  for(element in names_should){
-    if(!(element %in% colnames)){
-      missing_cols <- c(missing_cols, element)
-    }
-  } 
-  if (length(missing_cols) > 0){
-    stop(c("Columnname(s) missing from within_info data frame: ", paste(missing_cols, collapse = ", ")))
-  }
-}
-
-
-# This function checks whether the number of rows in the within_info table equals the 
-# number of within conditions coded in the data table and whether there are duplicate within_ids 
-# in within_id
-correct_n_of_withinid <- function(within_info, data_df){
-  # check if within ids are unique
-  if(length(unique(within_info$within_id)) != nrow(within_info)){
-    stop("Dublicate within_id in within_info found. Make sure within_id is unique")
-  }
-  
-  # check if number of within id matches within columns in data table
-  if(length(unique(data_df$within)) > length(unique(within_info$within_id))){
-    stop("Number of unique within conditions in data table is larger than in within_info table. 
-         \nMake sure all within conditions are included in within_info.")
-  } else if(length(unique(data_df$within)) < length(unique(within_info$within_id))){
-    stop("The within_info table contains more unique within_ids than the data table does. 
-         \nMake sure the within column in the data table is coded correctly and the 
-         within_info table contains only relevant within conditions")
-  }
-}
-
-
-# This function takes a data_[i] list element and checks its entire structure, 
-# including the column names of the sub-element data frames 
-check_data_list <- function(data_i){
-  
-  # check if input is a list
-  if (inherits(data_i, "list") == FALSE)
+  length = length(object)
+  if (!"study_info" %in% names)
   {
-    stop("data_NUMBER object must be a list")
+    stop("Object needs to have a 'study_info' element")
   } 
+  if (!"group_info" %in% names)
+  {
+    stop("Object needs to have a 'group_info' element")
+  }
+  # This if checks if all names are valid
+  if (!all(stringr::str_detect(names,
+                               paste(
+                                 regex_matches_data_names,
+                                 "study_info",
+                                 "group_info",
+                                 sep = "|")
+  )
+  )
+  )
+  {
+    error_name = names[which(stringr::str_detect(names,
+                                                 paste(
+                                                   regex_matches_data_names, 
+                                                   "study_info",
+                                                   "group_info",
+                                                   sep = "|"
+                                                 ),
+                                                 negate = TRUE)
+    )]
+    error_message = paste(
+      "Element-name:",
+      error_name,
+      "invalid.",
+      "Elements can only be named 'study_info', 'group_info' or 'data_[NUMBER]"
+    )
+    stop(error_message)
+  }
   
-  # check if list contains correct elements
-  correct_elements_in_data_list(data_i)
+  # This if checks if there is at least one data entry
+  if (!any(stringr::str_detect(names, regex_matches_data_names)))
+  { 
+    error_name = names
+    error_message = paste(
+      "Object must contain at least one data element named 'data_[NUMBER].",
+      "Current names:",
+      error_name
+    )
+    stop(error_message) 
+  }
   
-  # check if each element in data_i list is a df and contains required columns
-  correct_cols_in_task_info(data_i$task_info)
-  correct_cols_in_overview_info(data_i$overview_info)
-  correct_cols_in_within_info(data_i$within_info)
-  correct_cols_in_data(data_i$data)
+  stop_if_names_duplicated(names)
+}
+
+# check study info structure
+check_study_info_structure <- function(study_info){
+  names = names(study_info)
+  if(is.data.frame(study_info) == FALSE)
+  {# check study info is data frame
+    stop("Study-Info is not a dataframe")
+  } 
+  if (nrow(study_info != 1)){# check the number of rows in that dataframe, should be 1
+    stop("Study-Info contains more than one row")
+  } 
+
   
-  # check if number of within condition in data equals number of within_ids in within_info
-  correct_n_of_withinid(data_i$within_info, data_i$data)
+  # No need for n_groups. n_tasks and comment to be specified for entry
+  
+  confirm_columns_not_specified(c("n_groups", "n_tasks", "commend"), study_info)
 }
 
 
+# This checks structure of study$group_info
+check_group_info_structure <- function(group_info){
+  if(is.data.frame(group_info) == FALSE)
+  {
+    stop("Group-Info is not a dataframe")
+  }
+  if(nrow(group_info != 1))
+  {
+    stop("Group-Info contains more than one row")
+  }
+  confirm_columns_not_specified(c("mean_age", "percentage_female",
+                                  "n_participants", "group_description"))
+}
+
+# This function checks the entries on study level to see if they have proper structure
+# Former: check_object_elements
+check_study_level_structure <- function(object){
+  stop_if_not_study_level(object)
+  names = names(object)
+  length = length(object)
+  # This speed up processing if all elements are in correct order
+  if (names != c("study_info", "group_info", paste0("data", 1:(length-2))))
+  {
+    which_element_wrong_study(object)
+  }
+  
+  # Check the study info element
+  check_study_info_structure(object$study_info)
+  
+  # Check group
+  check_group_info_structure(object$group_info)
+}
