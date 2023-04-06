@@ -1,8 +1,20 @@
-source("helper_functions.R")
+# CHECK STRUCTURE OF INSERTED ELEMENT ON DATA LEVEL  
+# -----------------------------------------------------------------------------
 
+# Overview: study element is list; has following structure: 
+#data1 = list(
+#  task_info = task_name,
+#  overview_info = dataset_overview,
+#  data = data_table,
+#  within_info = within_description
+#)
+
+source("./inject/helper_functions.R")
+
+# ---
 
 # This function checks whether an element on the data-level consists of one task element,
-# one overview element, one data element, and one within element
+# one overview element, one data element, and one within element 
 
 correct_elements_in_data_list <- function(object){
   names = names(object)

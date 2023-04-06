@@ -1,12 +1,6 @@
 # CHECK STRUCTURE OF INSERTED ELEMENT ON STUDY LEVEL  
 source("./inject/helper_functions.R")
-# Overview: study element is list; has following structure: 
-#data1 = list(
-#  task_info = task_name,
-#  overview_info = dataset_overview,
-#  data = data_table,
-#  within_info = within_description
-#),
+
 
 # This function checks whether element on study level contains:
 # 1. "study_info"
