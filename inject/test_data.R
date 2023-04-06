@@ -64,8 +64,9 @@ correct_cols_in_task_info <- function(task_info){
 }
 
 
-# TODO: distinguish between mandatory cols (error) and optional cols (warning)
-# This function checks whether all required columns of the overview_info table are provided 
+# This function checks whether all optional columns of the overview_info table 
+# are provided; since none are mandatory, no error occurs but warning is given
+# and input from user is required
 correct_cols_in_overview_info <- function(overview_info){
   colnames = colnames(overview_info)
   
@@ -78,18 +79,10 @@ correct_cols_in_overview_info <- function(overview_info){
     stop("The overview_info data frame can only contain 1 row")
   }
   
-  # stop if required column names are not present
-  names_should <- c("data_excl", "n_participants", "n_blocks", "n_trials", 
-                    "neutral_trials", "fixation_cross", "time_limit", "github")
-  missing_cols <- c()
-  for(element in names_should){
-    if(!(element %in% colnames)){
-      missing_cols <- c(missing_cols, element)
-    }
-  } 
-  if (length(missing_cols) > 0){
-    stop(c("Columnname(s) missing from overview_info data frame: ", paste(missing_cols, collapse = ", ")))
-  }
+  # warning and user input for missing columns 
+  optional_cols <- c("data_excl", "fixation_cross", "time_limit", "github",
+                     "comment")
+  confirm_columns_not_specified(optional_cols, overview_info)
 }
 
 
