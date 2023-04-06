@@ -169,12 +169,16 @@ dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
     subject = rep(seq_along(rle(ID)$lengths), times = rle(ID)$lengths),
     subject = as.factor(subject),
     block = NA,
-    trial = trialNum,
     group = NA, 
     within = factor(interaction(phase, session, itemType)),   # baseline/ reactive/ proactive condition and test setting
     congr = ifelse(grepl("incon", trialCode), 2, 1),
     accuracy = ACC,
     rt = RT / 1000)  %>%
+  group_by(subject, within) %>%   # adding within each subject and within condition trial number
+  mutate(
+    trial = row_number()
+    ) %>%
+  ungroup() %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 
