@@ -31,16 +31,18 @@ data_enty <- list(
       group_info,
       data1 = list(
         # Data level
-        task = task_name,
-        overview = dataset_overview,
+        task = task_info,
+        overview = dataset_overview_info,
         data = data_table,
-        within = within_description
+        within = within_info,
+        condition  = condition_descr_info
       ),
       data2 = list(
         task = task_name,
         overview = dataset_overview,
         data = data_table,
-        within = within_description
+        within = within_description,
+        condition = condition_descr_info
       )
     ),
     study2 = list(
@@ -50,7 +52,8 @@ data_enty <- list(
         task = task_name,
         overview = dataset_overview,
         data = data_table,
-        within = within_description
+        within = within_description,
+        condition  = condition_descr_info
       )
     )
   )
