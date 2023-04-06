@@ -132,6 +132,29 @@ correct_cols_in_within_info <- function(within_info){
   }
 }
 
+# This function checks whether all required columns of condition_descr_info are provided 
+correct_cols_in_condition_info <- function(condition_descr_info){
+  colnames = colnames(condition_descr_info)
+  
+  # check if object is data frame
+  if(!is.data.frame(condition_descr_info)){
+    stop("condition_info must be a dataframe")
+  }
+  
+  # stop if required column names are not present
+  names_should <- c("percentage_congruent", "percentage_neutral",
+                    "n_obs", "mean_obs_per_participant")
+  missing_cols <- c()
+  for(element in names_should){
+    if(!(element %in% colnames)){
+      missing_cols <- c(missing_cols, element)
+    }
+  } 
+  if (length(missing_cols) > 0){
+    stop(c("Columnname(s) missing from condition_info data frame: ", paste(missing_cols, collapse = ", ")))
+  }
+}
+
 
 # This function checks whether the number of rows in the within_info table equals the 
 # number of within conditions coded in the data table and whether there are duplicate within_ids 
