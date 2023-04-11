@@ -7,10 +7,10 @@ add_ids <- function(conn, object){
   
   for (publication in pub_names){
     pub_code = object[[publication]]$publication_info$publication_code
-    if (does_publication_code_exist(conn, pub_code) == TRUE){
-      stop("Implement this. Cross check all other existances with the db. Or just go ahead and add nonetheless.
-         But how do you prevent duplicates in this case?")
-    }
+    # if (does_publication_code_exist(conn, pub_code) == TRUE){
+    #   stop("Implement this. Cross check all other existances with the db. Or just go ahead and add nonetheless.
+    #      But how do you prevent duplicates in this case?")
+    # }
     
     # Find and add pub id
     pub_id = find_next_free_id(conn, "publication")
@@ -36,10 +36,10 @@ add_ids <- function(conn, object){
       study_info = object[[publication]][[study]]$study_info
       add_table(conn, study_info, "study")
       
-      group_id = find_next_free_id(conn, "group")
+      group_id = find_next_free_id(conn, "group_table")
       
       # This adds the global group-id to the group_id table
-      for (row in seq_along(object[[publication]][[study]]$group_info)){
+      for (row in 1:nrow(object[[publication]][[study]]$group_info)){
         object[[publication]][[study]]$group_info$id[row] = group_id
         group_id = group_id + 1
       }
@@ -49,12 +49,15 @@ add_ids <- function(conn, object){
       # Then add the group table
       group_info = object[[publication]][[study]]$group_info
       
+      add_table(conn, group_info, "group_table")
+      
       # Now moving to dataset
       data_names = which_elements_match(names(object[[publication]][[study]]), regex_matches_data_names)
       
       for (data in data_names){
         # Add task and get the task id
         # TODO:
+        task_id = 1
         
         # Get dataset id
         dataset_id = find_next_free_id(conn, "dataset_overview")
@@ -70,7 +73,7 @@ add_ids <- function(conn, object){
 
         # Add within
         within_id = find_next_free_id(conn, "within")
-        for (row in seq_along(object[[publication]][[study]][[data]]$within)){
+        for (row in 1:nrow(object[[publication]][[study]][[data]]$within)){
           object[[publication]][[study]][[data]]$within$within_id[row] = within_id
           within_id = within_id + 1
         }
@@ -78,11 +81,12 @@ add_ids <- function(conn, object){
         # TODO: Replace within-id in dataset
         
         # Add condition
-        condition_id = find_next_free_id(conn, "condition")
-        for (row in seq_along(object[[publication]][[study]][[data]]$condition)){
-          object[[publication]][[study]][[data]]$condition$condition_id[row] = condition_id
-          condition_id = condition_id + 1
-        }
+        # TODO: We dont have a condition ID
+        # condition_id = find_next_free_id(conn, "condition")
+        # for (row in 1:nrow(object[[publication]][[study]][[data]]$condition)){
+        #   object[[publication]][[study]][[data]]$condition$condition_id[row] = condition_id
+        #   condition_id = condition_id + 1
+        # }
         
         # TODO: Do correct within and group id in condition
         
@@ -98,12 +102,9 @@ add_ids <- function(conn, object){
         condition = object[[publication]][[study]][[data]]$condition
         add_table(conn, condition, "condition")
         
-        data = object[[publication]][[study]][[data]]$data
-        add_table(conn, data, "data")
+        raw_data = object[[publication]][[study]][[data]]$data
+        add_table(conn, raw_data, "data")
       }
     }
   }
- 
-  
-  return(object_with_ids)
 }

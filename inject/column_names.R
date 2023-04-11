@@ -13,7 +13,8 @@ publication_info_columns <- c(
 study_info_columns <- c(
   "n_groups",
   "n_tasks",
-  "comment"
+  "comment",
+  "publication_id"
 )
 
 data_overview_info_columns <- c(
@@ -25,18 +26,21 @@ data_overview_info_columns <- c(
   "neutral_trials",
   "fixation_cross", 
   "time_limit",
-  "filename_github_repo"
+  "filename_github_repo",
+  "study_id"
 )
 
 within_info_columns <- c(
-  "within_description"
+  "within_description",
+  "dataset_id"
 )
 
 group_info_columns <- c(
   "mean_age",
   "percentage_female",
-  "n_participants",
-  "group_description"
+  "n_members",
+  "group_description",
+  "study_id"
 )
 
 task_info_columns <- c(
@@ -47,25 +51,33 @@ condition_descriptives_info_columns <- c(
   "percentage_congr",
   "percentage_neutral",
   "n_observations",
-  "n_trials",
-  "n_blocks"
+  # "n_trials",
+  "n_blocks",
+  "dataset_id",
+  "group_id",
+  "within_id",
+  "n_obs"
 )
 
 data_columns <- c(
   "subject",
   "block", 
   "trial",
-  "congr",
+  "congruency",
   "accruacy",
-  "rt"
+  "rt",
+  "dataset_id",
+  "group_id",
+  "within_id",
+  "condition_id"
 )
 
 column_names_db <- list(
   publication = publication_info_columns,
   study = study_info_columns,
-  dataset_overview = data_info_columns,
+  dataset_overview = data_overview_info_columns,
   within = within_info_columns,
-  group = group_info_columns,
+  group_table = group_info_columns,
   condition = condition_descriptives_info_columns,
   data = data_columns
 )

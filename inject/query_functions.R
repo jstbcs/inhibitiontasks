@@ -2,7 +2,9 @@
 return_id_name <- function(type){
   if (type == "data" | type == "dataset_overview"){
     name = "dataset_id"
-  } else {
+  } else if(type == "group_table") {
+    name = "group_id"
+  } else{
     name = paste0(type, "_id")
   }
   return(name)
@@ -37,13 +39,13 @@ find_publication_id <- function(conn, code){
 }
 
 find_next_free_id <- function(conn, type){
-  data = tbl(conn, type)
+  data = as.data.frame(tbl(conn, type))
   column = return_id_name(type)
-  max = max(data$column)
-  if (is.na(max)){
+  max = max(data[column], na.rm = TRUE)
+  if (is.na(max) | max <= 0){
     max = 0
   }
-  next_free = last_id + 1
+  next_free = max + 1
   return(next_free)
 }
 
