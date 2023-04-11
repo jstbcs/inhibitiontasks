@@ -93,7 +93,7 @@ dbExecute(
 
 dbExecute(
   conn,
-  "CREATE TABLE group_table (
+  "CREATE TABLE group (
   group_id INTEGER PRIMARY KEY AUTOINCREMENT,
   study_id INTEGER,
   mean_age FLOAT,
@@ -155,7 +155,7 @@ dbExecute(
   mean_obs_per_participant INTEGER,
   PRIMARY KEY (dataset_id, group_id, within_id),
   FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id),
-  FOREIGN KEY (group_id) REFERENCES group_table(group_id),
+  FOREIGN KEY (group_id) REFERENCES group(group_id),
   FOREIGN KEY (within_id) REFERENCES within(within_id)
   );"
 )
@@ -173,7 +173,7 @@ dbExecute(
   accuracy BOOLEAN,
   rt FLOAT,
   FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id),
-  FOREIGN KEY (group_id) REFERENCES group_table(group_id),
+  FOREIGN KEY (group_id) REFERENCES group(group_id),
   FOREIGN KEY (within_id) REFERENCES within(within_id),
   PRIMARY KEY (dataset_id, subject, block, trial, group_id, within_id)
   );"
