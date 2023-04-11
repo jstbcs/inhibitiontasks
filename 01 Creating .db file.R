@@ -78,7 +78,7 @@ dataset5 <- left_join(dataset5, trialnumber, by = c("id", "sub", "ageGroup", "bl
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
 
-# Dataset 6 (Hedge et al.); Stroop task
+# Dataset 6 (Hedge et al.); Stroop task study 1
 study <- 1:2
 idx <- list(matrix(c(rep(rep(c(1:5, 7:16, 18:36, 38:50), each = 2),2), # no data of participants 6, 17 and 37 (no second session)
                      rep(c(1,2), 94), rep(c("Stroop", "Flanker"), each = 94)), ncol = 3),
@@ -97,14 +97,15 @@ for(i in 1:length(study)){
   }
 }
 
-hedge_data <- bind_rows(hedge[[1]], hedge[[2]]) %>%
+# combine data of study 1
+hedge_data1 <- bind_rows(hedge[[1]]) %>%
   mutate(congr = ifelse(cond == 0, 1, ifelse(cond == 2, 2, ifelse(cond == 1, 3, NA))),
          congr = as.factor(congr),
          block = ifelse(session == 1, block, block + 5),
          group = NA,
          within = NA,
          subject = as.factor(as.numeric(study)*100 + as.numeric(participant))) # add subject numbers
-dataset6 <- hedge_data %>% filter(direction == 0) %>% # keep Stroop task data
+dataset6 <- hedge_data1 %>% filter(direction == 0) %>% # keep Stroop task data of study 1
   mutate(datasetid = 6) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
 
@@ -198,8 +199,8 @@ dataset12 <- left_join(dataset12, trialnumber, by = c("id", "sub", "ageGroup", "
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)  
 
 
-# Dataset 13 (Hedge et al.); flanker
-dataset13 <- hedge_data %>% filter(direction != 0) %>% # keep flanker task data
+# Dataset 13 (Hedge et al.); flanker of study 1
+dataset13 <- hedge_data1 %>% filter(direction != 0) %>% # keep flanker task data of study 1
   mutate(datasetid = 13) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
  
@@ -224,6 +225,24 @@ for(i in 1:21){
            arrange(trial, .by_group = TRUE) %>%
            ungroup())
 }
+
+# Additionally: Hedge data of study 2
+hedge_data2 <- bind_rows(hedge[[2]]) %>% # combine data of study2
+  mutate(congr = ifelse(cond == 0, 1, ifelse(cond == 2, 2, ifelse(cond == 1, 3, NA))),
+         congr = as.factor(congr),
+         block = ifelse(session == 1, block, block + 5),
+         group = NA,
+         within = NA,
+         subject = as.factor(as.numeric(study)*100 + as.numeric(participant))) # add subject numbers
+
+dataset49 <- hedge_data2 %>% filter(direction == 0) %>% # keep Stroop task data of study 2
+  mutate(datasetid = 49) %>%
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+
+dataset50 <- hedge_data2 %>% filter(direction != 0) %>% # keep flanker task data of study 2
+  mutate(datasetid = 50) %>%
+  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+
 
 
 # Add new datasets here:
