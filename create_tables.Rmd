@@ -146,6 +146,7 @@ dbExecute(
 dbExecute(
   conn,
   "CREATE TABLE condition (
+  condition_id INTEGER PRIMARY KEY AUTOINCREMENT,
   dataset_id INTEGER,
   group_id INTEGER,
   within_id INTEGER,
@@ -153,7 +154,7 @@ dbExecute(
   percentage_neutral FLOAT,
   n_obs INTEGER,
   mean_obs_per_participant INTEGER,
-  PRIMARY KEY (dataset_id, group_id, within_id),
+  UNIQUE (dataset_id, group_id, within_id),
   FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id),
   FOREIGN KEY (group_id) REFERENCES group_table(group_id),
   FOREIGN KEY (within_id) REFERENCES within(within_id)
@@ -163,19 +164,22 @@ dbExecute(
 dbExecute(
   conn,
   "CREATE TABLE data (
+  observation_id INTEGER PRIMARY KEY AUTOINCREMENT,
   dataset_id INTEGER,
   subject INTEGER,
   block INTEGER,
   trial INTEGER,
   group_id INTEGER,
   within_id INTEGER,
+  condition_id INTEGER,
   congruency INTEGER,
   accuracy BOOLEAN,
   rt FLOAT,
   FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id),
   FOREIGN KEY (group_id) REFERENCES group_table(group_id),
   FOREIGN KEY (within_id) REFERENCES within(within_id),
-  PRIMARY KEY (dataset_id, subject, block, trial, group_id, within_id)
+  FOREIGN KEY (condition_id) REFERENCES condition(condition_id),
+  UNIQUE (dataset_id, subject, block, trial, condition_id, group_id, within_id)
   );"
 )
 ```
