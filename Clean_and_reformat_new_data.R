@@ -153,11 +153,9 @@ dataset40 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
 
 # Dataset 41 (Snijder et al., 2022); data online at https://osf.io/evuhg
 dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/tang_2022_dual/destroop-raw.csv")  %>% 
-  mutate(itemType = ifelse(
-    .$itemType == 2, 
+  mutate(itemType = ifelse(.$itemType == 2, 
     "PC50",
-    ifelse(
-      .$itemType == 1 & .$session != "baseline",
+    ifelse(.$itemType == 1 & .$session != "baseline",
       "MI",
       "MC"
       )
@@ -168,13 +166,19 @@ dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
     # create subject variable starting at 1
     subject = rep(seq_along(rle(ID)$lengths), times = rle(ID)$lengths),
     subject = as.factor(subject),
-    block = NA,
+    block = case_when(
+      phase == "test" & session == "baseline"  ~ 1,
+      phase == "test" & session == "reactive"  ~ 2,
+      phase == "test" & session == "proactive" ~ 3,
+      phase == "retest" & session == "baseline"  ~ 4,
+      phase == "retest" & session == "reactive"  ~ 5,
+      phase == "retest" & session == "proactive" ~ 6),
     group = NA, 
     within = factor(interaction(phase, session, itemType)),   # baseline/ reactive/ proactive condition and test setting
     congr = ifelse(grepl("incon", trialCode), 2, 1),
     accuracy = ACC,
     rt = RT / 1000)  %>%
-  group_by(subject, within) %>%   # adding within each subject and within condition trial number
+  group_by(subject, block) %>%   # adding within each subject and within condition trial number
   mutate(
     trial = row_number()
     ) %>%
