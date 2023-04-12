@@ -74,23 +74,40 @@ check_study_info_structure <- function(study_info){
     stop("Study-Info contains more than one row")
   } 
 
+  if (!"comment" %in% names){
+    stop("Object needs to have a 'comment' element")
+  }
   
-  # No need for n_groups. n_tasks and comment to be specified for entry
-  
-  confirm_columns_not_specified(c("n_groups", "n_tasks", "comment"), study_info)
+  if (is.na(study_info$comment) | is.null(study_info$comment) | study_info$comment == ""){
+    stop("Comment can not be empty")
+  }
+
+  confirm_columns_not_specified(c("n_groups", "n_tasks"), study_info)
 }
 
 
 # This checks structure of study$group_info
 check_group_info_structure <- function(group_info){
+  names = names(group_info)
   if(is.data.frame(group_info) == FALSE)
   {
     stop("Group-Info is not a dataframe")
   }
-  if(nrow(group_info) != 1)
-  {
-    stop("Group-Info contains more than one row")
+  
+  if (nrow(group_info) > 1){
+    if (!"group_description" %in% names){
+      stop("Object needs to have a 'group_description' element")
+    }
+    
+    if (is.na(group_info$group_description) | is.null(group_info$group_description) | group_info$group_description == ""){
+      stop("group_description can not be empty")
+    }
   }
+  
+  if (!"group" %in% names){
+    stop("Object needs to have a 'group' element")
+  }
+  
   confirm_columns_not_specified(c("mean_age", "percentage_female",
                                   "n_participants", "group_description"),
                                 group_info)
