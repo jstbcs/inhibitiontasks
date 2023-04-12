@@ -20,7 +20,7 @@ dataset1$trial <- rep(1:ntrial, nsub) # add subject and trial numbers
 dataset1 <- dataset1 %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)  
 
-# Dataset 2 (Pratte et al.)
+# Dataset 2 (Pratte et al.); color stroop
 dataset2 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi2.dat.txt", sep = " ")
 colnames(dataset2) <- c("exp", "subject", "blk", "trial", "color", "distract", "cond", "resp", "accuracy", "rt", "errorTotal", "unused")
 dataset2 <- dataset2 %>% filter(exp == 1) %>% # keep Stroop task data
@@ -34,7 +34,7 @@ dataset2 <- dataset2 %>% filter(exp == 1) %>% # keep Stroop task data
          within = NA) %>%
   select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
 
-# Dataset 3 (Pratte et al.); Stroop
+# Dataset 3 (Pratte et al.); spatial Stroop
 dataset3 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi7.dat.txt", sep = " ")
 colnames(dataset3) <- c("subject","blk","blktype","trial","word","location","cond","resp","accuracy","rt","errorTotal", "unused")
 dataset3 <- dataset3 %>% filter(blktype == 1) %>% # keep Stroop task data
