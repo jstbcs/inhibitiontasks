@@ -14,6 +14,7 @@ study_info_columns <- c(
   "n_groups",
   "n_tasks",
   "comment",
+  "study_id",
   "publication_id"
 )
 
@@ -27,12 +28,14 @@ data_overview_info_columns <- c(
   "fixation_cross", 
   "time_limit",
   "filename_github_repo",
-  "study_id"
+  "study_id",
+  "dataset_id"
 )
 
 within_info_columns <- c(
   "within_description",
-  "dataset_id"
+  "dataset_id",
+  "within_id"
 )
 
 group_info_columns <- c(
@@ -40,23 +43,25 @@ group_info_columns <- c(
   "percentage_female",
   "n_members",
   "group_description",
-  "study_id"
+  "study_id",
+  "group_id"
 )
 
 task_info_columns <- c(
-  "task"
+  "task",
+  "task_id",
+  "task_description"
 )
 
 condition_descriptives_info_columns <- c(
-  "percentage_congr",
+  "percentage_congruent",
   "percentage_neutral",
-  "n_observations",
-  # "n_trials",
-  "n_blocks",
   "dataset_id",
   "group_id",
   "within_id",
-  "n_obs"
+  "condition_id",
+  "n_obs",
+  "mean_obs_per_participant"
 )
 
 data_columns <- c(
