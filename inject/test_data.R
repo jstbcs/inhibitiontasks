@@ -179,7 +179,7 @@ correct_n_of_withinid <- function(within_info, data_df){
 
 # This function takes a data_[i] list element and checks its entire structure, 
 # including the column names of the sub-element data frames 
-check_data_list <- function(data_i){
+check_data_level_structure <- function(data_i){
   
   # check if input is a list
   if (inherits(data_i, "list") == FALSE)
