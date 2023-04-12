@@ -10,6 +10,8 @@ regex_matches_publication_names <- "^publication([1-9][0-9]?)$"
 regex_matches_study_names <- "^study([1-9][0-9]?)$"
 regex_matches_data_names <- "^data([1-9][0-9]?)$"
 
+# Task names
+valid_task_names <- c("stroop", "simon", "flanker")
 # Require user input to confirm something
 # Returns the pressed key
 require_warning_input <- function(message){

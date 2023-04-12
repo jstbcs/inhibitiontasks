@@ -50,6 +50,13 @@ correct_cols_in_task_info <- function(task_info){
     stop("The task_info data frame can only contain 1 row")
   }
   
+  # Check to see if task name is valid
+  task_name = task_info$task
+  if (!task_name %in% valid_task_names){
+    msg = paste("Task name:", task_name, "is invalid. Please ensure you want to add that task name")
+    continue_after_warning(msg)
+  }
+  
   # stop if required column names are not present
   names_should <- c("task", "task_description" )
   missing_cols <- c()
