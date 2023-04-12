@@ -77,7 +77,7 @@ check_study_info_structure <- function(study_info){
   
   # No need for n_groups. n_tasks and comment to be specified for entry
   
-  confirm_columns_not_specified(c("n_groups", "n_tasks", "commend"), study_info)
+  confirm_columns_not_specified(c("n_groups", "n_tasks", "comment"), study_info)
 }
 
 
