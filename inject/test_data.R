@@ -23,12 +23,12 @@ correct_elements_in_data_list <- function(object){
   stop_if_names_duplicated(names)
   
   # give warning if more than 4 elements in object
-  if(length(names) > 4){
-    warning("The study object contains more than 4 elements. Only the task, overview, data, and within
+  if(length(names) > 5){
+    warning("The study object contains more than 4 elements. Only the task, overview, data, condition and within
             element will be extracted")
   }
   # error if not all required objects are present
-  names_should <- c("task_info", "overview_info", "data", "within_info")
+  names_should <- c("task_info", "overview_info", "data", "within_info", "condition_info")
   for(element in names_should){
     if(!(element %in% names)){
       stop(c(element, " element is required but missing in data_NUMBER list"))

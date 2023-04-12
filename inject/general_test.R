@@ -10,21 +10,40 @@ library(tidyverse)
 # this function takes nested list element 'entry_list' and checks entire structure
 
 check_overall_structure <- function(entry_list){
-  # check publication level 
-  check_publication_level_structure(entry_list$publication)
+  # Its possible that multiple publications are in one entry_list
+  pub_names = which_elements_match(names(entry_list), regex_matches_publication_names)
   
-  # loop over each study element and test structure on study level
-  for(study in publication) {
-    check_study_level_structure(entry_list$study)
+  # If length pub_names is 0, wrong object passed
+  if (length(pub_names) == 0){
+    stop("Object has no valid publication elements")
+  }
+  
+  for (publication in pub_names){
+    # check publication level 
+    check_publication_level_structure(entry_list[[publication]])
     
-    # loop over each data element within each study element
-    for(i in study) {
-      # if element is data element
-      if(str_detect(names(study$i), regex_matches_data_names)){
-        check_data_level_structure(entry_list$study$i)
+    # Now get names of all the study elements in that publication
+    study_names = which_elements_match(names(entry_list[[publication]]), regex_matches_study_names)
+    # loop over each study element and test structure on study level
+    for(study in study_names) {
+      check_study_level_structure(entry_list[[publication]][[study]])
+      
+      # now loop over data names
+      data_names = which_elements_match(
+        names(entry_list[[publication]][[study]]),
+        regex_matches_data_names
+        )
+      
+      # loop over each data element within each study element
+      for(data in data_names) {
+          check_data_level_structure(entry_list[[publication]][[study]][[data]])
       }
     }
   }
+ 
+  
+  
+ 
 }
 
 
@@ -42,7 +61,7 @@ publication$study1$group_info <- data.frame(mean_age = 1, percentage_female = 2,
                                             n_participants = 100, group_description = "bla")
 ### study 1 data 1
 publication$study1$data1$task_info <- data.frame(task = "stroop", task_description = "bla")
-publication$study1$data1$dataset_overview_info <- data.frame(data_exclusion = 1, 
+publication$study1$data1$overview_info <- data.frame(data_exclusion = 1, 
                                                        fixation_cross = 2, 
                                                        time_limit = 3, 
                                                        github = "https", 
@@ -54,7 +73,7 @@ publication$study1$data1$data <- dataset35 # from clean_and_reformat_new_data
 
 ### study 1 data 2
 publication$study1$data2$task_info <- data.frame(task = "stroop", task_description = "bla")
-publication$study1$data2$dataset_overview_info <- data.frame(data_exclusion = 1, 
+publication$study1$data2$overview_info <- data.frame(data_exclusion = 1, 
                                                              fixation_cross = 2, 
                                                              time_limit = 3, 
                                                              github = "https", 
@@ -70,7 +89,7 @@ publication$study2$group_info <- data.frame(mean_age = 1, percentage_female = 2,
                                             n_participants = 100, group_description = "bla")
 ### study 2 data 1 
 publication$study2$data1$task_info <- data.frame(task = "stroop", task_description = "bla")
-publication$study2$data1$dataset_overview_info <- data.frame(data_exclusion = 1, 
+publication$study2$data1$overview_info <- data.frame(data_exclusion = 1, 
                                                              fixation_cross = 2, 
                                                              time_limit = 3, 
                                                              github = "https", 
@@ -80,9 +99,13 @@ publication$study2$data1$condition_info <- data.frame(percentage_congruent = 0.5
                                                       n_obs = 7000, mean_obs_per_participant = 70)
 publication$study2$data1$data <- dataset43 # from clean_and_reformat_new_data
 
+# Need to have a top level element with all publications
+object <- list(
+  publication1 = publication
+)
 
 # ------------- test function
-check_overall_structure(publication)
+check_overall_structure(object)
 
 
 

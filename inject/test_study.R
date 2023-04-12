@@ -70,7 +70,7 @@ check_study_info_structure <- function(study_info){
   {# check study info is data frame
     stop("Study-Info is not a dataframe")
   } 
-  if (nrow(study_info != 1)){# check the number of rows in that dataframe, should be 1
+  if (nrow(study_info) != 1){# check the number of rows in that dataframe, should be 1
     stop("Study-Info contains more than one row")
   } 
 
@@ -87,12 +87,13 @@ check_group_info_structure <- function(group_info){
   {
     stop("Group-Info is not a dataframe")
   }
-  if(nrow(group_info != 1))
+  if(nrow(group_info) != 1)
   {
     stop("Group-Info contains more than one row")
   }
   confirm_columns_not_specified(c("mean_age", "percentage_female",
-                                  "n_participants", "group_description"))
+                                  "n_participants", "group_description"),
+                                group_info)
 }
 
 # This function checks the entries on study level to see if they have proper structure
@@ -102,7 +103,7 @@ check_study_level_structure <- function(object){
   names = names(object)
   length = length(object)
   # This speed up processing if all elements are in correct order
-  if (names != c("study_info", "group_info", paste0("data", 1:(length-2))))
+  if (!all(names == c("study_info", "group_info", paste0("data", 1:(length-2)))))
   {
     which_element_wrong_study(object)
   }
