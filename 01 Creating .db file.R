@@ -103,7 +103,7 @@ hedge_data1 <- bind_rows(hedge[[1]]) %>%
          congr = as.factor(congr),
          block = ifelse(session == 1, block, block + 5),
          group = NA,
-         within = NA,
+         within = as.numeric(session),
          subject = as.factor(as.numeric(study)*100 + as.numeric(participant))) # add subject numbers
 dataset6 <- hedge_data1 %>% filter(direction == 0) %>% # keep Stroop task data of study 1
   mutate(datasetid = 6) %>%
@@ -232,7 +232,7 @@ hedge_data2 <- bind_rows(hedge[[2]]) %>% # combine data of study2
          congr = as.factor(congr),
          block = ifelse(session == 1, block, block + 5),
          group = NA,
-         within = NA,
+         within = as.numeric(session),
          subject = as.factor(as.numeric(study)*100 + as.numeric(participant))) # add subject numbers
 
 dataset49 <- hedge_data2 %>% filter(direction == 0) %>% # keep Stroop task data of study 2
