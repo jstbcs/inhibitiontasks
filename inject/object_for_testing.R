@@ -17,12 +17,14 @@ study_info_2 = data.frame(
 )
 
 group_info_1 = data.frame(
+  group = 1:3,
   mean_age =c(20, 30, 40),
   n_participants = c(100, 100, 200),
   group_description = c("stink", "stink", "okay")
 )
 
 group_info_2 = data.frame(
+  group = 1,
   mean_age = c(45),
   n_participants = c(400),
   group_description = c("hey")
@@ -47,7 +49,7 @@ data_overview_2 = data.frame(
 )
 
 within = data.frame(
-  within_number = 1:3,
+  within = 1:3,
   within_description = c("test", "retest", "messing about")
 )
 
@@ -64,7 +66,9 @@ data = data.frame(
   acc = rep(1, 200),
   congr = rep(c(0,1), 100),
   block = rep(1:10, 20),
-  trial = 1:200
+  trial = 1:200,
+  group = 1,
+  within = 1
 )
 
 object = list(

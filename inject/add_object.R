@@ -2,7 +2,7 @@
 # Need to find the IDs to make sure that tables on different levels can get them
 
 # Publication
-add_ids <- function(conn, object){
+add_object <- function(conn, object){
   pub_names = which_elements_match(names(object), regex_matches_publication_names)
   
   for (publication in pub_names){
@@ -40,12 +40,13 @@ add_ids <- function(conn, object){
       
       # This adds the global group-id to the group_id table
       for (row in 1:nrow(object[[publication]][[study]]$group_info)){
-        object[[publication]][[study]]$group_info$id[row] = group_id
+        object[[publication]][[study]]$group_info$group_id[row] = group_id
         group_id = group_id + 1
       }
       
-      # TODO: Replace the group-ids in the dataset with the correct group-ids
-      
+      group_keys = obtain_keys(object[[publication]][[study]]$group_info,
+                               "group")
+
       # Then add the group table
       group_info = object[[publication]][[study]]$group_info
       
@@ -56,8 +57,12 @@ add_ids <- function(conn, object){
       
       for (data in data_names){
         # Add task and get the task id
-        # TODO:
-        task_id = 1
+        task_id = find_next_free_id(conn, "task")
+        object[[publication]][[study]][[data]]$task_info$task_id = task_id
+        object[[publication]][[study]][[data]]$overview$task_id = task_id
+        
+        task = object[[publication]][[study]][[data]]$task_info
+        add_table(conn, task, "task")
         
         # Get dataset id
         dataset_id = find_next_free_id(conn, "dataset_overview")
@@ -78,19 +83,25 @@ add_ids <- function(conn, object){
           within_id = within_id + 1
         }
         
-        # TODO: Replace within-id in dataset
+        within_keys = obtain_keys(object[[publication]][[study]][[data]]$within,
+                                  "within")
         
         # Add condition
-        # TODO: We dont have a condition ID
-        # condition_id = find_next_free_id(conn, "condition")
-        # for (row in 1:nrow(object[[publication]][[study]][[data]]$condition)){
-        #   object[[publication]][[study]][[data]]$condition$condition_id[row] = condition_id
-        #   condition_id = condition_id + 1
-        # }
+        condition_id = find_next_free_id(conn, "condition")
+        for (row in 1:nrow(object[[publication]][[study]][[data]]$condition)){
+          object[[publication]][[study]][[data]]$condition$condition_id[row] = condition_id
+          condition_id = condition_id + 1
+        }
         
-        # TODO: Do correct within and group id in condition
+        condition_keys = obtain_keys(object[[publication]][[study]][[data]]$condition,
+                                     "condition")
         
-        # TODO: Replace group, within, condition in data
+
+        # Replace group, within, condition in data
+        object[[publication]][[study]][[data]]$data = object[[publication]][[study]][[data]]$data %>% 
+          replace_id_keys_in_data(., group_keys, "group") %>% 
+          replace_id_keys_in_data(., within_keys, "within") %>% 
+          replace_id_keys_in_data(., condition, "condition")
         
         # Add all tables
         dataset_overview = object[[publication]][[study]][[data]]$overview
@@ -108,3 +119,9 @@ add_ids <- function(conn, object){
     }
   }
 }
+
+# Informative Error messages: check publication code
+# If publication is already present. Pull study and dataset ids
+# Then add_function with publication code
+
+# function to delete publication, study, or dataset
