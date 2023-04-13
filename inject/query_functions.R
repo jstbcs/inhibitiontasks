@@ -67,3 +67,10 @@ return_publication_id <- function(conn, code){
     find_study_id(conn, object)
   }
 }
+
+filter_db_table <- function(conn, table, filter_function){
+  data = tbl(conn, table)
+  result = data %>% filter_function
+  
+  return(result)
+}
