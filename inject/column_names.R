@@ -77,6 +77,12 @@ data_columns <- c(
   "condition_id"
 )
 
+task_columns <- c(
+  "task_id",
+  "task_name",
+  "task_description"
+)
+
 column_names_db <- list(
   publication = publication_info_columns,
   study = study_info_columns,
@@ -84,5 +90,6 @@ column_names_db <- list(
   within = within_info_columns,
   group_table = group_info_columns,
   condition = condition_descriptives_info_columns,
-  data = data_columns
+  data = data_columns,
+  task = task_columns
 )

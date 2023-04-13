@@ -1,7 +1,7 @@
 publication_info_1 = data.frame(
   authors = "One and two",
   added = "2018",
-  publication_code = "one2018test"
+  publication_code = "one2018ptest"
 )
 
 study_info_1 = data.frame(
@@ -54,8 +54,8 @@ within = data.frame(
 )
 
 condition = data.frame(
-  condition_number = 1:6,
-  n_trials = 201:206
+  condition = 1:6,
+  n_obs = 201:206
 )
 task_info = data.frame(
   task = "stroop"
@@ -68,7 +68,8 @@ data = data.frame(
   block = rep(1:10, 20),
   trial = 1:200,
   group = 1,
-  within = 1
+  within = 1,
+  condition =1 
 )
 
 object = list(
