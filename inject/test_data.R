@@ -104,7 +104,7 @@ correct_cols_in_data <- function(data_df){
   
   # stop if required column names are not present
   names_should <- c("subject", "block", "trial", "group",
-                    "within", "congr", "accuracy", "rt")
+                    "within", "condition", "congr", "accuracy", "rt")
   missing_cols <- c()
   for(element in names_should){
     if(!(element %in% colnames)){
@@ -127,7 +127,7 @@ correct_cols_in_within_info <- function(within_info){
   }
   
   # stop if required column names are not present
-  names_should <- c("within_id", "within_description")
+  names_should <- c("within", "within_description")
   missing_cols <- c()
   for(element in names_should){
     if(!(element %in% colnames)){
@@ -149,7 +149,7 @@ correct_cols_in_condition_info <- function(condition_descr_info){
   }
   
   # stop if required column names are not present
-  names_should <- c("percentage_congruent", "percentage_neutral",
+  names_should <- c("condition", "percentage_congruent", "percentage_neutral",
                     "n_obs", "mean_obs_per_participant")
   missing_cols <- c()
   for(element in names_should){
