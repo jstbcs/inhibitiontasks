@@ -150,7 +150,7 @@ correct_cols_in_condition_info <- function(condition_descr_info){
   
   # stop if required column names are not present
   names_should <- c("condition", "percentage_congruent", "percentage_neutral",
-                    "n_obs", "mean_obs_per_participant")
+                    "n_obs", "mean_obs_per_participant", "n_obs")
   missing_cols <- c()
   for(element in names_should){
     if(!(element %in% colnames)){
