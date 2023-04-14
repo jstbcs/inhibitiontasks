@@ -114,7 +114,6 @@ check_group_info_structure <- function(group_info){
 }
 
 # This function checks the entries on study level to see if they have proper structure
-# Former: check_object_elements
 check_study_level_structure <- function(object){
   stop_if_not_study_level(object)
   names = names(object)

@@ -40,10 +40,6 @@ check_overall_structure <- function(entry_list){
       }
     }
   }
- 
-  
-  
- 
 }
 
 
