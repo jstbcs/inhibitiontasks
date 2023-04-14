@@ -213,7 +213,7 @@ dataset43 <- dataset43 %>%
     subject = as.factor(subject),
     block = ifelse(grepl("tst", block), 
                    apply(dataset43["block"], 1, function(i) as.numeric(strsplit(i, "tst")[[1]][2])),
-                   ifelse(grepl("mix", block),
+                   ifelse(grepl("mix", block) | grepl("ueb_", block),
                           -999,
                           block)),
     congr = ifelse(condition == "con" | condition == "ident", 1, 
@@ -262,7 +262,7 @@ dataset45 <- dataset45 %>%
     block = ifelse(grepl("tst", block), 
                    apply(dataset45["block"], 1, function(i) as.numeric(strsplit(i, "tst")[[1]][2])),
                    block),  # extract block number
-    block = ifelse(grepl("mix", block), 
+    block = ifelse(grepl("mix", block)  | grepl("ueb_", block), 
                    -999,
                    block),   # encode practice block
     congr = ifelse(condition == "congr" | condition == "ident", 1, 
