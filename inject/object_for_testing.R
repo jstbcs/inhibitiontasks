@@ -58,7 +58,7 @@ condition = data.frame(
   n_obs = 201:206
 )
 task_info = data.frame(
-  task = "stroop"
+  task_name = "stroop"
 )
 
 data = data.frame(

@@ -1,7 +1,7 @@
 # Function for selecting based on one or two values
 
 check_filter_db_arguments <- function(data, column, cutoff_values, alternative){
-  if (!alternative %in% c("greater", "less", "between", "two.sided")){
+  if (!alternative %in% c("greater", "less", "between", "two.sided", "equal")){
     stop("alternative can only be 'greater', 'less' or 'between'.")
   }
   if (alternative == "two.sided"){
@@ -18,9 +18,9 @@ check_filter_db_arguments <- function(data, column, cutoff_values, alternative){
     stop("The first cutoff value must be the minimum, the second the maximum")
   }
   
-  if (alternative == "greater" | alternative == "less"){
+  if (alternative == "greater" | alternative == "less" | alternative == "equal"){
     if (length(cutoff_values) != 1){
-      stop("For alternatives 'greater' and 'less' there can only be one cutoff-value specified")
+      stop("For alternatives 'equal', 'greater' and 'less' there can only be one cutoff-value specified")
     }
   }
 }
@@ -36,6 +36,10 @@ filter_db <- function(data, column, cutoff_values, alternative = "greater"){
   }
   if (alternative == "between"){
     filter = filter_between(data, column, cutoff_values)
+  }
+  
+  if(alternative == "equal"){
+    filter = filter_equal(data, column, cutoff_values)
   }
   return(filter)
 }
@@ -59,8 +63,16 @@ filter_between <- function(data, column, cutoff_values){
   return(filtered_data)
 }
 
+filter_equal <- function(data, column, cutoff_value){
+  filtered_data = data %>% 
+    filter({{column}} == cutoff_value)
+  
+  return(filtered_data)
+}
+
 query_db <- function(conn, arguments, target_level = "data"){
   # TODO: Testing fro structure
+  # TODO: Target-
   # arguments = list(list(column = "column", values = c(value1, value2?)), list(...))
   
   # Querying starts
@@ -75,9 +87,9 @@ query_db <- function(conn, arguments, target_level = "data"){
     table_match_ids = list(
       tables = relevant_tables
     )
-    for (i in seq_along(relevant_tables)){
+    for (j in seq_along(relevant_tables)){
       ids = extract_table_ids(conn, relevant_tables[i])
-      table_match_ids[[i+1]] = ids
+      table_match_ids[[j+1]] = ids
     }
     arguments_matches[[i]] = table_match_ids
   }

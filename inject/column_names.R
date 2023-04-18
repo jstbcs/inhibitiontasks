@@ -1,4 +1,5 @@
 # Column names for the tables
+# TODO: Replace all functions with reference to this setup file.
 publication_info_columns <- c(
   "authors",
   "conducted",
@@ -49,6 +50,7 @@ group_info_columns <- c(
 
 task_info_columns <- c(
   "task",
+  "task_name",
   "task_id",
   "task_description"
 )

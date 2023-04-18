@@ -57,11 +57,15 @@ return_connected_ids <- function(conn, table, ids){
       
       # Get finished ids
       finished_ids = c()
-      for (j in 1:length(done)){
-        finished_ids[j] = return_id_name_from_table(done[j])
+      for (j in 1:length(query)){
+        finished_ids[j] = return_id_name_from_table(query[[j]]$table)
       }
       
-      # Get all other tables that need to be queried
+      finished_tables = c()
+      for (j in 1:length(finished_ids)){
+        finished_tables[j] = return_table_name_from_id(finished_ids[j])
+      }
+            # Get all other tables that need to be queried
       # This is a forward search
       forward_ids = colnames(relevant_ids)[!colnames(relevant_ids) %in% finished_ids]
       forward_tables = c()
@@ -70,53 +74,65 @@ return_connected_ids <- function(conn, table, ids){
           forward_tables[j] = return_table_name_from_id(forward_ids[j])
         }
       }
-      
       # Need to add backward search aswell
       backward_tables = find_relevant_tables(conn, id_name)
-      backward_tables = backward_tables[!backward_tables %in% done]
+      backward_tables = backward_tables[!backward_tables %in% finished_tables]
       backward_ids = c()
       if (length(backward_tables) != 0){
         for (j in 1:length(backward_tables)){
           backward_ids[j] = return_id_name_from_table(backward_tables[j])
         }
       }
-
       
-      other_tables = unique(c(forward_tables, backward_tables))
-      other_ids = unique(c(forward_ids, backward_ids))
-      mode = c(rep("forward", length(forward_ids)), rep("backward", length(backward_ids)))
-      origin = id_name
-      
-      if (length(other_tables) != 0){
-        other_table_data = data.frame(
-          other_tables,
-          other_ids,
-          mode,
-          origin
+      forward_data = data.frame()
+      if (length(forward_tables) != 0){
+        forward_data = data.frame(
+          table = forward_tables,
+          ids = forward_ids,
+          mode = "forward",
+          origin = id_name
         )
       }
       
-      # TODO: Not i+j, but find next free spot
-      if (length(other_tables != 0)){
+      backward_data = data.frame()
+      if (length(backward_tables) != 0){
+        backward_data = data.frame(
+          table = backward_tables,
+          ids = backward_ids,
+          mode = "backward",
+          origin = id_name
+        )
+      }
+      
+      other_table_data = data.frame()
+      if (length(forward_tables) != 0 & length(backward_tables) != 0){
+        other_table_data = rbind(forward_data, backward_data)
+      } else if (length(forward_tables) == 0 & length(backward_tables) != 0){
+        other_table_data = backward_data
+      } else if (length(forward_tables) != 0 & length(backward_tables) == 0){
+        other_table_data = forward_data
+      }
+      
+      newlist = list()
+      if (nrow(other_table_data) != 0){
         for (j in 1:nrow(other_table_data)){
           newlist = list()
-          newlist$table = other_table_data$other_tables[j]
+          newlist$table = other_table_data$table[j]
           if (other_table_data$mode[j] == "backward"){
             newlist$ids = relevant_ids[, other_table_data$origin[j]]
           } else {
-            newlist$ids = relevant_ids[, other_table_data$other_ids[j]]
+            newlist$ids = relevant_ids[, other_table_data$ids[j]]
           }
           newlist$mode = other_table_data$mode[j]
           newlist$origin_id = other_table_data$origin[j]
           query = c(query, list(newlist))
         }
       }
+      # Increase max_i
       max_i = max_i + 1
-      print(paste("Max_i within for loop:", max_i))
+      
       print(paste("Query", i, "done"))
-      print(done)
     }
-    print(paste("Max_i outside:", max_i))
   }
   
   return(id_list)
@@ -152,6 +168,6 @@ library(RSQLite)
 library(dplyr)
 conn = DBI::dbConnect(RSQLite::SQLite(), "pilot.db")
 table = "study"
-ids = c(1, 2)
+ids = c(2,3)
 
 test = return_connected_ids(conn, table, ids)
