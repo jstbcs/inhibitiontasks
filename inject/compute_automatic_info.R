@@ -41,7 +41,7 @@ get_n_trials <- function(df_test){
 }
 
 get_neutral_trials <- function(df_test){
-  return(ifelse(3 %in% df_test$congr, 1, 0))
+  return(ifelse(3 %in% df_test$congruency, 1, 0))
 }
 
 
@@ -60,13 +60,13 @@ filter_condition <- function(df_test, cond = 1) {
 
 # percentage congruent
 get_perc_congr <- function(df_cond){
-  perc_congr <- sum(df$congr == 1) / length(df$congr)
+  perc_congr <- sum(df$congruency == 1) / length(df$congruency)
   return(round(perc_congr),2)
 }
 
 # percentage neutral
 get_perc_neut <- function(df_cond){
-  perc_neut <- sum(df$congr == 3) / length(df$congr)
+  perc_neut <- sum(df$congruency == 3) / length(df$congruency)
   return(round(perc_neut),2)  
 }
 
