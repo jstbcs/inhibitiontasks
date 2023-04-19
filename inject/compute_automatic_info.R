@@ -1,12 +1,12 @@
 # COMPUTING MISSING INFO FOR DATA BASE #--------------------------------------#
 
-# Overview: Info computed in this script ---
-# - for overview_info: 
+# Info computed in this script ---
+# - for dataset_info: 
 #  - n_participants 
 #  - n_blocks 
 #  - n_trials 
 #  - neutral_trials
-# - for conditions: 
+# - for condition_table: 
 #   - percentage_congr
 #   - percentage_neut
 #   - mean_obs_pp 
@@ -16,7 +16,7 @@
 library(dplyr)
 
 
-# For overview_info --------------------------
+# For dataset_info --------------------------
 
 # create data frame without trial blocks 
 remove_practice <- function(df) {
@@ -45,10 +45,17 @@ get_neutral_trials <- function(df_test){
 }
 
 
-# For condition_descriptives -------------------
+# For condition_table -------------------
 
-# TODO: function to split data frame (df_test!) based on condition column
-# e.g. dataset6_test <- dataset6[dataset6$within == 1, ] # change this 
+# filter data frame by condition
+filter_condition <- function(df_test, cond = 1) {
+  # inputs:
+  # - df_test: data frame (without practice trials)
+  # - cond: condition_id to filter by 
+  
+  df_cond <- df_test[df_test$condition == cond, ]
+  return(df_cond)
+}
 
 
 # percentage congruent
