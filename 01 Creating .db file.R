@@ -6,11 +6,11 @@ library(tidyr)
 
 # Dataset 1 (Von Bastian et al.) Stroop task 
 dataset1 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/vonbastian_2015_evidence/LEF_stroop.csv", sep = ";") %>%
-  mutate(congr = ifelse(congruency == "congruent", 1, ifelse(congruency == "incongruent", 2, ifelse(congruency == "neutral", 3, NA))),
-         congr = as.factor(congr),
+  mutate(congruency = ifelse(congruency == "congruent", 1, ifelse(congruency == "incongruent", 2, ifelse(congruency == "neutral", 3, NA))),
+         congruency = as.factor(congruency),
          datasetid = 1,
          subject = as.factor(ID),
-         group = NA,
+         between = NA,
          within = NA,
          block = 1,
          rt = RT/1000) # rt data in seconds
@@ -18,7 +18,7 @@ ntrial <- length(dataset1 [dataset1$ID == dataset1$ID[1], 1])
 nsub <- length(unique(dataset1$ID))
 dataset1$trial <- rep(1:ntrial, nsub) # add subject and trial numbers
 dataset1 <- dataset1 %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)  
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)  
 
 # Dataset 2 (Pratte et al.); color stroop
 dataset2 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi2.dat.txt", sep = " ")
@@ -28,11 +28,11 @@ dataset2 <- dataset2 %>% filter(exp == 1) %>% # keep Stroop task data
          block = blk+1,
          trial = trial+1,
          subject = as.factor(subject),
-         congr = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
-         congr = as.factor(congr),
-         group = NA,
+         congruency = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
+         congruency = as.factor(congruency),
+         between = NA,
          within = NA) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 # Dataset 3 (Pratte et al.); spatial Stroop
 dataset3 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi7.dat.txt", sep = " ")
@@ -42,40 +42,40 @@ dataset3 <- dataset3 %>% filter(blktype == 1) %>% # keep Stroop task data
          block = (blk+2)/2,
          trial = trial,
          subject = as.factor(subject),
-         congr = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
-         congr = as.factor(congr),
-         group = NA, 
+         congruency = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
+         congruency = as.factor(congruency),
+         between = NA, 
          within = NA) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 # Dataset 4 (Rey-Mermet et al.); numStroop
 dataset4 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/mermet_2018_should/numStroop.dat.txt", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset4 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset4 <- left_join(dataset4, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
-  mutate(congr = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
-         congr = as.factor(congr),
+  mutate(congruency = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
+         congruency = as.factor(congruency),
          block = ifelse(block == "practice", -999, substring(block ,nchar(block))),
          datasetid = 4,
          subject =  sub - 100, 
          subject = as.factor(subject),
          accuracy = acc,
-         group = ageGroup,        
+         between = ageGroup,        
          within = NA) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 # Dataset 5 (Rey-Mermet et al.); colStroop
 dataset5 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/mermet_2018_should/colStroop.dat.txt", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset5 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset5 <- left_join(dataset5, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
-  mutate(congr = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
-         congr = as.factor(congr),
+  mutate(congruency = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
+         congruency = as.factor(congr),
          block = ifelse(block == "practice", -999, substring(block ,nchar(block))),
          datasetid = 5,
          subject = as.factor(sub - 100),
          accuracy = acc,
-         group = ageGroup,
+         between = ageGroup,
          within = NA) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
 
 
 # Dataset 6 (Hedge et al.); Stroop task study 1
@@ -99,31 +99,31 @@ for(i in 1:length(study)){
 
 # combine data of study 1
 hedge_data1 <- bind_rows(hedge[[1]]) %>%
-  mutate(congr = ifelse(cond == 0, 1, ifelse(cond == 2, 2, ifelse(cond == 1, 3, NA))),
-         congr = as.factor(congr),
+  mutate(congruency = ifelse(cond == 0, 1, ifelse(cond == 2, 2, ifelse(cond == 1, 3, NA))),
+         congruency = as.factor(congruency),
          block = ifelse(session == 1, block, block + 5),
-         group = NA,
+         between = NA,
          within = as.numeric(session),
          subject = as.factor(as.numeric(study)*100 + as.numeric(participant))) # add subject numbers
 dataset6 <- hedge_data1 %>% filter(direction == 0) %>% # keep Stroop task data of study 1
   mutate(datasetid = 6) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
 
 
 # Dataset 7 (Von Bastian et al.); simon task 
 dataset7 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/vonbastian_2015_evidence/LEF_simon.csv", sep = ";") %>%
-  mutate(congr = ifelse(congruency == "congruent", 1, ifelse(congruency == "incongruent", 2, ifelse(congruency == "neutral", 3, NA))),
-         congr = as.factor(congr),
+  mutate(congruency = ifelse(congruency == "congruent", 1, ifelse(congruency == "incongruent", 2, ifelse(congruency == "neutral", 3, NA))),
+         congruency = as.factor(congruency),
          datasetid = 7,
          block = 1,
          subject = as.factor(ID),
-         group = NA, 
+         between = NA, 
          within = NA,
          rt = RT/1000) # rt data in seconds
 ntrial <- length(dataset7[dataset7$ID == dataset7$ID[1], 1])
 nsub <- length(unique(dataset7$ID))
 dataset7$trial <- rep(1:ntrial, nsub) # add subject and trial numbers
-dataset7 <- dataset7 %>% select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+dataset7 <- dataset7 %>% select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 # Dataset 8 (Pratte et al.); classic simon task
 dataset8 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi2.dat.txt", sep = " ")
@@ -133,11 +133,11 @@ dataset8 <- dataset8 %>% filter(exp == 0) %>% # keep classic Simon task data
          block = blk+1,
          trial = trial,
          subject = as.factor(subject),
-         congr = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
-         congr = as.factor(congr),
+         congruency = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
+         congruency = as.factor(congruency),
          group = NA, 
          within = NA) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 # Dataset 9 (Pratte et al.); lateral simon task
 dataset9 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/pratte_2010_exploring/allsi7.dat.txt", sep = " ")
@@ -147,62 +147,62 @@ dataset9 <- dataset9 %>% filter(blktype == 0) %>% # keep lateral Simon task data
          block = (blk+1)/2,
          trial = trial+1,
          subject = as.factor(subject),
-         congr = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
-         congr = as.factor(congr),
+         congruency = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
+         congruency = as.factor(congruency),
          group = NA, 
          within = NA) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 # Dataset 10 (Von Bastian et al.); flanker task
 dataset10 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/vonbastian_2015_evidence/LEF_flanker.csv", sep = ";") %>%
-  mutate(congr = ifelse(congruency == "congruent", 1, ifelse(congruency == "incongruent", 2, ifelse(congruency == "neutral", 3, NA))),
-         congr = as.factor(congr),
+  mutate(congruency = ifelse(congruency == "congruent", 1, ifelse(congruency == "incongruent", 2, ifelse(congruency == "neutral", 3, NA))),
+         congruency = as.factor(congruency),
          datasetid = 10,
          block = 1,
          subject = as.factor(ID),
-         group = NA,
+         between = NA,
          within = NA,
          rt = RT/1000) # rt data in seconds
 ntrial <- length(dataset10[dataset10$ID == dataset10$ID[1], 1])
 nsub <- length(unique(dataset10$ID))
 dataset10$trial <- rep(1:ntrial, nsub) # add subject and trial numbers
 dataset10 <- dataset10 %>% 
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)  
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)  
 
 # Young: 18-24, old: 65-75
 # Dataset 11 (Rey-Mermet et al.); arrow flanker task
 dataset11 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/mermet_2018_should/arrowFlanker.dat.txt", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset11 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset11 <- left_join(dataset11, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
-  mutate(congr = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
-         congr = as.factor(congr),
+  mutate(congruency = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
+         congruency = as.factor(congruency),
          block = ifelse(block == "practice", -999, substring(block ,nchar(block))),
          datasetid = 11,
          subject = as.factor(sub - 100),
          accuracy = acc,
-         group = ageGroup,   
+         between = ageGroup,   
          within = NA) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 # Dataset 12 (Rey-Mermet et al.); letter flanker task
 dataset12 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/mermet_2018_should/letFlanker.dat.txt", sep = " ") %>% mutate(id = row_number())
 trialnumber <- dataset12 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset12 <- left_join(dataset12, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
-  mutate(congr = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
-         congr = as.factor(congr),
+  mutate(congruency = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
+         congruency = as.factor(congr),
          block = ifelse(block == "practice", -999, substring(block ,nchar(block))),
          datasetid = 12,
          subject = as.factor(sub - 100),
          accuracy = acc,
-         group = ageGroup,   
+         between = ageGroup,   
          within = NA) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)  
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)  
 
 
 # Dataset 13 (Hedge et al.); flanker of study 1
 dataset13 <- hedge_data1 %>% filter(direction != 0) %>% # keep flanker task data of study 1
   mutate(datasetid = 13) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
  
 
 # Dataset 14-34 (Many Labs studies from https://osf.io/n8xa7/)
@@ -214,13 +214,13 @@ for(i in 1:21){
                   subject = as.factor(session_id), 
                   block = block_number,
                   trial = trial_number+1, 
-                  congr = ifelse(congruent == "Congruent", 1, ifelse(congruent == "Incongruent", 2, NA)), 
-                  congr = as.factor(congr),
+                  congruency = ifelse(congruent == "Congruent", 1, ifelse(congruent == "Incongruent", 2, NA)), 
+                  congruency = as.factor(congruency),
                   accuracy = trial_error,
-                  group = NA,
+                  between = NA,
                   within = NA,
                   rt = trial_latency/1000) %>% 
-           select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) %>%
+           select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) %>%
            group_by(subject) %>%
            arrange(trial, .by_group = TRUE) %>%
            ungroup())
@@ -228,20 +228,20 @@ for(i in 1:21){
 
 # Additionally: Hedge data of study 2
 hedge_data2 <- bind_rows(hedge[[2]]) %>% # combine data of study2
-  mutate(congr = ifelse(cond == 0, 1, ifelse(cond == 2, 2, ifelse(cond == 1, 3, NA))),
-         congr = as.factor(congr),
+  mutate(congruency = ifelse(cond == 0, 1, ifelse(cond == 2, 2, ifelse(cond == 1, 3, NA))),
+         congruency = as.factor(congruency),
          block = ifelse(session == 1, block, block + 5),
-         group = NA,
+         between = NA,
          within = as.numeric(session),
          subject = as.factor(as.numeric(study)*100 + as.numeric(participant))) # add subject numbers
 
 dataset49 <- hedge_data2 %>% filter(direction == 0) %>% # keep Stroop task data of study 2
   mutate(datasetid = 49) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
 
 dataset50 <- hedge_data2 %>% filter(direction != 0) %>% # keep flanker task data of study 2
   mutate(datasetid = 50) %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
 
 
 

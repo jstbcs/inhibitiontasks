@@ -44,28 +44,28 @@ library(data.table)
 dataset35 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/FlankerExp2.csv") %>%
   mutate(
     datasetid = 35,
-    congr = ifelse(Congruency == 0, 2, Congruency),
-    congr = as.factor(congr),
+    congruency = ifelse(Congruency == 0, 2, Congruency),
+    congruency = as.factor(congruency),
     subject = as.factor(Subject - 100),
     block = BlockNum,
-    group = NA,
+    between = NA,
     within = NA,
     rt = StimSlideFlanker.RT / 1000,
     accuracy = StimSlideFlanker.ACC) %>%
   group_by(subject, block) %>%  # add trial number
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 
 # Dataset 36 (Whitehead et al., 2020; FlankerExp3)
 dataset36 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/FlankerExp3.csv") %>% 
   mutate(
     datasetid = 36,
-    congr = ifelse(Congruency == 0, 2, Congruency),
-    congr = as.factor(congr),
+    congruency = ifelse(Congruency == 0, 2, Congruency),
+    congruency = as.factor(congruency),
     subject = factor(Subject - 100),
-    group = NA,
+    between = NA,
     within = NA,
     block = ifelse(PracExp == "Exp", 1, -999), # Todo: Check in original paper
     rt = StimSlideFlanker.RT / 1000,
@@ -74,17 +74,17 @@ dataset36 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
   group_by(subject) %>% 
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 
 # Dataset 37 (Whitehead et al., 2020; SimonExp2)
 dataset37 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/SimonExp2.csv") %>%
   mutate(
     datasetid = 37,
-    congr = ifelse(Congruency == 0, 2, Congruency),
-    congr = as.factor(congr),
+    congruency = ifelse(Congruency == 0, 2, Congruency),
+    congruency = as.factor(congruency),
     subject = as.factor(Subject - 100),
-    group = NA, 
+    between = NA, 
     within = NA,
     block = BlockNum, 
     rt = StimSlideSimon.RT / 1000,
@@ -93,17 +93,17 @@ dataset37 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
   group_by(subject, block) %>%
   mutate(trial = row_number()) %>%
   ungroup() %>% 
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 
 # Dataset 38 (Whitehead et al., 2020; SimonExp 3)
 dataset38 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/SimonExp3.csv") %>%
   mutate(
     datasetid = 38,
-    congr = ifelse(Congruency == 0, 2, Congruency),
-    congr = as.factor(congr),
+    congruency = ifelse(Congruency == 0, 2, Congruency),
+    congruency = as.factor(congruency),
     subject = as.factor(Subject - 100),
-    group = NA, 
+    between = NA, 
     within = NA,
     block = ifelse(PracExp == "Exp", 1, -999), # Todo: Check in original paper
     rt = StimSlideSimon.RT / 1000,
@@ -112,17 +112,17 @@ dataset38 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
   group_by(subject) %>% 
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 
 # Dataset 39 (Whitehead et al., 2020; StroopExp 2)
 dataset39 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/StroopExp2.csv") %>% 
   mutate(
     datasetid = 39, 
-    congr = ifelse(Congruency == 0, 2, Congruency),
-    congr = as.factor(congr),
+    congruency = ifelse(Congruency == 0, 2, Congruency),
+    congruency = as.factor(congruency),
     subject = as.factor(Subject - 100),
-    group = NA, 
+    between = NA, 
     within = NA, 
     block = BlockNum, 
     rt = StimSlideStroop.RT / 1000,
@@ -130,17 +130,17 @@ dataset39 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
   group_by(subject, block) %>% 
   mutate(trial = row_number()) %>% 
   ungroup() %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
 
 
 # Dataset 40 (Whitehead et al., 2020; StroopExp 3)
 dataset40 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/StroopExp3.csv") %>% 
   mutate(
     datasetid = 40,
-    congr = ifelse(Congruency == 0, 2, Congruency),
-    congr = as.factor(congr),
+    congruency = ifelse(Congruency == 0, 2, Congruency),
+    congruency = as.factor(congruency),
     subject = as.factor(Subject - 100),
-    group = NA, 
+    between = NA, 
     within = NA, 
     block = ifelse(PracExp == "Exp", 1, -999), # Todo: Check in original paper 
     rt = StimSlideStroop.RT / 1000,
@@ -148,7 +148,7 @@ dataset40 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
   group_by(subject, block) %>% # group by block if existed
   mutate(trial = row_number()) %>% 
   ungroup() %>% # add trial column
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 
 # Dataset 41 (Snijder et al., 2022); data online at https://osf.io/evuhg
@@ -173,9 +173,9 @@ dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
       phase == "retest" & session == "baseline"  ~ 4,
       phase == "retest" & session == "reactive"  ~ 5,
       phase == "retest" & session == "proactive" ~ 6),
-    group = NA, 
+    between = NA, 
     within = factor(interaction(phase, session, itemType)),   # baseline/ reactive/ proactive condition and test setting
-    congr = ifelse(grepl("incon", trialCode), 2, 1),
+    congruency = ifelse(grepl("incon", trialCode), 2, 1),
     accuracy = ACC,
     rt = RT / 1000)  %>%
   group_by(subject, block) %>%   # adding within each subject and within condition trial number
@@ -183,7 +183,7 @@ dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
     trial = row_number()
     ) %>%
   ungroup() %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
 
 
 # Dataset 42 (Chetverikov et al., 2017); data online at https://osf.io/7rb48
@@ -193,12 +193,12 @@ dataset42 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
     subject = as.factor(uid),
     block = lapply(blockf, function(i) as.numeric(strsplit(i, " ")[[1]][2])),
     trial = trialN + 1, 
-    group = NA, # NOTE: change later; this is agegroup + add gender?
+    between = NA, # NOTE: change later; this is agegroup + add gender?
     # max age is 31
     within = NA, 
-    congr = ifelse(grepl("Incompatible", compf), 2, 1), 
+    congruency = ifelse(grepl("Incompatible", compf), 2, 1), 
     accuracy = corr) %>% 
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
 
 # Dataset 43: Stahl et al. (2014): Stroop task 
 dataset43 <- read.delim("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/stahl_2014_behavioral/stroop.dat", header = FALSE, sep = " ") %>%
@@ -216,17 +216,17 @@ dataset43 <- dataset43 %>%
                    ifelse(grepl("mix", block) | grepl("ueb_", block),
                           -999,
                           block)),
-    congr = ifelse(condition == "con" | condition == "ident", 1, 
+    congruency = ifelse(condition == "con" | condition == "ident", 1, 
                        ifelse(condition == "incon", 2, 3)),
-    congr = as.factor(congr),
+    congruency = as.factor(congruency),
     accuracy = error,
-    group = NA, 
+    between = NA, 
     within = NA,
     rt = latency / 1000) %>%
   group_by(subject, block) %>% # change trial number to include warm-ups
   mutate(trial = row_number()) %>% 
   ungroup() %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
 
 
 # Dataset 44: Stahl et al. (2014); Simon task
@@ -240,9 +240,9 @@ dataset44 <- dataset44 %>%
     subject = as.factor(subject),
     # block = part?,
     # trial = trial_no?,
-    # cond = trial_type? 
+    # congruency = trial_type? 
     # accuracy missing,  
-    group = NA, 
+    between = NA, 
     within = NA, 
     rt = latency / 1000
   )
@@ -265,72 +265,72 @@ dataset45 <- dataset45 %>%
     block = ifelse(grepl("mix", block)  | grepl("ueb_", block), 
                    -999,
                    block),   # encode practice block
-    congr = ifelse(condition == "congr" | condition == "ident", 1, 
+    congruency = ifelse(condition == "congr" | condition == "ident", 1, 
                   ifelse(condition == "incon", 2, 3)),
-    congr = as.factor(congr),
+    congruency = as.factor(congruency),
     accuracy = err,
-    group = NA,
+    between = NA,
     within = NA, # code match/ mismatch of target & distractor (i.e., identical)?
     rt = latency / 1000
   ) %>%
   group_by(subject, block) %>% # change trial number to include warm-ups
   mutate(trial = row_number()) %>% 
   ungroup() %>%
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt)
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt)
 
 
 # Dataset 46: Whitehead et al. (2020): Simon task from Experiment1
 dataset46 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/Experiment1.csv") %>% 
   filter(StimSlideSimon.RT != "NA") %>%  # choose simon task entries
   mutate(datasetid = 46, 
-         congr = ifelse(Congruency == 0, 2, Congruency),
-         congr = as.factor(congr),
+         congruency = ifelse(Congruency == 0, 2, Congruency),
+         congruency = as.factor(congruency),
          subject = as.factor(Subject - 505),
          block = BlockNum, 
-         group = NA, 
+         between = NA, 
          within = NA,
          rt = StimSlideSimon.RT / 1000,
          accuracy = StimSlideSimon.ACC) %>%
   group_by(subject, block) %>%  # add trial number
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 
 # Dataset 47: Whitehead et al. (2020): Flanker task from Experiment1
 dataset47 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/Experiment1.csv") %>% 
   filter(StimSlideFlanker.RT != "NA") %>%  # choose Flanker task entries
   mutate(datasetid = 47, 
-         congr = ifelse(Congruency == 0, 2, Congruency),
-         congr = as.factor(congr),
+         congruency = ifelse(Congruency == 0, 2, Congruency),
+         congruency = as.factor(congruency),
          subject = as.factor(Subject - 505),
          block = BlockNum, 
-         group = NA, 
+         between = NA, 
          within = NA,
          rt = StimSlideFlanker.RT / 1000,
          accuracy = StimSlideFlanker.ACC) %>%
   group_by(subject, block) %>%  # add trial number
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 
 # Dataset 48: Whitehead et al. (2020): Stroop task from Experiment1
 dataset48 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/whitehead_2020/Experiment1.csv") %>% 
   filter(StimSlideStroop.RT != "NA") %>%  # choose Stroop task entries
   mutate(datasetid = 48, 
-         congr = ifelse(Congruency == 0, 2, Congruency),
-         congr = as.factor(congr),
+         congruency = ifelse(Congruency == 0, 2, Congruency),
+         congruency = as.factor(congruency),
          subject = as.factor(Subject - 505),
          block = BlockNum, 
-         group = NA, 
+         between = NA, 
          within = NA,
          rt = StimSlideStroop.RT / 1000,
          accuracy = StimSlideStroop.ACC) %>%
   group_by(subject, block) %>%  # add trial number
   mutate(trial = row_number()) %>% 
   ungroup() %>% 
-  select(datasetid, subject, block, trial, congr, group, within, accuracy, rt) 
+  select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
 
 
