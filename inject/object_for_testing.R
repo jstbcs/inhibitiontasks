@@ -55,8 +55,12 @@ within = data.frame(
 
 condition = data.frame(
   condition = 1:6,
+  percentage_congruent = NA, 
+  percentage_neutral = NA, 
+  mean_obs_per_participant = NA, 
   n_obs = 201:206
 )
+
 task_info = data.frame(
   task_name = "stroop"
 )
