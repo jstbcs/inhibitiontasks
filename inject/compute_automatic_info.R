@@ -1,7 +1,9 @@
 # COMPUTING MISSING INFO FOR DATA BASE #--------------------------------------#
 
 # Info computed in this script ---
-# - for dataset_info: 
+# - for observation_table: 
+#   - condition column
+# - for dataset_table: 
 #  - n_participants 
 #  - n_blocks 
 #  - n_trials 
@@ -15,8 +17,24 @@
 
 library(dplyr)
 
+# For observation_table -----------------
 
-# For dataset_info --------------------------
+# code condition column based on combination of within and between column
+code_condition <- function(df){
+  # create overview of conditions
+  conditions <- df %>%
+    count(within, between) %>%
+    select(within, between) %>%
+    mutate(condition = 1:nrow(.))
+  
+  # add respective condition value to observation
+  data <- df %>% 
+    left_join(conditions, by = join_by(between, within))
+  
+  return(data)
+}
+  
+# For dataset_table --------------------------
 
 # create data frame without trial blocks 
 remove_practice <- function(df) {
@@ -43,7 +61,6 @@ get_n_trials <- function(df_test){
 get_neutral_trials <- function(df_test){
   return(ifelse(3 %in% df_test$congruency, 1, 0))
 }
-
 
 # For condition_table -------------------
 

@@ -17,7 +17,7 @@ add_missing_info <- function(entry_list) {
       # loop over each data list in study 
       for(k in 1:n_data) { 
         # code condition column for data frame 
-        #entry_list[[i]][[j+1]][[k+2]]$observation_table$condition <- 
+        entry_list[[i]][[j+1]][[k+2]]$observation_table$condition <- code_condition(entry_list[[i]][[j+1]][[k+2]]$observation_table)
         
         # remove practice trials 
         df_test <- remove_practice(entry_list[[i]][[j+1]][[k+2]]$observation_table)

@@ -189,7 +189,7 @@ dataset12 <- read.csv("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/
 trialnumber <- dataset12 %>% group_by(sub, block) %>% mutate(trial = row_number()) %>% ungroup()
 dataset12 <- left_join(dataset12, trialnumber, by = c("id", "sub", "ageGroup", "block", "trialType", "cond", "stim", "acc", "rt")) %>%
   mutate(congruency = ifelse(cond == "congruent", 1, ifelse(cond == "incongruent", 2, ifelse(cond == "neutral", 3, NA))),
-         congruency = as.factor(congr),
+         congruency = as.factor(congruency),
          block = ifelse(block == "practice", -999, substring(block ,nchar(block))),
          datasetid = 12,
          subject = as.factor(sub - 100),
