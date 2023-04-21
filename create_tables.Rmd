@@ -20,54 +20,11 @@ library(lubridate)
 conn <- dbConnect(RSQLite::SQLite(), "pilot.db")
 ```
 
-```{r list structure}
-data_enty <- list(
-  # top level
-  publication = list(
-    # publication level
-    study1 = list(
-      # study level
-      study_info,
-      group_info,
-      data1 = list(
-        # Data level
-        task = task_info,
-        overview = dataset_overview_info,
-        data = data_table,
-        within = within_info,
-        condition  = condition_descr_info
-      ),
-      data2 = list(
-        task = task_name,
-        overview = dataset_overview,
-        data = data_table,
-        within = within_description,
-        condition = condition_descr_info
-      )
-    ),
-    study2 = list(
-      study_info,
-      group_info,
-      data1 = list(
-        task = task_name,
-        overview = dataset_overview,
-        data = data_table,
-        within = within_description,
-        condition  = condition_descr_info
-      )
-    )
-  )
-)
-
-inject(data_entry)
-
-```
-
 ```{r creating tables}
 # Publication table
 dbExecute(
   conn,
-  "CREATE TABLE publication (
+  "CREATE TABLE publication_table (
   publication_id INTEGER PRIMARY KEY AUTOINCREMENT,
   authors VARCHAR(10000),
   conducted DATE,
@@ -81,32 +38,32 @@ dbExecute(
 
 dbExecute(
   conn,
-  "CREATE TABLE study (
+  "CREATE TABLE study_table (
   study_id INTEGER PRIMARY KEY AUTOINCREMENT,
   publication_id INTEGER,
   n_groups INTEGER,
   n_tasks INTEGER,
   comment VARCHAR(10000),
-  FOREIGN KEY (publication_id) REFERENCES publication(publication_id)
+  FOREIGN KEY (publication_id) REFERENCES publication_table(publication_id)
   );"
 )
 
 dbExecute(
   conn,
-  "CREATE TABLE group_table (
-  group_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  "CREATE TABLE between_table (
+  between_id INTEGER PRIMARY KEY AUTOINCREMENT,
   study_id INTEGER,
   mean_age FLOAT,
   percentage_female FLOAT,
   n_nembers INTEGER,
   group_description VARCHAR(10000),
-  FOREIGN KEY (study_id) REFERENCES study(study_id)
+  FOREIGN KEY (study_id) REFERENCES study_table(study_id)
   );"
 )
 
 dbExecute(
   conn,
-  "CREATE TABLE task (
+  "CREATE TABLE task_table (
   task_id INTEGER PRIMARY KEY AUTOINCREMENT,
   task_name VARCHAR(255),
   task_description VARCHAR(10000)
@@ -115,7 +72,7 @@ dbExecute(
 
 dbExecute(
   conn,
-  "CREATE TABLE dataset_overview (
+  "CREATE TABLE dataset_table (
   dataset_id INTEGER PRIMARY KEY AUTOINCREMENT,
   study_id INTEGER,
   task_id INTEGER,
@@ -128,58 +85,58 @@ dbExecute(
   time_limit INTEGER,
   github VARCHAR(1000),
   comment VARCHAR(10000),
-  FOREIGN KEY (study_id) REFERENCES study(study_id),
-  FOREIGN KEY (task_id) REFERENCES task(task_id)
+  FOREIGN KEY (study_id) REFERENCES study_table(study_id),
+  FOREIGN KEY (task_id) REFERENCES task_table(task_id)
   );"
 )
 
 dbExecute(
   conn,
-  "CREATE TABLE within (
+  "CREATE TABLE within_table (
   within_id INTEGER PRIMARY KEY AUTOINCREMENT,
   dataset_id INTEGER,
   within_description VARCHAR(10000),
-  FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id)
+  FOREIGN KEY (dataset_id) REFERENCES dataset_table(dataset_id)
   );"
 )
 
 dbExecute(
   conn,
-  "CREATE TABLE condition (
+  "CREATE TABLE condition_table (
   condition_id INTEGER PRIMARY KEY AUTOINCREMENT,
   dataset_id INTEGER,
-  group_id INTEGER,
+  between_id INTEGER,
   within_id INTEGER,
   percentage_congruent FLOAT,
   percentage_neutral FLOAT,
   n_obs INTEGER,
   mean_obs_per_participant INTEGER,
-  UNIQUE (dataset_id, group_id, within_id),
-  FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id),
-  FOREIGN KEY (group_id) REFERENCES group_table(group_id),
-  FOREIGN KEY (within_id) REFERENCES within(within_id)
+  UNIQUE (dataset_id, between_id, within_id),
+  FOREIGN KEY (dataset_id) REFERENCES dataset_table(dataset_id),
+  FOREIGN KEY (between_id) REFERENCES between_table(between_id),
+  FOREIGN KEY (within_id) REFERENCES within_table(within_id)
   );"
 )
 
 dbExecute(
   conn,
-  "CREATE TABLE data (
+  "CREATE TABLE observation_table (
   observation_id INTEGER PRIMARY KEY AUTOINCREMENT,
   dataset_id INTEGER,
   subject INTEGER,
   block INTEGER,
   trial INTEGER,
-  group_id INTEGER,
+  between_id INTEGER,
   within_id INTEGER,
   condition_id INTEGER,
   congruency INTEGER,
   accuracy BOOLEAN,
   rt FLOAT,
-  FOREIGN KEY (dataset_id) REFERENCES dataset_overview(dataset_id),
-  FOREIGN KEY (group_id) REFERENCES group_table(group_id),
-  FOREIGN KEY (within_id) REFERENCES within(within_id),
-  FOREIGN KEY (condition_id) REFERENCES condition(condition_id),
-  UNIQUE (dataset_id, subject, block, trial, condition_id, group_id, within_id)
+  FOREIGN KEY (dataset_id) REFERENCES dataset_table(dataset_id),
+  FOREIGN KEY (between_id) REFERENCES between_table(between_id),
+  FOREIGN KEY (within_id) REFERENCES within_table(within_id),
+  FOREIGN KEY (condition_id) REFERENCES condition_table(condition_id),
+  UNIQUE (dataset_id, subject, block, trial, condition_id, between_id, within_id)
   );"
 )
 ```
