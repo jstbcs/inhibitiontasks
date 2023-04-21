@@ -30,7 +30,7 @@ group_info_2 = data.frame(
   group_description = c("hey")
 )
 
-data_overview_1 = data.frame(
+dataset_1 = data.frame(
   data_excl = c("Did this"),
   n_participants = 400,
   n_blocks = 12,
@@ -39,7 +39,7 @@ data_overview_1 = data.frame(
   fixation_cross = 1
 )
 
-data_overview_2 = data.frame(
+dataset_2 = data.frame(
   data_excl = "None",
   n_participants = 500,
   n_blocks = 5,
@@ -55,13 +55,17 @@ within = data.frame(
 
 condition = data.frame(
   condition = 1:6,
+  percentage_congruent = NA, 
+  percentage_neutral = NA, 
+  mean_obs_per_participant = NA, 
   n_obs = 201:206
 )
+
 task_info = data.frame(
   task_name = "stroop"
 )
 
-data = data.frame(
+observation = data.frame(
   rt = 1:200,
   acc = rep(1, 200),
   congr = rep(c(0,1), 100),
@@ -74,66 +78,66 @@ data = data.frame(
 
 object = list(
   publication1 = list(
-    publication_info = publication_info_1,
+    publication_table = publication_info_1,
     study1 = list(
-      study_info = study_info_1,
-      group_info = group_info_1,
+      study_table = study_info_1,
+      group_table = group_info_1,
       data1 = list(
-        task = task_info,
-        overview = data_overview_1,
-        within = within,
-        condition = condition,
-        data = data
+        task_table = task_info,
+        dataset_table = dataset_1,
+        within_table = within,
+        condition_table = condition,
+        observation_table = observation
       ),
       data2 = list(
-        task = task_info,
-        overview = data_overview_1,
-        within = within,
-        condition = condition,
-        data = data
+        task_table = task_info,
+        dataset_table = dataset_1,
+        within_table = within,
+        condition_table = condition,
+        observation_table = observation
       )
     ),
     study2 = list(
-      study_info = study_info_2,
-      group_info = group_info_2,
+      study_table = study_info_2,
+      group_table = group_info_2,
       data1 = list(
-        task = task_info,
-        overview = data_overview_1,
-        within = within,
-        condition = condition,
-        data = data
+        task_table = task_info,
+        dataset_table = dataset_1,
+        within_table = within,
+        condition_table = condition,
+        observation_table = observation
       )
     )
   ),
   publication2 = list(
-    publication_info = publication_info_1,
+    publication_table = publication_info_1,
     study1 = list(
-      study_info = study_info_1,
-      group_info = group_info_1,
+      study_table = study_info_1,
+      group_table = group_info_1,
       data1 = list(
-        task = task_info,
-        overview = data_overview_1,
-        within = within,
-        condition = condition,
-        data = data
+        task_table = task_info,
+        dataset_table = dataset_1,
+        within_table = within,
+        condition_table = condition,
+        observation_table = observation
       ),
       data2 = list(
-        task = task_info,
-        overview = data_overview_1,
-        within = within,
-        condition = condition,
-        data = data
+        task_table = task_info,
+        dataset_table = dataset_1,
+        within_table = within,
+        condition_table = condition,
+        observation_table = observation
       )
     ),
     study2 = list(
-      study_info = study_info_2,
-      group_info = group_info_2,
+      study_table = study_info_2,
+      group_table = group_info_2,
       data1 = list(
-        task = task_info,
-        overview = data_overview_1,
-        within = within,
+        task_table = task_info,
+        dataset_table = dataset_1,
+        within_table = within,
         condition = condition,
-        data = data
+        observation_table = observation
       )
     )
   )
