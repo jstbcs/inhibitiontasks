@@ -3,8 +3,9 @@ return_connected_ids <- function(conn, table, ids){
   
   id_list = list()
   done = c()
-  finished = c("publication", "study", "condition", "dataset_overview", "data",
-               "group_table", "within", "task")
+  finished = c("publication_table", "study_table", "condition_table", 
+               "dataset_table", "observation_table",
+               "group_table", "within_table", "task_table")
 
   counter = 0
   
@@ -138,36 +139,21 @@ return_connected_ids <- function(conn, table, ids){
   return(id_list)
 }
 
-return_id_name_from_table <- function(table){
-  if (table == "data"){
-    name = "observation_id"
-  } else if (table == "dataset_overview"){
-    name = "dataset_id"
-  } else if(table == "group_table") {
-    name = "group_id"
-  } else{
-    name = paste0(table, "_id")
-  }
+return_id_name_from_table <- function(table_name){
+  name = stringr::str_replace(table_name, "table$", "id$")
   return(name)
 }
 
 return_table_name_from_id <- function(id_name){
-  if (id_name == "observation_id"){
-    name = "data"
-  } else if (id_name == "dataset_id"){
-    name = "dataset_overview"
-  } else if (id_name == "group_id"){
-    name = "group_table"
-  } else {
-    name = stringr::str_remove(id_name, "_id$")
-  }
+  name = stringr::str_replace(id_name, "id$", "table$")
+  return(name)
 }
 
 library(DBI)
 library(RSQLite)
 library(dplyr)
 conn = DBI::dbConnect(RSQLite::SQLite(), "pilot.db")
-table = "study"
+table = "study_table"
 ids = c(2,3)
 
 test = return_connected_ids(conn, table, ids)

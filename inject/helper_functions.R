@@ -81,14 +81,14 @@ stop_if_not_publication_level <- function(object){
 }
 
 stop_if_not_study_level <- function(object){
-  if(do_elements_exist(c("study_info", "group_info", "data1"), object) == FALSE)
+  if(do_elements_exist(c("study_table", "between_table", "data1"), object) == FALSE)
   {
     stop("This function takes a study-level object")
   }
 }
 
 stop_if_not_data_level <- function(object){
-  if (do_elements_exist(c("task", "overview", "data", "within"), object) == FALSE)
+  if (do_elements_exist(c("task_table", "dataset_table", "within_table", "condition_table", "observation_table"), object) == FALSE)
   {
     stop("This function takes a data-level object")
   }
@@ -141,3 +141,26 @@ which_elements_match <- function(vector, regex){
 }
 
 
+are_mandatory_elements_present <- function(object, mandatory_colnames){
+  names = names(object)
+  for (name in mandatory_colnames){
+    if (!name %in% names){
+      msg = paste("The column:", name, "must be specified in the data.")
+      stop(msg)
+    }
+  }
+}
+
+confirm_object_names <- function(object, data_frame_names){
+  # This function checks whether an object has the correctly specified names
+  # The data_frame_names gives the info on what names should be there and 
+  # whether they are mandatory or not.
+  
+  for (i in 1:nrow(data_frame_names)){
+    if (data_frame_names$mandatory[i] == 1){
+      are_mandatory_elements_present(object, data_frame_names$column[i])
+    } else {
+      confirm_columns_not_specified(data_frame_names$column[i], object)
+    }
+  }
+}

@@ -3,10 +3,10 @@
 
 # Overview: study element is list; has following structure: 
 #data1 = list(
-#  task_info = task_name,
-#  overview_info = dataset_overview,
+#  task_table = task_name,
+#  dataset_table = dataset_overview,
 #  data = data_table,
-#  within_info = within_description
+#  within_table = within_description
 #)
 
 source("./inject/helper_functions.R")
@@ -28,7 +28,7 @@ correct_elements_in_data_list <- function(object){
             element will be extracted")
   }
   # error if not all required objects are present
-  names_should <- c("task_info", "overview_info", "data", "within_info", "condition_info")
+  names_should <- c("task_table", "condition_table", "dataset_table", "within_table", "observation_table")
   for(element in names_should){
     if(!(element %in% names)){
       stop(c(element, " element is required but missing in data_NUMBER list"))
@@ -37,149 +37,109 @@ correct_elements_in_data_list <- function(object){
 }
 
 
-# This function checks whether all required columns of the task_info table are provided
-correct_cols_in_task_info <- function(task_info){
-  colnames = colnames(task_info)
+# This function checks whether all required columns of the task_table table are provided
+correct_cols_in_task_table <- function(task_table){
+  colnames = colnames(task_table)
   
   # check if object is data frame 
-  if(!is.data.frame(task_info)){
-    stop("task_info must be a dataframe")
+  if(!is.data.frame(task_table)){
+    stop("task_table must be a dataframe")
   }
   # check if object contains more than 1 entry
-  if(nrow(task_info) > 1){
-    stop("The task_info data frame can only contain 1 row")
-  }
-  
-  # Check to see if task name is valid
-  task_name = task_info$task
-  if (!task_name %in% valid_task_names){
-    msg = paste("Task name:", task_name, "is invalid. Please ensure you want to add that task name")
-    continue_after_warning(msg)
+  if(nrow(task_table) > 1){
+    stop("The task_table data frame can only contain 1 row")
   }
   
   # stop if required column names are not present
-  names_should <- c("task", "task_description" )
-  missing_cols <- c()
-  for(element in names_should){
-    if(!(element %in% colnames)){
-      missing_cols <- c(missing_cols, element)
-    }
-  } 
-  if (length(missing_cols) > 0){
-    stop(c("Columnname(s) missing from task_info data frame: ", paste(missing_cols, collapse = ", ")))
+  confirm_object_names(task_table, table_info_db$task_table)
+  
+  # Check to see if task name is valid
+  task_name = task_table$task_name
+  if (!task_name %in% valid_task_names){
+    # valid_task_names is from "helper_functions.R". Contains all 3 valid names
+    msg = paste("Task name:", task_name, "is invalid. Please ensure you want to add that task name")
+    continue_after_warning(msg)
   }
 }
 
 
-# This function checks whether all optional columns of the overview_info table 
+# This function checks whether all optional columns of the dataset_table table 
 # are provided; since none are mandatory, no error occurs but warning is given
 # and input from user is required
-correct_cols_in_overview_info <- function(overview_info){
-  colnames = colnames(overview_info)
+correct_cols_in_dataset_table <- function(dataset_table){
+  colnames = colnames(dataset_table)
   
   # check if object is data frame 
-  if(!is.data.frame(overview_info)){
-    stop("overview_info must be a dataframe")
+  if(!is.data.frame(dataset_table)){
+    stop("dataset_table must be a dataframe")
   }
   # check if object contains more than 1 entry
-  if(nrow(overview_info) > 1){
-    stop("The overview_info data frame can only contain 1 row")
+  if(nrow(dataset_table) > 1){
+    stop("The dataset_table data frame can only contain 1 row")
   }
   
-  # warning and user input for missing columns 
-  optional_cols <- c("data_excl", "fixation_cross", "time_limit", "github",
-                     "comment")
-  confirm_columns_not_specified(optional_cols, overview_info)
+  confirm_object_names(dataset_table, table_info_db$observation_table)
 }
 
 
 # This function checks whether all required columns of the data table are provided 
-correct_cols_in_data <- function(data_df){
-  colnames = colnames(data_df)
+correct_cols_in_observation_table <- function(observation_table){
+  colnames = colnames(observation_table)
   
   # check if object is data frame 
-  if(!is.data.frame(data_df)){
+  if(!is.data.frame(observation_table)){
     stop("Data table must be a dataframe")
   }
   
   # stop if required column names are not present
-  names_should <- c("subject", "block", "trial", "group",
-                    "within", "condition", "congr", "accuracy", "rt")
-  missing_cols <- c()
-  for(element in names_should){
-    if(!(element %in% colnames)){
-      missing_cols <- c(missing_cols, element)
-    }
-  } 
-  if (length(missing_cols) > 0){
-    stop(c("Columnname(s) missing from data table: ", paste(missing_cols, collapse = ", ")))
-  }
+  confirm_object_names(observation_table, table_info_db$observation_table)
 }
 
 
-# This function checks whether all required columns of the within_info table are provided 
-correct_cols_in_within_info <- function(within_info){
-  colnames = colnames(within_info)
+# This function checks whether all required columns of the within_table table are provided 
+correct_cols_in_within_table <- function(within_table){
+  colnames = colnames(within_table)
   
   # check if object is data frame 
-  if(!is.data.frame(within_info)){
-    stop("Within_info must be a dataframe")
+  if(!is.data.frame(within_table)){
+    stop("within_table must be a dataframe")
   }
   
   # stop if required column names are not present
-  names_should <- c("within", "within_description")
-  missing_cols <- c()
-  for(element in names_should){
-    if(!(element %in% colnames)){
-      missing_cols <- c(missing_cols, element)
-    }
-  } 
-  if (length(missing_cols) > 0){
-    stop(c("Columnname(s) missing from within_info data frame: ", paste(missing_cols, collapse = ", ")))
-  }
+  confirm_object_names(within_table, table_info_db$within_table)
 }
 
-# This function checks whether all required columns of condition_descr_info are provided 
-correct_cols_in_condition_info <- function(condition_descr_info){
-  colnames = colnames(condition_descr_info)
+# This function checks whether all required columns of condition_table are provided 
+correct_cols_in_condition_table <- function(condition_table){
+  colnames = colnames(condition_table)
   
   # check if object is data frame
-  if(!is.data.frame(condition_descr_info)){
-    stop("condition_info must be a dataframe")
+  if(!is.data.frame(condition_table)){
+    stop("condition_table must be a dataframe")
   }
   
   # stop if required column names are not present
-  names_should <- c("condition", "percentage_congruent", "percentage_neutral",
-                    "n_obs", "mean_obs_per_participant", "n_obs")
-  missing_cols <- c()
-  for(element in names_should){
-    if(!(element %in% colnames)){
-      missing_cols <- c(missing_cols, element)
-    }
-  } 
-  if (length(missing_cols) > 0){
-    stop(c("Columnname(s) missing from condition_info data frame: ", paste(missing_cols, collapse = ", ")))
-  }
+  confirm_object_names(condition_table, table_info_db$condition_table)
 }
 
 
-# This function checks whether the number of rows in the within_info table equals the 
+# This function checks whether the number of rows in the within_table table equals the 
 # number of within conditions coded in the data table and whether there are duplicate within_ids 
 # in within_id
-correct_n_of_withinid <- function(within_info, data_df){
+correct_n_of_withinid <- function(within_table, observation_table){
   # check if within ids are unique
-  if(length(unique(within_info$within_id)) != nrow(within_info)){
-    stop("Dublicate within_id in within_info found. Make sure within_id is unique")
+  if(length(unique(within_table$within_id)) != nrow(within_table)){
+    stop("Duplicate within_id in within_table found. Make sure within_id is unique")
   }
   
   # check if number of within id matches within columns in data table
-  if(length(unique(data_df$within)) > length(unique(within_info$within_id))){
-    stop("Number of unique within conditions in data table is larger than in within_info table. 
-         \nMake sure all within conditions are included in within_info.")
-  } else if(length(unique(data_df$within)) < length(unique(within_info$within_id))){
-    stop("The within_info table contains more unique within_ids than the data table does. 
+  if(length(unique(observation_table$within)) > length(unique(within_table$within_id))){
+    stop("Number of unique within conditions in data table is larger than in within_table table. 
+         \nMake sure all within conditions are included in within_table.")
+  } else if(length(unique(observation_table$within)) < length(unique(within_table$within_id))){
+    stop("The within_table table contains more unique within_ids than the data table does. 
          \nMake sure the within column in the data table is coded correctly and the 
-         within_info table contains only relevant within conditions")
+         within_table table contains only relevant within conditions")
   }
 }
 
@@ -198,13 +158,14 @@ check_data_level_structure <- function(data_i){
   correct_elements_in_data_list(data_i)
   
   # check if each element in data_i list is a df and contains required columns
-  correct_cols_in_task_info(data_i$task_info)
-  correct_cols_in_overview_info(data_i$overview_info)
-  correct_cols_in_within_info(data_i$within_info)
-  correct_cols_in_data(data_i$data)
+  correct_cols_in_task_table(data_i$task_table)
+  correct_cols_in_dataset_table(data_i$dataset_table)
+  correct_cols_in_within_table(data_i$within_table)
+  correct_cols_in_condition_table(data_i$condition_table)
+  correct_cols_in_observation_table(data_i$observation_table)
   
-  # check if number of within condition in data equals number of within_ids in within_info
-  correct_n_of_withinid(data_i$within_info, data_i$data)
+  # check if number of within condition in data equals number of within_ids in within_table
+  correct_n_of_withinid(data_i$within_table, data_i$data)
 }
 
 

@@ -3,28 +3,29 @@ source("./inject/helper_functions.R")
 
 
 # This function checks whether element on study level contains:
-# 1. "study_info"
-# 2. "group_info"
+# 1. "study_table"
+# 2. "between_table"
 # 3. at least one data[NUMBER] element, e.g. data1
 # 4. no duplicated names
 which_element_wrong_study <- function(object){
   stop_if_not_study_level(object)
   names = names(object)
   length = length(object)
-  if (!"study_info" %in% names)
+  
+  if (!"study_table" %in% names)
   {
-    stop("Object needs to have a 'study_info' element")
+    stop("Object needs to have a 'study_table' element")
   } 
-  if (!"group_info" %in% names)
+  if (!"between_table" %in% names)
   {
-    stop("Object needs to have a 'group_info' element")
+    stop("Object needs to have a 'between_table' element")
   }
   # This if checks if all names are valid
   if (!all(stringr::str_detect(names,
                                paste(
                                  regex_matches_data_names,
-                                 "study_info",
-                                 "group_info",
+                                 "study_table",
+                                 "between_table",
                                  sep = "|")
   )
   )
@@ -33,8 +34,8 @@ which_element_wrong_study <- function(object){
     error_name = names[which(stringr::str_detect(names,
                                                  paste(
                                                    regex_matches_data_names, 
-                                                   "study_info",
-                                                   "group_info",
+                                                   "study_table",
+                                                   "between_table",
                                                    sep = "|"
                                                  ),
                                                  negate = TRUE)
@@ -43,7 +44,7 @@ which_element_wrong_study <- function(object){
       "Element-name:",
       error_name,
       "invalid.",
-      "Elements can only be named 'study_info', 'group_info' or 'data_[NUMBER]"
+      "Elements can only be named 'study_table', 'between_table' or 'data[NUMBER]"
     )
     stop(error_message)
   }
@@ -53,7 +54,7 @@ which_element_wrong_study <- function(object){
   { 
     error_name = names
     error_message = paste(
-      "Object must contain at least one data element named 'data_[NUMBER].",
+      "Object must contain at least one data element named 'data[NUMBER].",
       "Current names:",
       error_name
     )
@@ -64,53 +65,47 @@ which_element_wrong_study <- function(object){
 }
 
 # check study info structure
-check_study_info_structure <- function(study_info){
-  names = names(study_info)
-  if(is.data.frame(study_info) == FALSE)
+check_study_table_structure <- function(study_table){
+  names = names(study_table)
+  if(is.data.frame(study_table) == FALSE)
   {# check study info is data frame
     stop("Study-Info is not a dataframe")
   } 
-  if (nrow(study_info) != 1){# check the number of rows in that dataframe, should be 1
+  if (nrow(study_table) != 1){# check the number of rows in that dataframe, should be 1
     stop("Study-Info contains more than one row")
   } 
 
-  if (!"comment" %in% names){
-    stop("Object needs to have a 'comment' element")
-  }
+  confirm_object_names(study_table, table_info_db$study_table)
   
-  if (is.na(study_info$comment) | is.null(study_info$comment) | study_info$comment == ""){
+  if (is.na(study_table$comment) | is.null(study_table$comment) | study_table$comment == ""){
     stop("Comment can not be empty")
   }
-
-  confirm_columns_not_specified(c("n_groups", "n_tasks"), study_info)
 }
 
 
-# This checks structure of study$group_info
-check_group_info_structure <- function(group_info){
-  names = names(group_info)
-  if(is.data.frame(group_info) == FALSE)
+# This checks structure of study$between_table
+check_between_table_structure <- function(between_table){
+  names = names(between_table)
+  if(is.data.frame(between_table) == FALSE)
   {
-    stop("Group-Info is not a dataframe")
+    stop("Between-Table is not a dataframe")
   }
   
-  if (nrow(group_info) > 1){
+  if (nrow(between_table) > 1){
     if (!"group_description" %in% names){
       stop("Object needs to have a 'group_description' element")
     }
     
-    if (is.na(group_info$group_description) | is.null(group_info$group_description) | group_info$group_description == ""){
+    if (is.na(between_table$group_description) | is.null(between_table$group_description) | between_table$group_description == ""){
       stop("group_description can not be empty")
     }
   }
   
-  if (!"group" %in% names){
-    stop("Object needs to have a 'group' element")
+  if (!"between" %in% names){
+    stop("Object needs to have a 'between' element")
   }
   
-  confirm_columns_not_specified(c("mean_age", "percentage_female",
-                                  "n_participants", "group_description"),
-                                group_info)
+  confirm_object_names(between_table, table_info_db$between_table)
 }
 
 # This function checks the entries on study level to see if they have proper structure
@@ -119,14 +114,14 @@ check_study_level_structure <- function(object){
   names = names(object)
   length = length(object)
   # This speed up processing if all elements are in correct order
-  if (!all(names == c("study_info", "group_info", paste0("data", 1:(length-2)))))
+  if (!all(names == c("study_table", "between_table", paste0("data", 1:(length-2)))))
   {
     which_element_wrong_study(object)
   }
   
   # Check the study info element
-  check_study_info_structure(object$study_info)
+  check_study_table_structure(object$study_table)
   
   # Check group
-  check_group_info_structure(object$group_info)
+  check_between_table_structure(object$between_table)
 }

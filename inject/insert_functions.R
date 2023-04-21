@@ -7,7 +7,7 @@ add_table <- function(conn, table, type){
   # Depending on the type, read out the column names from name list
   
   # Only read possible cols
-  possible_cols = column_names_db[[type]]
+  possible_cols = table_info_db[[type]]
   
   insert = table[which_elements_exist(possible_cols, table)]
   

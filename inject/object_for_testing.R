@@ -81,7 +81,7 @@ object = list(
     publication_table = publication_info_1,
     study1 = list(
       study_table = study_info_1,
-      group_table = group_info_1,
+      between_table = group_info_1,
       data1 = list(
         task_table = task_info,
         dataset_table = dataset_1,
@@ -99,7 +99,7 @@ object = list(
     ),
     study2 = list(
       study_table = study_info_2,
-      group_table = group_info_2,
+      between_table = group_info_2,
       data1 = list(
         task_table = task_info,
         dataset_table = dataset_1,
@@ -113,7 +113,7 @@ object = list(
     publication_table = publication_info_1,
     study1 = list(
       study_table = study_info_1,
-      group_table = group_info_1,
+      between_table = group_info_1,
       data1 = list(
         task_table = task_info,
         dataset_table = dataset_1,
@@ -131,12 +131,12 @@ object = list(
     ),
     study2 = list(
       study_table = study_info_2,
-      group_table = group_info_2,
+      between_table = group_info_2,
       data1 = list(
         task_table = task_info,
         dataset_table = dataset_1,
         within_table = within,
-        condition = condition,
+        condition_table = condition,
         observation_table = observation
       )
     )
