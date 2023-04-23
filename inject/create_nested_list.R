@@ -78,7 +78,7 @@ study2_task2_github <- "https://raw.githubusercontent.com/jstbcs/inhibitiontasks
 # PUBLICATION LEVEL  --------------------
 pub <- list()
 
-pub$publication_info <- data.frame(
+pub$publication_table <- data.frame(
   authors = authors, 
   conducted = conducted, 
   added = Sys.Date(), 
@@ -110,7 +110,7 @@ for (i in 1:n_studies){
   
   
   # study_info table
-  pub[[i+1]]$study_info <- data.frame(
+  pub[[i+1]]$study_table <- data.frame(
     n_groups = eval(parse(text = n_groups_name)), 
     n_tasks = eval(parse(text = n_tasks_name)),
     comment = eval(parse(text = comment_name))
@@ -118,7 +118,7 @@ for (i in 1:n_studies){
 
   
   # group_info table 
-  pub[[i+1]]$group_info <- data.frame(
+  pub[[i+1]]$group_table <- data.frame(
     group =  eval(parse(text = group_number_name)),
     mean_age = eval(parse(text = group_meanage_name)),
     pecentage_female = eval(parse(text = group_percfem_name)),
@@ -127,13 +127,13 @@ for (i in 1:n_studies){
   )
   
   # if just one group and no description given: automatically fill in description
-  if(pub[[i+1]]$study_info$n_groups == 1 && is.na(eval(parse(text = group_descr_name)))){
-    pub[[i+1]]$group_info$group_description <- "all participants in same group"
+  if(pub[[i+1]]$study_table$n_groups == 1 && is.na(eval(parse(text = group_descr_name)))){
+    pub[[i+1]]$group_table$group_description <- "all participants in same group"
   }
   
   # if more than one group: add info in additional rows
-  if(pub[[i+1]]$study_info$n_groups > 1) {
-    for(j in 2:pub[[i+1]]$study_info$n_groups) {
+  if(pub[[i+1]]$study_table$n_groups > 1) {
+    for(j in 2:pub[[i+1]]$study_table$n_groups) {
       # update object names of respective group j
       current_group_number_name <- paste("study", i, "_group",j, "_number", sep = "") # default for group 1
       current_group_descr_name <- paste("study", i, "_group", j, "_descr", sep = "")
@@ -142,11 +142,11 @@ for (i in 1:n_studies){
       current_group_members_name <- paste("study", i, "_group", j, "_members", sep = "")
       
       # add info to respective row in group_info
-      pub[[i+1]]$group_info$group[j] <- eval(parse(text = current_group_number_name))
-      pub[[i+1]]$group_info$mean_age[j] <- eval(parse(text = current_group_meanage_name))
-      pub[[i+1]]$group_info$percentage_female[j] <- eval(parse(text = current_percfem_number_name))
-      pub[[i+1]]$group_info$n_members[j] <- eval(parse(text = current_group_members_name))
-      pub[[i+1]]$group_info$group_description[j] <- eval(parse(text = current_group_descr_name))
+      pub[[i+1]]$group_table$group[j] <- eval(parse(text = current_group_number_name))
+      pub[[i+1]]$group_table$mean_age[j] <- eval(parse(text = current_group_meanage_name))
+      pub[[i+1]]$group_table$percentage_female[j] <- eval(parse(text = current_percfem_number_name))
+      pub[[i+1]]$group_table$n_members[j] <- eval(parse(text = current_group_members_name))
+      pub[[i+1]]$group_table$group_description[j] <- eval(parse(text = current_group_descr_name))
     }
     
   }
