@@ -135,7 +135,7 @@ dataset8 <- dataset8 %>% filter(exp == 0) %>% # keep classic Simon task data
          subject = as.factor(subject),
          congruency = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
          congruency = as.factor(congruency),
-         group = NA, 
+         between = NA, 
          within = NA) %>%
   select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
@@ -149,7 +149,7 @@ dataset9 <- dataset9 %>% filter(blktype == 0) %>% # keep lateral Simon task data
          subject = as.factor(subject),
          congruency = ifelse(cond == 1, 1, ifelse(cond == 0, 2, ifelse(cond == 2, 3, NA))),
          congruency = as.factor(congruency),
-         group = NA, 
+         between = NA, 
          within = NA) %>%
   select(datasetid, subject, block, trial, congruency, between, within, accuracy, rt) 
 
