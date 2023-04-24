@@ -77,14 +77,14 @@ filter_condition <- function(df_test, cond = 1) {
 
 # percentage congruent
 get_perc_congr <- function(df_cond){
-  perc_congr <- sum(df$congruency == 1) / length(df$congruency)
-  return(round(perc_congr),2)
+  perc_congr <- round(sum(df$congruency == 1) / length(df$congruency),2)
+  return(perc_congr)
 }
 
 # percentage neutral
 get_perc_neut <- function(df_cond){
-  perc_neut <- sum(df$congruency == 3) / length(df$congruency)
-  return(round(perc_neut),2)  
+  perc_neut <- round(sum(df$congruency == 3) / length(df$congruency),2)
+  return(perc_neut) 
 }
 
 # mean_obs_pp
@@ -94,7 +94,9 @@ get_mean_obs_pp <- function(df_cond){
     summarise(N = n()) %>%
     summarise(mean(N))
   
-  return(round(mean_obs$`mean(N)`, 0))
+  mean_obs <- round(mean_obs$`mean(N)`,0)
+  
+  return(mean_obs)
 }
 
 # n_obs
