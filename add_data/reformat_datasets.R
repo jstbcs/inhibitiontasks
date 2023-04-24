@@ -407,8 +407,7 @@ dataset42 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
     subject = as.factor(uid),
     block = lapply(blockf, function(i) as.numeric(strsplit(i, " ")[[1]][2])),
     trial = trialN + 1, 
-    between = NA, # NOTE: change later; this is agegroup + add gender?
-    # max age is 31
+    between = NA, 
     within = NA, 
     congruency = ifelse(grepl("Incompatible", compf), 2, 1), 
     accuracy = corr) %>% 
