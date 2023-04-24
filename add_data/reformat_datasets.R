@@ -373,6 +373,22 @@ dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
       phase == "retest" & session == "proactive" ~ 6),
     between = NA, 
     within = factor(interaction(phase, session, itemType)),   # baseline/ reactive/ proactive condition and test setting
+    within = case_when(
+      within == "test.baseline.MC" ~ 1, 
+      within == "test.baseline.PC50" ~ 2, 
+      within == "test.reactive.MC" ~ 3, 
+      within == "test.reactice.PC50" ~ 4,
+      within == "test.reactive.MI" ~ 5, 
+      within == "test.proactive.PC50" ~ 6, 
+      within == "test.proactive.MI" ~ 7, 
+      within == "restest.baseline.MC" ~ 8, 
+      within == "restest.baseline.PC50" ~ 9, 
+      within == "retest.reactive.MC" ~ 10, 
+      within == "retest.reactive.PC50" ~ 11, 
+      within == "retest.reactive.MI" ~ 12, 
+      within == "retest.proactive.PC50" ~ 13, 
+      within == "retest.proactive.MI" ~ 14
+    ),
     congruency = ifelse(grepl("incon", trialCode), 2, 1),
     accuracy = ACC,
     rt = RT / 1000)  %>%
