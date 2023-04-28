@@ -96,13 +96,9 @@ check_between_table_structure <- function(between_table){
       stop("Object needs to have a 'group_description' element")
     }
     
-    if (is.na(between_table$group_description) | is.null(between_table$group_description) | between_table$group_description == ""){
+    if (any(is.na(between_table$group_description)) | any(is.null(between_table$group_description)) | any(between_table$group_description == "")){
       stop("group_description can not be empty")
     }
-  }
-  
-  if (!"between" %in% names){
-    stop("Object needs to have a 'between' element")
   }
   
   confirm_object_names(between_table, entry_list_info$between_table)
