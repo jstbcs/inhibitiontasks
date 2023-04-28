@@ -11,6 +11,11 @@ obtain_keys <- function(info_table, method){
   
   keys = info_table[, c(key_name, id_name)]
 
+  if (is.character(keys[, key_name])){
+    keys[, key_name] = parse_number(keys[, key_name])
+    
+  }
+  
   return(keys)
 }
 
@@ -19,6 +24,7 @@ replace_id_keys_in_data <- function(data, keys, method){
   
   # Keys has colums: within_name and within_id, we want within, within_id
   colnames(keys) = c(method, id_name)
+  
   
   data = data %>% 
     dplyr::left_join(., keys) %>% 

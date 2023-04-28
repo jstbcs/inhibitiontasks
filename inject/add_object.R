@@ -101,7 +101,7 @@ add_study <- function(conn, study_add, pub_id){
       conn,
       study_add[[data_element]],
       study_id,
-      group_keys
+      between_keys
     )
   }
   
@@ -114,9 +114,9 @@ add_object <- function(conn, object){
   
   for (publication in pub_names){
     pub_code = object[[publication]]$publication_table$publication_code
-    # if (does_publication_code_exist(conn, pub_code) == TRUE){
-    #   stop("This publication code already exists. Please use the append_db function to add to a specific publication.")
-    # }
+    if (does_publication_code_exist(conn, pub_code) == TRUE){
+      stop("This publication code already exists. Please use the append_db function to add to a specific publication.")
+    }
     
     # Find and add pub id
     pub_id = find_next_free_id(conn, "publication_table")
