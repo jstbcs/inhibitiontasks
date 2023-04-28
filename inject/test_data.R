@@ -51,7 +51,7 @@ correct_cols_in_task_table <- function(task_table){
   }
   
   # stop if required column names are not present
-  confirm_object_names(task_table, table_info_db$task_table)
+  confirm_object_names(task_table, entry_list_info$task_table)
   
   # Check to see if task name is valid
   task_name = task_table$task_name
@@ -78,7 +78,7 @@ correct_cols_in_dataset_table <- function(dataset_table){
     stop("The dataset_table data frame can only contain 1 row")
   }
   
-  confirm_object_names(dataset_table, table_info_db$observation_table)
+  confirm_object_names(dataset_table, entry_list_info$observation_table)
 }
 
 
@@ -92,7 +92,7 @@ correct_cols_in_observation_table <- function(observation_table){
   }
   
   # stop if required column names are not present
-  confirm_object_names(observation_table, table_info_db$observation_table)
+  confirm_object_names(observation_table, entry_list_info$observation_table)
 }
 
 
@@ -106,7 +106,7 @@ correct_cols_in_within_table <- function(within_table){
   }
   
   # stop if required column names are not present
-  confirm_object_names(within_table, table_info_db$within_table)
+  confirm_object_names(within_table, entry_list_info$within_table)
 }
 
 # This function checks whether all required columns of condition_table are provided 
@@ -119,7 +119,7 @@ correct_cols_in_condition_table <- function(condition_table){
   }
   
   # stop if required column names are not present
-  confirm_object_names(condition_table, table_info_db$condition_table)
+  confirm_object_names(condition_table, entry_list_info$condition_table)
 }
 
 

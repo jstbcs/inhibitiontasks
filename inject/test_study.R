@@ -75,7 +75,7 @@ check_study_table_structure <- function(study_table){
     stop("Study-Info contains more than one row")
   } 
 
-  confirm_object_names(study_table, table_info_db$study_table)
+  confirm_object_names(study_table, entry_list_info$study_table)
   
   if (is.na(study_table$comment) | is.null(study_table$comment) | study_table$comment == ""){
     stop("Comment can not be empty")
@@ -105,7 +105,7 @@ check_between_table_structure <- function(between_table){
     stop("Object needs to have a 'between' element")
   }
   
-  confirm_object_names(between_table, table_info_db$between_table)
+  confirm_object_names(between_table, entry_list_info$between_table)
 }
 
 # This function checks the entries on study level to see if they have proper structure
