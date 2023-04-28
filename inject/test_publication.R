@@ -12,7 +12,7 @@ check_publication_level_structure <- function(object){
 }
 
 check_publication_table <- function(pub_table){
-  name = names(pub_table)
+  names = names(pub_table)
   stop_if_names_duplicated(names)
   
   confirm_object_names(pub_table, entry_list_info$publication_table)
