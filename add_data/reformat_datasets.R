@@ -401,12 +401,13 @@ dataset41 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibit
 
 
 # Dataset 42 (Chetverikov et al., 2017); data online at https://osf.io/7rb48
-dataset42 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/chetverikov_2017_blame/flanker_data.csv") 
-dataset42 <- dataset42 %>% 
+dataset42 <- data.table::fread("https://raw.githubusercontent.com/jstbcs/inhibitiontasks/adding-new-data/data/chetverikov_2017_blame/flanker_data.csv") %>% 
   mutate(
     datasetid = 42,
     subject = as.factor(uid),
-    block = sapply(blockf, function(i) as.numeric(strsplit(i, " ")[[1]][2])),
+    #block = lapply(dataset42, 1, function(i) as.numeric(strsplit(i, " ")[[1]][2])),
+    block = gsub("Block ", " ", blockf),
+    block = as.numeric(block),
     trial = trialN + 1, 
     between = NA, 
     within = NA, 
