@@ -1,5 +1,4 @@
 # # check structure of inserted element on  publication level
-source("./inject/helper_functions.R")
 # This function checks elements on publication level
 check_publication_level_structure <- function(object){
   names = names(object)
