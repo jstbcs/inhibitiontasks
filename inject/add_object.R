@@ -45,7 +45,7 @@ add_data <- function(conn, entry_data, study_id, group_keys){
   
   # Replace group, within, condition in data
   entry_data$observation_table = entry_data$observation_table %>% 
-    replace_id_keys_in_data(., group_keys, "group") %>% 
+    replace_id_keys_in_data(., group_keys, "between") %>% 
     replace_id_keys_in_data(., within_keys, "within") %>% 
     replace_id_keys_in_data(., condition_keys, "condition")
   
@@ -59,7 +59,8 @@ add_data <- function(conn, entry_data, study_id, group_keys){
   condition = entry_data$condition_table
   add_table(conn, condition, "condition_table")
   
-  observation = entry_data$observation_table
+  observation = as.data.frame(entry_data$observation_table)
+  
   add_table(conn, observation, "observation_table")
 }
 
@@ -74,12 +75,12 @@ add_study <- function(conn, study_add, pub_id){
   
   # Then add the study table
   study_table = study_add$study_table
-  add_table(conn, study_table, "study")
+  add_table(conn, study_table, "study_table")
   
   between_id = find_next_free_id(conn, "between_table")
   
   # This adds the global group-id to the group_id table
-  for (row in 1:nrow(study_add$group_info)){
+  for (row in 1:nrow(study_add$between_table)){
     study_add$between_table$between_id[row] = between_id
     between_id = between_id + 1
   }
@@ -95,10 +96,10 @@ add_study <- function(conn, study_add, pub_id){
   # Now moving to dataset
   data_names = which_elements_match(names(study_add), regex_matches_data_names)
   
-  for (data in data_names){
+  for (data_element in data_names){
     add_data(
       conn,
-      study_add[[data]],
+      study_add[[data_element]],
       study_id,
       group_keys
     )

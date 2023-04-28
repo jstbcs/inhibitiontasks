@@ -56,7 +56,7 @@ dbExecute(
   study_id INTEGER,
   mean_age FLOAT,
   percentage_female FLOAT,
-  n_nembers INTEGER,
+  n_members INTEGER,
   group_description VARCHAR(10000),
   FOREIGN KEY (study_id) REFERENCES study_table(study_id)
   );"
