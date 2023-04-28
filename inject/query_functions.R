@@ -1,14 +1,4 @@
-# Functions that query the database and return certain objects
-return_id_name <- function(type){
-  if (type == "data" | type == "dataset_overview"){
-    name = "dataset_id"
-  } else if(type == "group_table") {
-    name = "group_id"
-  } else{
-    name = paste0(type, "_id")
-  }
-  return(name)
-}
+# Functions that query the database and return certain object
 
 return_publication_code <- function(publication_info){
   publication_code = publication_info$publication_code
@@ -16,7 +6,7 @@ return_publication_code <- function(publication_info){
 }
 
 does_publication_code_exist <- function(conn, code){
-  pub_table = tbl(conn, "publication")
+  pub_table = tbl(conn, "publication_table")
   pub_id = pub_table %>% 
     filter(publication_code == code) %>% 
     pull(publication_id)
@@ -31,7 +21,7 @@ does_publication_code_exist <- function(conn, code){
 }
 
 find_publication_id <- function(conn, code){
-  pub_table = tbl(conn, "publication")
+  pub_table = tbl(conn, "publication_table")
   pub_id = pub_table %>% 
     filter(publication_code == code) %>% 
     pull(publication_id)
@@ -40,7 +30,7 @@ find_publication_id <- function(conn, code){
 
 find_next_free_id <- function(conn, type){
   data = as.data.frame(tbl(conn, type))
-  column = return_id_name(type)
+  column = return_id_name_from_table(type)
   max = max(data[column], na.rm = TRUE)
   if (is.na(max) | max <= 0){
     max = 0
@@ -50,7 +40,7 @@ find_next_free_id <- function(conn, type){
 }
 
 find_next_free_publication_id <- function(conn){
-  pub_table = tbl(conn, "publication")
+  pub_table = tbl(conn, "publication_table")
   next_free = find_next_free(pub_table, "publication_id")
   return(next_free)
 }

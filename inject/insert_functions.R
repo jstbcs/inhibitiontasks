@@ -9,7 +9,7 @@ add_table <- function(conn, table, type){
   # Only read possible cols
   possible_cols = table_info_db[[type]]
   
-  insert = table[which_elements_exist(possible_cols, table)]
+  insert = table[which_elements_exist(possible_cols$column, table)]
   
   dbWriteTable(
     conn = conn,

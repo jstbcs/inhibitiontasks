@@ -32,6 +32,7 @@ dbExecute(
   country VARCHAR(255),
   contact VARCHAR(10000),
   apa_reference VARCHAR(10000),
+  keywords VARCHAR(10000),
   publication_code VARCHAR(255) UNIQUE
   );"
 )

@@ -63,42 +63,42 @@ add_data <- function(conn, entry_data, study_id, group_keys){
   add_table(conn, observation, "observation_table")
 }
 
-add_study <- function(conn, study, pub_id){
+add_study <- function(conn, study_add, pub_id){
   study_id = find_next_free_id(conn, "study_table")
   # Add study id to study_info and group_info
-  study$study_table$study_id = study_id
-  study$between_table$study_id = study_id
+  study_add$study_table$study_id = study_id
+  study_add$between_table$study_id = study_id
   
   # Also add the publication id
-  study$study_table$publication_id = pub_id
+  study_add$study_table$publication_id = pub_id
   
   # Then add the study table
-  study_table = study$study_table
+  study_table = study_add$study_table
   add_table(conn, study_table, "study")
   
   between_id = find_next_free_id(conn, "between_table")
   
   # This adds the global group-id to the group_id table
-  for (row in 1:nrow(study$group_info)){
-    study$between_table$between_id[row] = between_id
+  for (row in 1:nrow(study_add$group_info)){
+    study_add$between_table$between_id[row] = between_id
     between_id = between_id + 1
   }
   
-  between_keys = obtain_keys(study$between_table,
+  between_keys = obtain_keys(study_add$between_table,
                            "between")
   
   # Then add the group table
-  between_table = study$between_table
+  between_table = study_add$between_table
   
   add_table(conn, between_table, "between_table")
   
   # Now moving to dataset
-  data_names = which_elements_match(names(study), regex_matches_data_names)
+  data_names = which_elements_match(names(study_add), regex_matches_data_names)
   
   for (data in data_names){
     add_data(
       conn,
-      study[[data]],
+      study_add[[data]],
       study_id,
       group_keys
     )
@@ -113,9 +113,9 @@ add_object <- function(conn, object){
   
   for (publication in pub_names){
     pub_code = object[[publication]]$publication_table$publication_code
-    if (does_publication_code_exist(conn, pub_code) == TRUE){
-      stop("This publication code already exists. Please use the append_db function to add to a specific publication.")
-    }
+    # if (does_publication_code_exist(conn, pub_code) == TRUE){
+    #   stop("This publication code already exists. Please use the append_db function to add to a specific publication.")
+    # }
     
     # Find and add pub id
     pub_id = find_next_free_id(conn, "publication_table")
