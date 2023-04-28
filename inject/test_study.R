@@ -101,10 +101,6 @@ check_between_table_structure <- function(between_table){
     }
   }
   
-  if (!"between" %in% names){
-    stop("Object needs to have a 'between' element")
-  }
-  
   confirm_object_names(between_table, entry_list_info$between_table)
 }
 

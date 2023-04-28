@@ -78,7 +78,7 @@ correct_cols_in_dataset_table <- function(dataset_table){
     stop("The dataset_table data frame can only contain 1 row")
   }
   
-  confirm_object_names(dataset_table, entry_list_info$observation_table)
+  confirm_object_names(dataset_table, entry_list_info$dataset_table)
 }
 
 
@@ -124,20 +124,20 @@ correct_cols_in_condition_table <- function(condition_table){
 
 
 # This function checks whether the number of rows in the within_table table equals the 
-# number of within conditions coded in the data table and whether there are duplicate within_ids 
-# in within_id
+# number of within conditions coded in the data table and whether there are duplicate within_names 
+# in within_name
 correct_n_of_withinid <- function(within_table, observation_table){
   # check if within ids are unique
-  if(length(unique(within_table$within_id)) != nrow(within_table)){
-    stop("Duplicate within_id in within_table found. Make sure within_id is unique")
+  if(length(unique(within_table$within_name)) != nrow(within_table)){
+    stop("Duplicate within_name in within_table found. Make sure within_name is unique")
   }
   
   # check if number of within id matches within columns in data table
-  if(length(unique(observation_table$within)) > length(unique(within_table$within_id))){
+  if(length(unique(observation_table$within)) > length(unique(within_table$within_name))){
     stop("Number of unique within conditions in data table is larger than in within_table table. 
          \nMake sure all within conditions are included in within_table.")
-  } else if(length(unique(observation_table$within)) < length(unique(within_table$within_id))){
-    stop("The within_table table contains more unique within_ids than the data table does. 
+  } else if(length(unique(observation_table$within)) < length(unique(within_table$within_name))){
+    stop("The within_table table contains more unique within_names than the data table does. 
          \nMake sure the within column in the data table is coded correctly and the 
          within_table table contains only relevant within conditions")
   }
@@ -164,8 +164,8 @@ check_data_level_structure <- function(data_i){
   correct_cols_in_condition_table(data_i$condition_table)
   correct_cols_in_observation_table(data_i$observation_table)
   
-  # check if number of within condition in data equals number of within_ids in within_table
-  correct_n_of_withinid(data_i$within_table, data_i$data)
+  # check if number of within condition in data equals number of within_names in within_table
+  correct_n_of_withinid(data_i$within_table, data_i$observation_table)
 }
 
 

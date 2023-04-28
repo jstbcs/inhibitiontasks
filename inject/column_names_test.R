@@ -81,7 +81,7 @@ observation_table_columns <- c(
   "within",
   "condition",
   "congruency",
-  "accruacy",
+  "accuracy",
   "rt"
 )
 

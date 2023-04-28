@@ -96,7 +96,7 @@ observation_table_columns <- c(
   "within_id",
   "condition_id",
   "congruency",
-  "accruacy",
+  "accuracy",
   "rt"
 )
 
