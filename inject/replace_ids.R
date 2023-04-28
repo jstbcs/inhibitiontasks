@@ -3,18 +3,23 @@
 
 obtain_keys <- function(info_table, method){
   id_name = paste0(method, "_id")
+  key_name = paste0(method, "_name")
   
   if (!id_name %in% names(info_table)){
     stop("Remember to add the proper db ids to the table first")
   }
   
-  keys = info_table[, c(method, id_name)]
-  
+  keys = info_table[, c(key_name, id_name)]
+
   return(keys)
 }
 
 replace_id_keys_in_data <- function(data, keys, method){
   id_name = paste0(method, "_id")
+  
+  # Keys has colums: within_name and within_id, we want within, within_id
+  colnames(keys) = c(method, id_name)
+  
   data = data %>% 
     dplyr::left_join(., keys) %>% 
     select(-{{method}}) 
