@@ -23,7 +23,6 @@ study_table_mandatory <- c(1, 1, 1)
 
 dataset_table_columns <- c(
   "data_excl",
-  "codebook",
   "n_participants",
   "n_blocks",
   "n_trials",
@@ -36,7 +35,7 @@ dataset_table_columns <- c(
 
 dataset_table_mandatory <- c(0, 0, 0, 0,
                              0, 0, 0, 0,
-                             0, 0)
+                             0)
 
 within_table_columns <- c(
   "within_name",
