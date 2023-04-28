@@ -109,3 +109,21 @@ entry_list_info <- list(
 )
 
 
+rm(
+  publication_table_columns,
+  publication_table_mandatory,
+  study_table_columns,
+  study_table_mandatory,
+  dataset_table_columns,
+  dataset_table_mandatory,
+  within_table_columns,
+  within_table_mandatory,
+  between_table_columns,
+  between_table_mandatory,
+  condition_table_columns,
+  condition_table_mandatory,
+  observation_table_columns,
+  observation_table_mandatory,
+  task_table_columns,
+  task_table_mandatory
+)
