@@ -15,7 +15,7 @@ library(DBI)
 ```
 
 ```{r connection}
-conn <- DBI::dbConnect(RSQLite::SQLite(), "pilot.db")
+conn <- DBI::dbConnect(RSQLite::SQLite(), "initial_db.db")
 ```
 
 ```{r creating tables}
