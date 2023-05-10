@@ -1,4 +1,6 @@
 extract_table_ids <- function(conn, table, name = NULL){
+  # TODO: Replace this with SQL-Language
+  
   data = as.data.frame(tbl(conn, table))
   ids = data %>% 
     select(ends_with("_id"))

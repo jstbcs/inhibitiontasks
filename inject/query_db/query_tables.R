@@ -72,10 +72,13 @@ filter_equal <- function(data, column, cutoff_value){
 
 query_db <- function(conn, arguments, target_level = "data"){
   # TODO: Testing fro structure
-  # TODO: Target-
+  # TODO: Target-level
+  # TODO: Have the first set of returned IDs be a baseline for the next query.
+    # Dont query all ids for all arguments. Think about at which points this is important
+  #
   # arguments = list(list(column = "column", values = c(value1, value2?)), list(...))
   
-  # Querying starts
+  # Querying starts 
   column_names = get_column_names(conn)
   
   arguments_matches = list()

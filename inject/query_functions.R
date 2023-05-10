@@ -58,11 +58,3 @@ return_publication_id <- function(conn, code){
   }
 }
 
-filter_db_table <- function(conn, table, filter_function){
-  data = tbl(conn, table)
-  result = data %>% filter_function
-  
-  return(result)
-}
-
-
