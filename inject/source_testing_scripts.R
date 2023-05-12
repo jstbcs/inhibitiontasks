@@ -1,0 +1,7 @@
+source("./inject/general_test.R")
+source("./helper_functions/helper_functions.R")
+source("./inject/test_publication.R")
+source("./inject/test_study.R")
+source("./inject/test_data.R")
+source("./helper_functions/column_names_db.R")
+source("./inject/column_names_test.R")
