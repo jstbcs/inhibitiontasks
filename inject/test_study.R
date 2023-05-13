@@ -1,6 +1,4 @@
 # CHECK STRUCTURE OF INSERTED ELEMENT ON STUDY LEVEL  
-source("./inject/helper_functions.R")
-
 
 # This function checks whether element on study level contains:
 # 1. "study_table"

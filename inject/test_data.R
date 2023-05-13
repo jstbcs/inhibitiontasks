@@ -9,8 +9,6 @@
 #  within_table = within_description
 #)
 
-source("./inject/helper_functions.R")
-
 # ---
 
 # This function checks whether an element on the data-level consists of one task element,

@@ -4,7 +4,7 @@ library(RSQLite)
 library(DBI)
 
 # Getting info on lists
-data_folder_path = ".Create_db/add_data/"
+data_folder_path = "./Create_db/add_data/"
 
 list_files = list.files(data_folder_path, "(list).*(RData)", full.names = TRUE)
 
@@ -28,6 +28,6 @@ check_overall_structure(lists)
 source("./inject/source_adding_scripts.R")
 
 # Adding lists
-db_conn = DBI::dbConnect(RSQLite::SQLite(), "initial_db.db")
+db_conn = DBI::dbConnect(RSQLite::SQLite(), "testing.db")
 
 add_object(db_conn, lists)
