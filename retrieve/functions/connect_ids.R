@@ -5,7 +5,7 @@ return_connected_ids <- function(conn, table, ids){
   done = c()
   finished = c("publication_table", "study_table", "condition_table", 
                "dataset_table", "observation_table",
-               "group_table", "within_table", "task_table")
+               "between_table", "within_table", "task_table")
 
   counter = 0
   
@@ -143,7 +143,7 @@ return_connected_ids <- function(conn, table, ids){
 library(DBI)
 library(RSQLite)
 library(dplyr)
-conn = DBI::dbConnect(RSQLite::SQLite(), "pilot.db")
+conn = DBI::dbConnect(RSQLite::SQLite(), "initial_db.db")
 table = "study_table"
 ids = c(2,3)
 

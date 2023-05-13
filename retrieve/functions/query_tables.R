@@ -1,100 +1,45 @@
 # Function for selecting based on one or two values
-
-check_filter_db_arguments <- function(data, column, cutoff_values, alternative){
-  if (!alternative %in% c("greater", "less", "between", "two.sided", "equal")){
-    stop("alternative can only be 'greater', 'less' or 'between'.")
-  }
-  if (alternative == "two.sided"){
-    alternative == "between"
-  }
-  if (is.vector(cutoff_values) == FALSE){
-    stop("Specify cutoff values as a vector")
-  }
-  if (length(cutoff_values) != 2 & length(cutoff_values) != 1){
-    stop("Cutoff values can only be one or two values")
-  }
-  
-  if (cutoff_values[1] > cutoff_values[2]){
-    stop("The first cutoff value must be the minimum, the second the maximum")
-  }
-  
-  if (alternative == "greater" | alternative == "less" | alternative == "equal"){
-    if (length(cutoff_values) != 1){
-      stop("For alternatives 'equal', 'greater' and 'less' there can only be one cutoff-value specified")
-    }
-  }
-}
-
-filter_db <- function(data, column, cutoff_values, alternative = "greater"){
-  check_filter_db_arguments(data, column, cutoff_values, alternative)
-  
-  if (alternative == "greater"){
-    filter = filter_greater(data, column, cutoff_values)
-  }
-  if (alternative == "less"){
-    filter = filter_less(data, column, cutoff_values)
-  }
-  if (alternative == "between"){
-    filter = filter_between(data, column, cutoff_values)
-  }
-  
-  if(alternative == "equal"){
-    filter = filter_equal(data, column, cutoff_values)
-  }
-  return(filter)
-}
-
-filter_greater <- function(data, column, cutoff_value){
-  filtered_data = data %>% 
-    filter({{column}} > cutoff_value)
-  
-  return(filtered_data)
-}
-
-filter_less <- function(data, column, cutoff_value){
-  filtered_data = data %>% 
-    filter({{column}} < cutoff_value)
-  return(filtered_data)
-}
-
-filter_between <- function(data, column, cutoff_values){
-  filtered_data = data %>% 
-    filter({{column}} > cutoff_values[1] & {{column}} < cutoff_values[2])
-  return(filtered_data)
-}
-
-filter_equal <- function(data, column, cutoff_value){
-  filtered_data = data %>% 
-    filter({{column}} == cutoff_value)
-  
-  return(filtered_data)
-}
-
-query_db <- function(conn, arguments, target_level = "data"){
+query_db <- function(conn, arguments, target_level = "data", argument_relation = "and"){
   # TODO: Testing fro structure
   # TODO: Target-level
+  # TODO: Have argument-relation support. Different numbers are connected via AND, 
+    # Same numbers are connected via OR
   # TODO: Have the first set of returned IDs be a baseline for the next query.
+  # You can do this by having the first argument add ids into predefined structure
+  # Then when you query the new argument, check which table it query, find out the ids that 
+  # Match the agruments' condition and then only add ids that are new (not in the predefined structure)
     # Dont query all ids for all arguments. Think about at which points this is important
   #
-  # arguments = list(list(column = "column", values = c(value1, value2?)), list(...))
+  # arguments = list("argument1", "argument2")
   
   # Querying starts 
   column_names = get_column_names(conn)
   
-  arguments_matches = list()
+  possible_ids = list(
+    publication_id = list(),
+    study_id = list(),
+    between_id = list(),
+    within_id = list(),
+    condition_id = list(),
+    task_id = list(),
+    observation_id = list(),
+    dataset_table = list()
+  )
+  
+  argument_matches = list()
   
   for (i in seq_along(arguments)){
-    relevant_tables = find_relevant_tables(conn, arguments[[i]]$column, column_names)
-    
-    # Init list
-    table_match_ids = list(
-      tables = relevant_tables
-    )
-    for (j in seq_along(relevant_tables)){
-      ids = extract_table_ids(conn, relevant_tables[i])
-      table_match_ids[[j+1]] = ids
+    argument_matches[[i]] = possible_ids
+  }
+  
+  for (i in seq_along(arguments)){
+    # Loop through arguments, find matching primary keys
+    # Then find keys connected to these matches
+    # If its the first iteration (first argument), then the init ids is the matches
+    # Otherwise it is only the matches that are already present in the arguments
+    if (i == 1){
+      init_ids = 
     }
-    arguments_matches[[i]] = table_match_ids
   }
 }
 
