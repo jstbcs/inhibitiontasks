@@ -43,6 +43,17 @@ add_data <- function(conn, entry_data, study_id, group_keys){
                                "condition")
   
   
+  # Sometimes condition, between, or within might be NA, replace those
+  if (all(is.na(entry_data$observation_table$between))){
+    entry_data$observation_table$between = 1
+  }
+  if (all(is.na(entry_data$observation_table$within))){
+    entry_data$observation_table$within = 1
+  }
+  if (all(is.na(entry_data$observation_table$condition))){
+    entry_data$observation_table$condition = 1
+  }
+  
   # Replace group, within, condition in data
   entry_data$observation_table = entry_data$observation_table %>% 
     replace_id_keys_in_data(., group_keys, "between") %>% 

@@ -25,7 +25,6 @@ replace_id_keys_in_data <- function(data, keys, method){
   # Keys has colums: within_name and within_id, we want within, within_id
   colnames(keys) = c(method, id_name)
   
-  
   data = data %>% 
     dplyr::left_join(., keys) %>% 
     select(-{{method}}) 
