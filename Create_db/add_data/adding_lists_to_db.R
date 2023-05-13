@@ -28,6 +28,6 @@ check_overall_structure(lists)
 source("./inject/source_adding_scripts.R")
 
 # Adding lists
-db_conn = DBI::dbConnect(RSQLite::SQLite(), "testing.db")
+db_conn = DBI::dbConnect(RSQLite::SQLite(), "initial_db.db")
 
 add_object(db_conn, lists)

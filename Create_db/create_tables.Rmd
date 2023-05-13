@@ -108,7 +108,7 @@ dbExecute(
   percentage_neutral FLOAT,
   n_obs INTEGER,
   mean_obs_per_participant INTEGER,
-  FOREIGN KEY (dataset_id) REFERENCES dataset_table(dataset_id),
+  FOREIGN KEY (dataset_id) REFERENCES dataset_table(dataset_id)
   );"
 )
 
