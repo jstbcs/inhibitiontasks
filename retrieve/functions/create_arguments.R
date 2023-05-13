@@ -15,6 +15,11 @@ make_valid_sql <- function(conn, variable, operator, values){
   # Check validity of operator
   check_operator(operator, values)
   
+  # if values is a char, surround with ''
+  if (all(is.character(values))){
+    values = paste0("'", values, "'")
+  }
+  
   if (operator == "greater"){
     sql_statement = paste(
       "SELECT",
