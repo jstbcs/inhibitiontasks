@@ -104,16 +104,11 @@ dbExecute(
   "CREATE TABLE condition_table (
   condition_id INTEGER PRIMARY KEY AUTOINCREMENT,
   dataset_id INTEGER,
-  between_id INTEGER,
-  within_id INTEGER,
   percentage_congruent FLOAT,
   percentage_neutral FLOAT,
   n_obs INTEGER,
   mean_obs_per_participant INTEGER,
-  UNIQUE (dataset_id, between_id, within_id),
   FOREIGN KEY (dataset_id) REFERENCES dataset_table(dataset_id),
-  FOREIGN KEY (between_id) REFERENCES between_table(between_id),
-  FOREIGN KEY (within_id) REFERENCES within_table(within_id)
   );"
 )
 
