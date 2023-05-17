@@ -9,10 +9,6 @@ library(DBI)
 
 ```
 
-```{r functions}
-# Custom functions
-
-```
 
 ```{r connection}
 conn <- DBI::dbConnect(RSQLite::SQLite(), "initial_db.db")
