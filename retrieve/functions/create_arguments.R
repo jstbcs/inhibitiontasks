@@ -1,7 +1,15 @@
 # These functions serve to create arguments
 
-add_argument <- function(list, conn, variable, operator, values){
-  list[[length(list) + 1]] = make_valid_sql(conn, variable, operator, values)
+add_argument <- function(list, conn, variable, operator, values, manual = FALSE, statement = NULL){
+  if (manual == FALSE){
+    list[[length(list) + 1]] = make_valid_sql(conn, variable, operator, values)
+  } else {
+    if (is.null(statement)){
+      stop("When using manual argument select, specify a statement variable")
+    } else {
+      list[[length(list) + 1]] = statement
+    }
+  }
   return(list)
 }
 
@@ -48,15 +56,26 @@ make_valid_sql <- function(conn, variable, operator, values){
   }
   
   if (operator == "equal"){
+    equal_statement = ""
+    for (i in seq_along(values)){
+      added_statement = paste(
+        variable,
+        "=",
+        values[i]
+      )
+      if (i == 1){
+        equal_statement = added_statement
+      } else {
+        equal_statement = paste(equal_statement, "OR", added_statement)
+      }
+    }
     sql_statement = paste(
       "SELECT",
       id_name, 
       "FROM",
       table,
       "WHERE",
-      variable, 
-      "=",
-      values[1]
+      equal_statement
     )
   }
   
@@ -86,24 +105,27 @@ check_operator <- function(operator, values){
     stop(msg)
   }
   
-  if (length(values) > 2){
-    msg = "Please only provide a maximum of 2 values"
-    stop(msg)
-  }
-  
-  if (length(values) == 2 & (values[1] >= values[2])){
-    msg = "When providing two values, the first must be smaller than the second"
-    stop(msg)
-  }
+  # # Commented out because of 'equal' operator functionalities
+  # # TODO: Replace later
+  # if (length(values) > 2){
+  #   msg = "Please only provide a maximum of 2 values"
+  #   stop(msg)
+  # }
+  # 
+  # if (length(values) == 2 & (values[1] >= values[2])){
+  #   msg = "When providing two values, the first must be smaller than the second"
+  #   stop(msg)
+  # }
   
   if (operator == "between" & length(values) != 2){
     msg = "When using the 'between' operator, please provide two values"
     stop(msg)
   }
   
-  if (operator != "between" & length(values) != 1){
+  if (operator != "between" & operator != "equal" & length(values) != 1){
     msg = "When suing 'less', 'greater' or 'equal', provide only one value"
     stop(msg)
   }
   
 }
+

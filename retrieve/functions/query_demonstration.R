@@ -25,14 +25,7 @@ arguments %<>%
     conn = conn,
     variable = "task_name",
     operator = "equal",
-    values = "stroop"
-  ) %>% 
-  add_argument(
-    .,
-    conn = conn,
-    variable = "task_name",
-    operator = "equal",
-    values = "flanker"
+    values = c("stroop", "flanker")
   ) %>% 
   add_argument(
     .,
