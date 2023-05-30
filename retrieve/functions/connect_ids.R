@@ -139,12 +139,12 @@ return_connected_ids <- function(conn, table, ids){
   return(id_list)
 }
 
-
-library(DBI)
-library(RSQLite)
-library(dplyr)
-conn = DBI::dbConnect(RSQLite::SQLite(), "initial_db.db")
-table = "study_table"
-ids = c(2,3)
-
-test = return_connected_ids(conn, table, ids)
+# 
+# library(DBI)
+# library(RSQLite)
+# library(dplyr)
+# conn = DBI::dbConnect(RSQLite::SQLite(), "initial_db.db")
+# table = "study_table"
+# ids = c(2,3)
+# 
+# test = return_connected_ids(conn, table, ids)

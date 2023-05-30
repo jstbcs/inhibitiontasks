@@ -33,10 +33,19 @@ arguments %<>%
     variable = "n_tasks",
     operator = "greater",
     values = c(4)
+  ) %>% 
+  add_argument(
+    .,
+    conn = conn,
+    variable = "n_participants",
+    manual = TRUE,
+    statement = "SELECT dataset_id FROM dataset_table WHERE n_participants > 500"
   )
 
 test = query_db(
   conn,
-  arguments,
-  argument_relation = c(1, 2, 3, 3, 4)
+  arguments
 )
+
+test_df = merge_query_results(test)
+
