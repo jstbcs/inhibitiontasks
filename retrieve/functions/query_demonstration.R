@@ -2,7 +2,7 @@ library(DBI)
 library(RSQLite)
 library(dplyr)
 conn = DBI::dbConnect(RSQLite::SQLite(), "initial_db.db")
-
+source("./retrieve/functions/source_query_scripts.R")
 arguments = list()
 
 arguments %<>% 
@@ -12,6 +12,13 @@ arguments %<>%
     variable = "accuracy",
     operator = "equal",
     values = c(1)
+  ) %>% 
+  add_argument(
+    .,
+    conn = conn,
+    variable = "n_participants",
+    manual = TRUE,
+    statement = "SELECT dataset_id FROM dataset_table WHERE n_participants > 500"
   ) %>% 
   add_argument(
     .,
@@ -33,14 +40,7 @@ arguments %<>%
     variable = "n_tasks",
     operator = "greater",
     values = c(4)
-  ) %>% 
-  add_argument(
-    .,
-    conn = conn,
-    variable = "n_participants",
-    manual = TRUE,
-    statement = "SELECT dataset_id FROM dataset_table WHERE n_participants > 500"
-  )
+  ) 
 
 test = query_db(
   conn,

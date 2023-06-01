@@ -11,7 +11,8 @@ merge_query_results <- function(query_results){
     left_join(., query_results$study_table, by = "study_id") %>% 
     rename(comment_study = comment) %>% 
     left_join(., query_results$publication_table, by = "publication_id") %>% 
-    left_join(., query_results$task_table, by = "task_id")
+    left_join(., query_results$task_table, by = "task_id") %>% 
+    select(ends_with("id"), everything())
     
   return(data_joined)
   # Maybe add functionality to compress this here

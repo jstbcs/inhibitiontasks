@@ -2,7 +2,6 @@
 
 # Library calls
 library(stringr)
-library(dbplyr)
 
 # Regex patterns
 regex_matches_publication_code <- "^[a-zA-Z]+_[12][0-9][0-9][0-9]_[a-zA-Z]+$"
