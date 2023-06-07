@@ -1,7 +1,15 @@
 # Test read in online form data 
 library(dplyr)
 
+# STEP 1: Manual work --------------------------------------------------------#
+
+# download entry from wordpress and read in as csv
 entry <- read.csv("C:/Users/Michael/Downloads/inhibition-data-base-2023-06-07.csv")
+
+# download the actual data file(s)
+download_link <- entry$Upload.data
+download_link 
+# TODO: add links if more than 1 study
 
 # 1. delete all non-used columns (with some sanity checks)
 not_all_na <- function(x) any(!is.na(x))
@@ -13,9 +21,9 @@ entry <- entry %>%
 
 # 2. Manual work -------------------------------------------------------------#
 #   - create publication code 
-pub_code <- "tang_2022_dual"
-# TODO: (see if function could do this)
+pub_code <- "tang_2022_dual" # TODO: (see if function could do this)
 #   - search and fill in missing relevant data 
+#   - download data files
 
 # 2. create list object  ------------------------------------------------------#
 
@@ -33,45 +41,124 @@ pub$publication_table <- data.frame(
   publication_code = pub_code
 )
 
-# STUDY LEVEL ---------------#
-# for each study: 
-for (i in 1:entry$Number.of.studies){
-  # CREATE A STUDY LIST
-  pub[[i+1]] <- list()
-  names(pub)[i+1] <-paste("study", i, sep = "")
+# CREATE STUDY LEVEL IF ONLY 1 STUDY
+if(entry$Number.of.studies == 1){
+  # CREATE A STUDY LIST 
+  pub[[2]] <- list()
+  names(pub)[2] <- "study1"
   
-  # FILL WITH RESPECTIVE group_info, study_info AND data list
+  # FILL WITH RESPECTIVE study_info
   
-  # specify object names (not very elegant; we can change this later)
-  # if only one study: object names are "Number.of.groups", "Number.of.tasks" (i.e., without numbers)
-  if(entry$Number.of.studies == 1){
-    n_tasks_name <-   
+  # retrieve respective info about study of current loop
+  n_tasks_value <- entry$Number.of.tasks
+  n_groups_value <- entry$Number.of.groups
+  comment_value <- entry$Description
+  
+  # fill study_info table
+  pub[[2]]$study_table <- data.frame(
+    n_groups = n_tasks_value, 
+    n_tasks = n_groups_value,
+    comment = comment_value
+  )
+  
+  # FILL WITH group_info
+  # if only 1 group in study: 
+  if(n_groups_value == 1){
+    
+    # either retrieve or compute needed info 
+    mean_age_value <- ifelse("Mean.age" %in% colnames(entry), 
+                             entry$Mean.age,
+                             NA)
+    percentage_female_value <- ifelse("Percentage.female" %in% colnames(entry), 
+                                      entry$Percentage.female,
+                                      NA)
+    # TODO: n_members <- function_to_compute_n_members
+    group_description_value <- ifelse("Sample.description" %in% colnames(entry), 
+                                entry$Sample.description,
+                                NA)
+    
+    # insert in group_info table 
+    pub[[2]]$group_table <- data.frame(
+      group = 1,
+      mean_age = mean_age_value,
+      pecentage_female = percentage_female_value,
+     # n_members = n_members_value,
+      group_description = group_description_value
+    )
+    
+    # if more than 1 group
+  } else {
+    
+    # either retrieve or compute needed info 
+    #TODO: continue here
+    
+    # create group table with first group
+    pub[[2]]$group_table <- data.frame(
+      group = 1,
+      mean_age = mean_age_value,
+      pecentage_female = percentage_female_value,
+      # n_members = n_members_value,
+      group_description = group_description_value
+    )
+    
+    
+    
+    # loop over 
+    for(j in 2:n_groups_value)
+    
+    
     
   }
   
   
   
+}
+
+
+
+
+
+
+
+# STUDY LEVEL ---------------#
+for(i in 1:entry$Number.of.studies){
+  # CREATE A STUDY LIST 
+  pub[[i+1]] <- list()
+  names(pub)[i+1] <-paste("study", i, sep = "")
   
+  # FILL WITH RESPECTIVE study_info
   
-  n_tasks_name <- paste("study", i, "_n_tasks", sep = "")
-  n_groups_name <- paste("study", i, "_n_groups", sep = "")
-  comment_name <- paste("study", i, "_comment", sep = "")
-  group_number_name <- paste("study", i, "_group1_number", sep = "") # default for group 1
-  group_descr_name <- paste("study", i, "_group1_descr", sep = "")
-  group_meanage_name <- paste("study", i, "_group1_meanage", sep = "")
-  group_percfem_name <- paste("study", i, "_group1_percfem", sep = "")
-  group_members_name <- paste("study", i, "_group1_members", sep = "")
+  # retrieve respective info about study of current loop
+    # if only 1 study: names contain no numbers 
+    if(entry$Number.of.studies == 1){
+      n_tasks_value <- entry$Number.of.tasks
+      n_groups_value <- entry$Number.of.groups
+      comment_value <- entry$Description
+    } else {
+    # if more than 1 study: 
+      n_tasks_name <- paste("Number.of.tasks..STUDY.", i, sep = "")
+      n_tasks_value <- entry[, n_tasks_name]
+      n_groups_name <- paste("Number.of.groups..STUDY.", i, sep = "")
+      n_groups_value <- entry[, n_groups_name]
+      comment_name <- paste("Description.STUDY.", i, sep = "")
+      comment_value <- entry[, comment_name]
+    }
   
-  
-  # study_info table
+  # fill study_info table
   pub[[i+1]]$study_table <- data.frame(
-    n_groups = eval(parse(text = n_groups_name)), 
-    n_tasks = eval(parse(text = n_tasks_name)),
-    comment = eval(parse(text = comment_name))
+    n_groups = n_tasks_value, 
+    n_tasks = n_groups_value,
+    comment = comment_value
   )
   
+  # FILL WITH group_info 
   
-  # group_info table 
+  # retrieve info about groups of study in current loop
+  if(pub[[i+1]]$study_table$n_groups == 1){
+    
+  }
+  
+  # create group_info table 
   pub[[i+1]]$group_table <- data.frame(
     group =  eval(parse(text = group_number_name)),
     mean_age = eval(parse(text = group_meanage_name)),
@@ -80,32 +167,12 @@ for (i in 1:entry$Number.of.studies){
     group_description = eval(parse(text = group_descr_name))
   )
   
-  # if just one group and no description given: automatically fill in description
-  if(pub[[i+1]]$study_table$n_groups == 1 && is.na(eval(parse(text = group_descr_name)))){
-    pub[[i+1]]$group_table$group_description <- "all participants in same group"
-  }
+}
   
-  # if more than one group: add info in additional rows
-  if(pub[[i+1]]$study_table$n_groups > 1) {
-    for(j in 2:pub[[i+1]]$study_table$n_groups) {
-      # update object names of respective group j
-      current_group_number_name <- paste("study", i, "_group",j, "_number", sep = "") # default for group 1
-      current_group_descr_name <- paste("study", i, "_group", j, "_descr", sep = "")
-      current_group_meanage_name <- paste("study", i, "_group", j, "_meanage", sep = "")
-      current_group_percfem_name <- paste("study", i, "_group", j, "_percfem", sep = "")
-      current_group_members_name <- paste("study", i, "_group", j, "_members", sep = "")
-      
-      # add info to respective row in group_info
-      pub[[i+1]]$group_table$group[j] <- eval(parse(text = current_group_number_name))
-      pub[[i+1]]$group_table$mean_age[j] <- eval(parse(text = current_group_meanage_name))
-      pub[[i+1]]$group_table$percentage_female[j] <- eval(parse(text = current_percfem_number_name))
-      pub[[i+1]]$group_table$n_members[j] <- eval(parse(text = current_group_members_name))
-      pub[[i+1]]$group_table$group_description[j] <- eval(parse(text = current_group_descr_name))
-    }
-    
-  }
   
-  # add empty data list 
-  pub[[i+1]]$data <- list()
   
-}   # end study level
+  
+  
+  
+  
+  
