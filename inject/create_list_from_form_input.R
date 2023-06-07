@@ -4,7 +4,7 @@ library(dplyr)
 # STEP 1: Manual work --------------------------------------------------------#
 
 # download entry from wordpress and read in as csv
-entry <- read.csv("C:/Users/Michael/Downloads/inhibition-data-base-2023-06-07.csv")
+entry <- read.csv("C:/Users/Michael/Downloads/inhibition-data-base-2023-06-07(3).csv")
 
 # download the actual data file(s)
 download_link <- entry$Upload.data
@@ -32,11 +32,11 @@ pub <- list()
 
 pub$publication_table <- data.frame(
   authors = entry$Authors, 
-  conducted = entry$Year, 
+  #conducted = entry$Year, 
   added = Sys.Date(), 
-  country = entry$Country, 
-  contact = entry$Email.for.contact, 
-  keywords = entry$Keywords, 
+  #country = entry$Country, 
+  #contact = entry$Email.for.contact, 
+  #keywords = entry$Keywords, 
   APA_reference = entry$APA.reference, 
   publication_code = pub_code
 )
@@ -89,10 +89,7 @@ if(entry$Number.of.studies == 1){
     # if more than 1 group
   } else {
     
-    # either retrieve or compute needed info 
-    #TODO: continue here
-    
-    # create group table with first group
+    # initiate group_info table with first group 
     pub[[2]]$group_table <- data.frame(
       group = 1,
       mean_age = mean_age_value,
@@ -101,10 +98,27 @@ if(entry$Number.of.studies == 1){
       group_description = group_description_value
     )
     
+    # add entries for all following groups 
+    for(j in 2:n_groups_value){
+      
+      # either retrieve or compute needed info 
+      mean_age_name <- paste("Mean.age.group.", j, sep = "")
+      mean_age_value <- entry[, mean_age_name]
+      percentage_female_name <- paste("Percentage.female.group.", j, sep =)
+      percentage_female_value <- entry[, percentage_female_name]
+      group_description_name <- paste("Sample.description.of.group.", j, sep = "")
+      group_description_value <- entry[, group_description_name]
+      
+      # add entries 
+      
+      
+      
+    }
+    
+   
     
     
-    # loop over 
-    for(j in 2:n_groups_value)
+  
     
     
     
