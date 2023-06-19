@@ -16,7 +16,7 @@ publication_df <- readxl::read_excel("./add_data/Book.xlsx", "publication_table"
 study_df <- readxl::read_excel("./add_data/Book.xlsx", "study_table", range = "A14:D14",
                                col_names = c("study", "n_groups",	"n_tasks", "comment"))
 study_df$n_data <- 21 # encode number of data sets per study (by hand)
-group_df <- readxl::read_excel("./add_data/Book.xlsx", "group_table", range = "A15:G15",
+group_df <- readxl::read_excel("./add_data/Book.xlsx", "group_table", range = "A15:G35",
                                col_names = c("study_in_publication", "study_description",
                                              "between_id",	"mean_age",	"percentage_female",
                                              "n_members",	"group_description"))
