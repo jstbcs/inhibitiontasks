@@ -8,31 +8,31 @@ source("./inject/compute_automatic_info.R")
 source("./Create_db/add_data/scripts_creating_list_objects/00_create_publication_study_level.R")
 
 # Load required info from excel file -------------------------------------------------------
-publication_df <- readxl::read_excel("./add_data/Book.xlsx", "publication_table", range = "A10:I10", 
+publication_df <- readxl::read_excel("./Create_db/add_data/Book.xlsx", "publication_table", range = "A10:I10", 
                                      col_names = c("study", "authors", "conducted",
                                                    "added", "country","contact", 
                                                    "keywords", "APA-reference",
                                                    "publication_code")) 
-study_df <- readxl::read_excel("./add_data/Book.xlsx", "study_table", range = "A14:D14",
+study_df <- readxl::read_excel("./Create_db/add_data/Book.xlsx", "study_table", range = "A14:D34",
                                col_names = c("study", "n_groups",	"n_tasks", "comment"))
-study_df$n_data <- 21 # encode number of data sets per study (by hand)
-group_df <- readxl::read_excel("./add_data/Book.xlsx", "group_table", range = "A15:G35",
+study_df$n_data <- rep(1, nrow(study_df)) # encode number of data sets per study (by hand)
+group_df <- readxl::read_excel("./Create_db/add_data/Book.xlsx", "group_table", range = "A15:G35",
                                col_names = c("study_in_publication", "study_description",
                                              "between_id",	"mean_age",	"percentage_female",
                                              "n_members",	"group_description"))
-task_df <- readxl::read_excel("./add_data/Book.xlsx", "task", range = "A31:D31", 
+task_df <- readxl::read_excel("./Create_db/add_data/Book.xlsx", "task", range = "A31:D31", 
                               col_names = c("study_within_pub",	"Dataset", "task",
                                             "task_description"))
-dataset_df <- readxl::read_excel("./add_data/Book.xlsx", "dataset_overview_table", range = "A31:K51",
+dataset_df <- readxl::read_excel("./Create_db/add_data/Book.xlsx", "dataset_overview_table", range = "A31:K51",
                                  col_names = c("study_within_publication", "data",	
                                                "data_excl", "n_participants",
                                                "n_blocks", "n_trials", "neutral_trials",
                                                "fixaction_cross",	"time_limit",
                                                "github",	"dataset in R"))
-within_df <- readxl::read_excel("./add_data/Book.xlsx", "within_table", range = "A48:D68",
+within_df <- readxl::read_excel("./Create_db/add_data/Book.xlsx", "within_table", range = "A48:D68",
                                 col_names = c("study_within_publication",	"data set",
                                               "within_id",	"within_desciption"))
-condition_df <- readxl::read_excel("./add_data/Book.xlsx", "condition_descriptives", range = "A52:F72",
+condition_df <- readxl::read_excel("./Create_db/add_data/Book.xlsx", "condition_descriptives", range = "A52:F72",
                                    col_names = c("study_in_publication",
                                                  "dataset & condition",	"percentage_congr",
                                                  "percentage_neutral",	"mean_obs_pp",	"n_obs"))
