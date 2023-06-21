@@ -1,5 +1,4 @@
 extract_table_ids <- function(conn, table, name = NULL){
-  # TODO: Replace this with SQL-Language
   which_columns_exist_query = paste0("PRAGMA table_info(", table, ")")
   table_columns = dbGetQuery(conn, which_columns_exist_query)
   ends_in_id =  table_columns$name[grep("_id$", table_columns$name)]
