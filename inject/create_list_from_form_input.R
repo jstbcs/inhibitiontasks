@@ -19,13 +19,16 @@ entry <- entry %>%
 #   - deleted columns in line with N_studies, N groups and N tasks?
 #   - required info present?
 
-# 2. Manual work -------------------------------------------------------------#
-#   - create publication code 
-pub_code <- "tang_2022_dual" # TODO: (see if function could do this)
-#   - search and fill in missing relevant data 
-#   - download data files
 
-# 2. create list object  ------------------------------------------------------#
+# 2. create publication code  -------------------------------------------------------------#
+pub_code <- "tang_2022_dual" # TODO: (see if function could do this)
+
+# 3. search and fill in missing relevant data 
+
+
+# 4. download data files with download link 
+
+# STEP 2: create list object  ------------------------------------------------------#
 
 # PUBLICATION LEVEL ---------#
 pub <- list()
@@ -65,20 +68,19 @@ if(entry$Number.of.studies == 1){
   # if only 1 group in study: 
   if(n_groups_value == 1){
     
-    # either retrieve or compute needed info 
+    # retrieve needed info 
     mean_age_value <- ifelse("Mean.age" %in% colnames(entry), 
                              entry$Mean.age,
                              NA)
     percentage_female_value <- ifelse("Percentage.female" %in% colnames(entry), 
                                       entry$Percentage.female,
                                       NA)
-    # TODO: n_members <- function_to_compute_n_members
-    group_description_value <- ifelse("Sample.description" %in% colnames(entry), 
-                                entry$Sample.description,
-                                NA)
+    # TODO: compute n_members?
+    group_description_value <- entry$Sample.description
+                                
     
     # insert in group_info table 
-    pub[[2]]$group_table <- data.frame(
+    pub[[2]]$between_table <- data.frame(
       group = 1,
       mean_age = mean_age_value,
       pecentage_female = percentage_female_value,
@@ -88,6 +90,16 @@ if(entry$Number.of.studies == 1){
     
     # if more than 1 group
   } else {
+    
+    # retrieve needed info 
+    mean_age_value <- ifelse("Mean.age" %in% colnames(entry), 
+                             entry$Mean.age[1],
+                             NA)
+    percentage_female_value <- ifelse("Percentage.female" %in% colnames(entry), 
+                                  entry$Percentage.female[1],
+                                  NA)
+    # TODO: compute n_members?
+    group_description_value <- entry$Sample.description[1]
     
     # initiate group_info table with first group 
     pub[[2]]$group_table <- data.frame(
@@ -102,25 +114,22 @@ if(entry$Number.of.studies == 1){
     for(j in 2:n_groups_value){
       
       # either retrieve or compute needed info 
-      mean_age_name <- paste("Mean.age.group.", j, sep = "")
-      mean_age_value <- entry[, mean_age_name]
-      percentage_female_name <- paste("Percentage.female.group.", j, sep =)
-      percentage_female_value <- entry[, percentage_female_name]
-      group_description_name <- paste("Sample.description.of.group.", j, sep = "")
-      group_description_value <- entry[, group_description_name]
+      current_mean_age_name <- paste("Mean.age.group.", j, sep = "")
+      current_mean_age_value <- entry[j, current_mean_age_name]
+      current_percentage_female_name <- paste("Percentage.female.group.", j, sep =)
+      current_percentage_female_value <- entry[j , current_percentage_female_name]
+      current_group_description_name <- paste("Sample.description.of.group.", j, sep = "")
+      current_group_description_value <- entry[j, current_group_description_name]
       
       # add entries 
-      
-      
+      # add info to respective row in group_info
+      pub[[2]]$group_table$group[j] <- j
+      pub[[2]]$group_table$mean_age[j] <- current_mean_age_value
+      pub[[2]]$group_table$percentage_female[j] <- current_percentage_female_value
+      #pub[[2]]$group_table$n_members[j] <- ??
+      pub[[2]]$group_table$group_description[j] <- current_group_description_value
       
     }
-    
-   
-    
-    
-  
-    
-    
     
   }
   
