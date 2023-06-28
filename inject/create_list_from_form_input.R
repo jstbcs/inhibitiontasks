@@ -43,7 +43,7 @@ entry <- entry %>%
 
 pub <- list()
 
-# 3.1 PUBLICATION LEVEL: fill with relevant data, otherwise NA
+# 3.1 PUBLICATION LEVEL: fill with relevant data, otherwise NA --#
 pub$publication_table <- data.frame(
   authors = ifelse("Authors" %in% names(entry), entry$Authors, NA),
   conducted = ifelse("Year" %in% names(entry), entry$Year, NA), 
@@ -55,7 +55,7 @@ pub$publication_table <- data.frame(
   publication_code = pub_code
 )
 
-# 3.2 STUDY LEVEL IF NUMBER OF STUDIES = 1
+# 3.2 STUDY LEVEL IF NUMBER OF STUDIES = 1 --#
 if(entry$Number.of.studies == 1){
   
   # CREATE STUDY LEVEL LIST
@@ -84,9 +84,9 @@ if(entry$Number.of.studies == 1){
                                         entry$Sample.description, 
                                         "no within manipulation")
       
-            # insert into between_table 
+      # insert into between_table 
       pub[[2]]$between_table <- data.frame(
-        group = 1,
+        between_name = 1,
         mean_age = mean_age_value,
         pecentage_fem = percentage_fem_value,
         n_members = NA,
@@ -109,139 +109,161 @@ if(entry$Number.of.studies == 1){
       
       # intialize between_table with first group 
       pub[[2]]$between_table <- data.frame(
-        group = 1,
+        between_name = 1,
         mean_age = mean_age_value,
         pecentage_female = percentage_fem_value,
         n_members = NA,
         group_description = group_description_value
       )
       
-      # append row for each following group 
+      # append one row for each following group 
       for(j in 1:pub[[2]]$study_table$n_groups){
         
         # get needed needed info 
+        between_number <- paste("Between.value.of.group.", j, sep ="")
         mean_age_name <- paste("Mean.age.group.", j, sep = "")
         percentage_fem_name <- paste("Percentage.female.group.", j, sep =)
         group_description_name <- paste("Sample.description.of.group.", j, sep = "")
         
-        mean_age_value <- entry[j, mean_age_name]
-        percentage_fem_value <- entry[j , percentage_female_name]
-        group_description_value <- entry[j, group_description_name]
+        mean_age_value <- ifelse(mean_age_name %in% colnames(entry), 
+                                 entry[1, mean_age_name], 
+                                 NA)
+        percentage_fem_value <- ifelse(percentage_fem_name %in% colnames(entry), 
+                                       entry[1, percentage_fem_name],
+                                       NA)
+        group_description_value <- ifelse(group_description_name %in% colnames(entry),
+                                          entry[1, group_description_name] , 
+                                          NA)
         
         # add entries 
-        # add info to respective row in group_info
-        pub[[2]]$group_table$group[j] <- j
-        pub[[2]]$group_table$mean_age[j] <- mean_age_value
-        pub[[2]]$group_table$percentage_female[j] <- percentage_fem_value
-        pub[[2]]$group_table$n_members[j] <- NA
-        pub[[2]]$group_table$group_description[j] <- group_description_value
+        pub[[2]]$between_table$between_name[j] <- between_number
+        pub[[2]]$between_table$mean_age[j] <- mean_age_value
+        pub[[2]]$between_table$percentage_female[j] <- percentage_fem_value
+        pub[[2]]$between_table$n_members[j] <- NA
+        pub[[2]]$between_table$group_description[j] <- group_description_value
       }
     }
 }
 
+# 3.2 STUDY LEVEL IF NUMBER OF STUDIES > 1 --- #
 
-
-
-
-
-
-
-# STEP 2: create list object  ------------------------------------------------------#
-
-
-
-# CREATE STUDY LEVEL IF ONLY 1 STUDY
-if(entry$Number.of.studies == 1){
-  # CREATE A STUDY LIST 
-  pub[[2]] <- list()
-  names(pub)[2] <- "study1"
-  
-  # FILL WITH RESPECTIVE study_info
-  
-  # retrieve respective info about study of current loop
-  n_tasks_value <- entry$Number.of.tasks
-  n_groups_value <- entry$Number.of.groups
-  comment_value <- entry$Description
-  
-  # fill study_info table
-  pub[[2]]$study_table <- data.frame(
-    n_groups = n_tasks_value, 
-    n_tasks = n_groups_value,
-    comment = comment_value
-  )
-  
-  # FILL WITH group_info
-  # if only 1 group in study: 
-  if(n_groups_value == 1){
+if(entry$Number.of.studies > 1){
+  # loop through each study
+  for(i in 1:entry$Number.of.studies){
     
-    # retrieve needed info 
-    mean_age_value <- ifelse("Mean.age" %in% colnames(entry), 
-                             entry$Mean.age,
-                             NA)
-    percentage_female_value <- ifelse("Percentage.female" %in% colnames(entry), 
-                                      entry$Percentage.female,
-                                      NA)
-    # TODO: compute n_members?
-    group_description_value <- entry$Sample.description
-                                
+    # CREATE STUDY LEVEL LIST -----
     
-    # insert in group_info table 
-    pub[[2]]$between_table <- data.frame(
-      group = 1,
-      mean_age = mean_age_value,
-      pecentage_female = percentage_female_value,
-     # n_members = n_members_value,
-      group_description = group_description_value
+    pub[[i+1]] <- list()
+    names(pub)[i+1] <- paste("study", i, sep = "")
+    
+    # FILL study_table---------------
+    
+    # get required info 
+    n_tasks_name <- paste("Number.of.tasks..STUDY.", i, sep = "")
+    n_groups_name <- paste("Number.of.groups..STUDY.", i, sep = "")
+    comment_name <- paste("Description.STUDY.", i, sep = "")
+    
+    # insert into study_table 
+    pub[[i+1]]$study_table <- data.frame(
+      n_groups = entry[, n_tasks_name], 
+      n_tasks = entry[, n_groups_name],
+      comment = entry[, comment_name]
     )
     
-    # if more than 1 group
-  } else {
+    # FILL between_table ------------
     
-    # retrieve needed info 
-    mean_age_value <- ifelse("Mean.age" %in% colnames(entry), 
-                             entry$Mean.age[1],
-                             NA)
-    percentage_female_value <- ifelse("Percentage.female" %in% colnames(entry), 
-                                  entry$Percentage.female[1],
-                                  NA)
-    # TODO: compute n_members?
-    group_description_value <- entry$Sample.description[1]
-    
-    # initiate group_info table with first group 
-    pub[[2]]$group_table <- data.frame(
-      group = 1,
-      mean_age = mean_age_value,
-      pecentage_female = percentage_female_value,
-      # n_members = n_members_value,
-      group_description = group_description_value
-    )
-    
-    # add entries for all following groups 
-    for(j in 2:n_groups_value){
+    # if 1 group in respective study 
+    if(pub[[i+1]]$study_table$n_groups == 1){
       
-      # either retrieve or compute needed info 
-      current_mean_age_name <- paste("Mean.age.group.", j, sep = "")
-      current_mean_age_value <- entry[j, current_mean_age_name]
-      current_percentage_female_name <- paste("Percentage.female.group.", j, sep =)
-      current_percentage_female_value <- entry[j , current_percentage_female_name]
-      current_group_description_name <- paste("Sample.description.of.group.", j, sep = "")
-      current_group_description_value <- entry[j, current_group_description_name]
+      # get info, otherwise put NA
+      mean_age_name <- paste("Mean.age..STUDY.", i, ".", sep = "")
+      percentage_fem_name <- paste("Percentage.female..STUDY.", i, ".", sep = "")
+      group_description_name <- paste("Sample.description..STUDY.", i, ".", sep = "")
       
-      # add entries 
-      # add info to respective row in group_info
-      pub[[2]]$group_table$group[j] <- j
-      pub[[2]]$group_table$mean_age[j] <- current_mean_age_value
-      pub[[2]]$group_table$percentage_female[j] <- current_percentage_female_value
-      #pub[[2]]$group_table$n_members[j] <- ??
-      pub[[2]]$group_table$group_description[j] <- current_group_description_value
+      mean_age_value <- ifelse(mean_age_name %in% colnames(entry), 
+                               entry[1, mean_age_name], 
+                               NA)
+      percentage_fem_value <- ifelse(percentage_fem_name %in% colnames(entry), 
+                                     entry[1, percentage_fem_name],
+                                     NA)
+      group_description_value <- ifelse(group_description_name %in% colnames(entry),
+                                        entry[1, group_description_name] , 
+                                        NA)
       
+      # fill in between_table
+      pub[[i+1]]$between_table <- data.frame(
+        between_name =  1,
+        mean_age = mean_age_value,
+        pecentage_female = percentage_fem_value,
+        n_members = NA,
+        group_description = group_description_value
+      )
+      
+    # if several groups in respective study  
+    } else if(pub[[i+1]]$study_table$n_groups > 1){
+      
+      # get needed info of first group
+      between_number <- paste("Between.value.of.group.1..STUDY.",i, ".", sep = "")
+      mean_age_name <- paste("Mean.age...group.1..STUDY.", i, ".", sep = "")
+      percentage_fem_name <- paste("Percentage.female...group.1..STUDY.", i, ".", sep = "" )
+      group_description_name <- paste("Sample.description.of.group.1...STUDY.", i, ".", sep = "")
+      
+      mean_age_value <- ifelse(mean_age_name %in% colnames(entry), 
+                               entry[1, mean_age_name], 
+                               NA)
+      percentage_fem_value <- ifelse(percentage_fem_name %in% colnames(entry), 
+                                     entry[1, percentage_fem_name],
+                                     NA)
+      group_description_value <- ifelse(group_description_name %in% colnames(entry),
+                                        entry[1, group_description_name] , 
+                                        NA)
+      
+      # initialize between_table with first group 
+      pub[[i+1]]$between_table <- data.frame(
+        between_name =  between_number,
+        mean_age = mean_age_value,
+        pecentage_female = percentage_fem_value,
+        n_members = NA,
+        group_description = group_description_value
+      )
+      
+      # append one row for each following group 
+      for(j in 1:pub[[i+1]]$study_table$n_groups){
+        
+        # get needed info of group j in study i 
+        between_number <- paste("Between.value.of.group.", j, "..STUDY.",i, ".", sep = "")
+        mean_age_name <- paste("Mean.age...group.", j, "..STUDY.", i, ".", sep = "")
+        percentage_fem_name <- paste("Percentage.female...group.", j, "..STUDY.", i, sep = "" )
+        group_description_name <- paste("Sample.description.of.group.", j, "...STUDY.", i, ".", sep = "")
+        
+        mean_age_value <- ifelse(mean_age_name %in% colnames(entry), 
+                                 entry[1, mean_age_name], 
+                                 NA)
+        percentage_fem_value <- ifelse(percentage_fem_name %in% colnames(entry), 
+                                       entry[1, percentage_fem_name],
+                                       NA)
+        group_description_value <- ifelse(group_description_name %in% colnames(entry),
+                                          entry[1, group_description_name] , 
+                                          NA)
+        
+        # add entry
+        pub[[i+1]]$between_table$between_name[j] <- between_number
+        pub[[i+1]]$between_table$mean_age[j] <- mean_age_value
+        pub[[i+1]]$between_table$percentage_female[j] <- percentage_fem_value
+        pub[[i+1]]$between_table$n_members[j] <- NA
+        pub[[i+1]]$between_table$group_description[j] <- group_description_value
+        
+      }
     }
-    
   }
-  
-  
-  
 }
+
+
+
+
+
+
+
 
 
 
