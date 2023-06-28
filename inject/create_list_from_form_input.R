@@ -3,46 +3,152 @@ library(dplyr)
 
 # STEP 1: Manual work --------------------------------------------------------#
 
-# download entry from wordpress and read in as csv
-entry <- read.csv("C:/Users/Michael/Downloads/inhibition-data-base-2023-06-07(3).csv")
+# 1.1 download entry from wordpress and read in as csv
+#entry <- read.csv("C:/Users/Michael/Downloads/inhibition-data-base-2023-06-07(3).csv")
+entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-06-28.csv")
 
-# download the actual data file(s)
-download_link <- entry$Upload.data
-download_link 
-# TODO: add links if more than 1 study
+# 1.2 If several entries appeared on that day: Extract entry of interest
+# entry <- entry[1, ]
 
-# 1. delete all non-used columns (with some sanity checks)
-not_all_na <- function(x) any(!is.na(x))
+# 1.3 download the actual data file(s)
+  # finding non-empty "Upload.data" entries
+upload_columns <- which(grepl("Upload", colnames(entry)))
+download_links <- entry %>%
+  select(upload_columns[which(!is.na(entry[1, upload_columns]))])
+  # based on the download_links data frame download all data sets by entering the
+  # link in your browser and reading it into R (see manual for naming conventions)
+
+# 1.4 create the publication code 
+pub_code <- "tang_2022_dual"  # see naming conventions in manual 
+
+
+# 1.5 delete all non-used columns 
+not_all_na <- function(x) any(!is.na(x) & x!="")
 entry <- entry %>%
   select(where(not_all_na))
-# TODO: add sanity checks 
-#   - deleted columns in line with N_studies, N groups and N tasks?
-#   - required info present?
 
 
-# 2. create publication code  -------------------------------------------------------------#
-pub_code <- "tang_2022_dual" # TODO: (see if function could do this)
+# TODO: STEP 2: SANITY CHECKS ------------------------------------------------------# 
 
-# 3. search and fill in missing relevant data 
+# 2.1 are deleted columns in line with the number of studies? 
 
 
-# 4. download data files with download link 
+# 2.2 are deleted columns in line with the number of groups?
 
-# STEP 2: create list object  ------------------------------------------------------#
 
-# PUBLICATION LEVEL ---------#
+# 2.3 are deleted columns in line with the number of tasks?
+
+
+# STEP 3: AUTOMATICALLY CREATE LIST OBJECT -------------------------------------#
+
 pub <- list()
 
+# 3.1 PUBLICATION LEVEL: fill with relevant data, otherwise NA
 pub$publication_table <- data.frame(
-  authors = entry$Authors, 
-  #conducted = entry$Year, 
+  authors = ifelse("Authors" %in% names(entry), entry$Authors, NA),
+  conducted = ifelse("Year" %in% names(entry), entry$Year, NA), 
   added = Sys.Date(), 
-  #country = entry$Country, 
-  #contact = entry$Email.for.contact, 
-  #keywords = entry$Keywords, 
+  country = ifelse("Country" %in% names(entry), entry$Country, NA), 
+  contact = ifelse("Email.for.contact" %in% names(entry), entry$Email.for.contact, NA),
+  keywords = ifelse("Keywords" %in% names(entry), entry$Keywords, NA),
   APA_reference = entry$APA.reference, 
   publication_code = pub_code
 )
+
+# 3.2 STUDY LEVEL IF NUMBER OF STUDIES = 1
+if(entry$Number.of.studies == 1){
+  
+  # CREATE STUDY LEVEL LIST
+  pub[[2]] <- list()
+  names(pub)[2] <- "study1"
+  
+  # FILL study_table
+  pub[[2]]$study_table <- data.frame(
+    n_groups = entry$Number.of.groups,
+    n_tasks = entry$Number.of.tasks, 
+    comment = entry$Description
+  )
+  
+  # FILL between_table 
+    # if only 1 group: 
+    if(pub[[2]]$study_table$n_groups == 1){
+      
+      # get info, otherwise put NA 
+      mean_age_value <- ifelse("Mean.age" %in% colnames(entry), 
+                               entry$Mean.age,
+                               NA)
+      percentage_fem_value <- ifelse("Percentage.female" %in% colnames(entry), 
+                                        entry$Percentage.female,
+                                        NA)
+      group_description_value <- ifelse("Sample.description" %in% colnames(entry),
+                                        entry$Sample.description, 
+                                        "no within manipulation")
+      
+            # insert into between_table 
+      pub[[2]]$between_table <- data.frame(
+        group = 1,
+        mean_age = mean_age_value,
+        pecentage_fem = percentage_fem_value,
+        n_members = NA,
+        group_description = group_description_value
+      )
+      
+    # if several groups  
+    } else if (pub[[2]]$study_table$n_groups > 1){
+      
+      # get needed info of first group 
+      mean_age_value <- ifelse("Mean.age.group.1" %in% colnames(entry), 
+                               entry$Mean.age.group.1,
+                               NA)
+      percentage_fem_value <- ifelse("Percentage.female.group.1" %in% colnames(entry), 
+                                     entry$Percentage.female.group.1,
+                                     NA)
+      group_description_value <- ifelse("Sample.description.of.group.1" %in% colnames(entry),
+                                        entry$Sample.description.of.group.1, 
+                                        NA)
+      
+      # intialize between_table with first group 
+      pub[[2]]$between_table <- data.frame(
+        group = 1,
+        mean_age = mean_age_value,
+        pecentage_female = percentage_fem_value,
+        n_members = NA,
+        group_description = group_description_value
+      )
+      
+      # append row for each following group 
+      for(j in 1:pub[[2]]$study_table$n_groups){
+        
+        # get needed needed info 
+        mean_age_name <- paste("Mean.age.group.", j, sep = "")
+        percentage_fem_name <- paste("Percentage.female.group.", j, sep =)
+        group_description_name <- paste("Sample.description.of.group.", j, sep = "")
+        
+        mean_age_value <- entry[j, mean_age_name]
+        percentage_fem_value <- entry[j , percentage_female_name]
+        group_description_value <- entry[j, group_description_name]
+        
+        # add entries 
+        # add info to respective row in group_info
+        pub[[2]]$group_table$group[j] <- j
+        pub[[2]]$group_table$mean_age[j] <- mean_age_value
+        pub[[2]]$group_table$percentage_female[j] <- percentage_fem_value
+        pub[[2]]$group_table$n_members[j] <- NA
+        pub[[2]]$group_table$group_description[j] <- group_description_value
+      }
+    }
+}
+
+
+
+
+
+
+
+
+# STEP 2: create list object  ------------------------------------------------------#
+
+
 
 # CREATE STUDY LEVEL IF ONLY 1 STUDY
 if(entry$Number.of.studies == 1){
