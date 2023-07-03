@@ -54,7 +54,7 @@ get_n_blocks <- function(df_test){
 }
 
 get_n_trials <- function(df_test){
-  n_trials <- length(unique(df$trial))
+  n_trials <- length(unique(df_test$trial))
   return(n_trials)
 }
 
@@ -77,13 +77,13 @@ filter_condition <- function(df_test, cond = 1) {
 
 # percentage congruent
 get_perc_congr <- function(df_cond){
-  perc_congr <- round(sum(df$congruency == 1) / length(df$congruency),2)
+  perc_congr <- round(sum(df_cond$congruency == 1) / length(df_cond$congruency),2)
   return(perc_congr)
 }
 
 # percentage neutral
 get_perc_neut <- function(df_cond){
-  perc_neut <- round(sum(df$congruency == 3) / length(df$congruency),2)
+  perc_neut <- round(sum(df_cond$congruency == 3) / length(df_cond$congruency),2)
   return(perc_neut) 
 }
 

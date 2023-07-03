@@ -285,11 +285,15 @@ for(i in 1:entry$Number.of.inhibition.tasks){
   # create task_table ----------
   # get relevant column names
   task_name_value <- paste("Inhibition.task.type...task.", i, sep="")
-  task_desc_value <- paste("Task.description...task.", i, sep="")
+  task_desc_name <- paste("Task.description...task.", i, sep="")
+  
+  task_desc_value <- ifelse(task_desc_name %in% colnames(entry),
+                            entry[1, task_desc_name] , 
+                            NA)
   
   pub[[2]][[i+2]]$task_table<- data.frame(
     task_name = entry[1, task_name_value],
-    task_description = entry[1, task_desc_value]
+    task_description = task_desc_value
   )
   
   # create within_table    --------
@@ -349,12 +353,12 @@ for(i in 1:entry$Number.of.inhibition.tasks){
     n_blocks = NA, # computed later
     n_trials = NA, # computed later
     neutral_trials= NA, # computed later
-    fixation_cross = fix_cross_value, 
+    fixation_cross = fix_cross_value
     # time_limit = NA
   )
   
   # create observations_table  -----------------
-  observations_name <- paste("raw_data_study1_task",i)
+  observations_name <- paste("raw_data_study1_task",i, sep="")
   pub[[2]][[i+2]]$observations_table <- eval(parse(text = observations_name))
   
   # add condition column to dataset 
