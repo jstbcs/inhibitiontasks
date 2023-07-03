@@ -1,5 +1,6 @@
 # Test read in online form data 
 library(dplyr)
+source("./inject/compute_automatic_info.R")
 
 # STEP 1: Manual work --------------------------------------------------------#
 
@@ -143,10 +144,17 @@ if(entry$Number.of.studies == 1){
         pub[[2]]$between_table$group_description[j] <- group_description_value
       }
     }
+  
+  # add empty data list for each task 
+  for(i in 1:pub[[2]]$study_table$n_tasks){
+    
+    pub[[2]]$data <- list()
+    names(pub[[2]])[i+2] <- paste("data", i, sep ="")
+  }
 }
 
 # 3.2 STUDY LEVEL IF NUMBER OF STUDIES > 1 --- #
-
+# TODO: test this
 if(entry$Number.of.studies > 1){
   # loop through each study
   for(i in 1:entry$Number.of.studies){
@@ -255,72 +263,182 @@ if(entry$Number.of.studies > 1){
         
       }
     }
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# STUDY LEVEL ---------------#
-for(i in 1:entry$Number.of.studies){
-  # CREATE A STUDY LIST 
-  pub[[i+1]] <- list()
-  names(pub)[i+1] <-paste("study", i, sep = "")
-  
-  # FILL WITH RESPECTIVE study_info
-  
-  # retrieve respective info about study of current loop
-    # if only 1 study: names contain no numbers 
-    if(entry$Number.of.studies == 1){
-      n_tasks_value <- entry$Number.of.tasks
-      n_groups_value <- entry$Number.of.groups
-      comment_value <- entry$Description
-    } else {
-    # if more than 1 study: 
-      n_tasks_name <- paste("Number.of.tasks..STUDY.", i, sep = "")
-      n_tasks_value <- entry[, n_tasks_name]
-      n_groups_name <- paste("Number.of.groups..STUDY.", i, sep = "")
-      n_groups_value <- entry[, n_groups_name]
-      comment_name <- paste("Description.STUDY.", i, sep = "")
-      comment_value <- entry[, comment_name]
-    }
-  
-  # fill study_info table
-  pub[[i+1]]$study_table <- data.frame(
-    n_groups = n_tasks_value, 
-    n_tasks = n_groups_value,
-    comment = comment_value
-  )
-  
-  # FILL WITH group_info 
-  
-  # retrieve info about groups of study in current loop
-  if(pub[[i+1]]$study_table$n_groups == 1){
     
+    # add empty data list for each task in study i
+    for(k in 1:pub[[i+1]]$study_table$n_tasks){
+      
+      pub[[2]]$data <- list()
+      names(pub[[2]])[k+2] <- paste("data", k, sep ="")
+    }
   }
+}
+
+
+
+# 3.3 DATA LEVEL IF 1 STUDY
+
+# for each inhibition task 
+for(i in 1:entry$Number.of.inhibition.tasks){
   
-  # create group_info table 
-  pub[[i+1]]$group_table <- data.frame(
-    group =  eval(parse(text = group_number_name)),
-    mean_age = eval(parse(text = group_meanage_name)),
-    pecentage_female = eval(parse(text = group_percfem_name)),
-    n_members = eval(parse(text = group_members_name)),
-    group_description = eval(parse(text = group_descr_name))
+  # TODO: same thing but for column names when just one task in only study
+  
+  # create task_table ----------
+  # get relevant column names
+  task_name_value <- paste("Inhibition.task.type...task.", i, sep="")
+  task_desc_value <- paste("Task.description...task.", i, sep="")
+  
+  pub[[2]][[i+2]]$task_table<- data.frame(
+    task_name = entry[1, task_name_value],
+    task_description = entry[1, task_desc_value]
   )
   
+  # create within_table    --------
+  # if within no manipulation for task i: just fill in details
+  within_manipulation_name <- paste("Within.subject.manipulation...task.", i, sep="")
+  
+  if(entry[1, within_manipulation_name] == "No"){
+
+    pub[[2]][[i+2]]$within_table <- data.frame(
+      within_name = NA, 
+      within_description = "No within-subject manipulation"
+    )
+    
+  # if within manipulation:
+  } else if(entry[1, within_manipulation_name] == "Yes"){
+    
+    # set up data frame with first condition
+    within_name <- paste("Within.value.of.condition.1...task.", i, sep="")
+    within_descr_name <- paste("Within.description.condition.1...task.", i, sep="")
+    
+    pub[[2]][[i+2]]$within_table <- data.frame(
+      within_name = entry[1, within_name], 
+      within_description = entry[1, within_descr_name]
+    )
+    
+    # then loop over all remaining conditions and append them to the df
+    number_withincon_name <- paste("Number.of.within.conditions...task.", i, sep="")
+    
+    for(j in 2:entry[1, number_withincon_name]){
+      within_name <- paste("Within.value.of.condition.", j, "...task.", i, sep="")
+      within_descr_name <- paste("Within.description.condition.", j, "...task.", i, sep="")
+      
+      pub[[2]][[i+2]]$within_table$within_name[j] <- entry[1, within_name]
+      pub[[2]][[i+2]]$within_table$within_description[j] <- entry[1, within_descr_name]
+    }
+  }
+  
+  # create dataset_table -----------------
+  # relevant column names 
+  data_excl_name <- paste("Data.exclusion.criteria...task.", i, sep="")
+  fix_cross_name <- paste("Fixation.point...task.", i, sep="")
+  #time_limit_name <- paste()
+  
+  # get input, else put NA 
+  data_excl_value <- ifelse(data_excl_name %in% colnames(entry), 
+                           entry[1, data_excl_name], 
+                           NA)
+  fix_cross_value <- ifelse(fix_cross_name %in% colnames(entry), 
+                            entry[1, fix_cross_name], 
+                            NA)
+  #time_limit_value <- ifelse()
+  
+  # insert into dataset_table 
+  pub[[2]][[i+2]]$dataset_table <- data.frame(
+    data_excl = data_excl_value, 
+    n_participants = NA, # computed later
+    n_blocks = NA, # computed later
+    n_trials = NA, # computed later
+    neutral_trials= NA, # computed later
+    fixation_cross = fix_cross_value, 
+    # time_limit = NA
+  )
+  
+  # create observations_table  -----------------
+  observations_name <- paste("raw_data_study1_task",i)
+  pub[[2]][[i+2]]$observations_table <- eval(parse(text = observations_name))
+  
+  # add condition column to dataset 
+  # (unique combinations of between and within column values)
+  pub[[2]][[i+2]]$observations_table <- code_condition(pub[[2]][[i+2]]$observations_table)
+  
+  
+  # Compute automatic info for dataset_table --------------
+  
+  # create data frame without trial blocks 
+  df_test <- remove_practice(pub[[2]][[i+2]]$observations_table)
+  # get info for dataset_table
+  pub[[2]][[i+2]]$dataset_table$n_participants <- get_n(df_test)
+  pub[[2]][[i+2]]$dataset_table$n_blocks <- get_n_blocks(df_test)
+  pub[[2]][[i+2]]$dataset_table$n_trials <- get_n_trials(df_test)
+  pub[[2]][[i+2]]$dataset_table$neutral_trials <- get_neutral_trials(df_test)
+  
+  # create condition_table --------------------------
+  
+  # initiate with first condition
+  # get required info
+  df_condition1 <- filter_condition(df_test, cond = 1) # get data of condition 1
+  perc_congr <- get_perc_congr(df_condition1)
+  perc_neutral <- get_perc_neut(df_condition1)
+  mean_obs_pp <- get_mean_obs_pp(df_condition1)
+  n_obs <- get_n_obs(df_condition1)
+  
+  # fill table
+  pub[[2]][[i+2]]$condition_table <- data.frame(
+    condition_name = 1, 
+    percentage_congruent = perc_congr, 
+    percentage_neutral = perc_neutral, 
+    mean_obs_per_participant = mean_obs_pp,
+    n_obs = n_obs
+  )
+  
+  # if more than 1 condition: fill in following ones
+  if(length(unique(df_test$condition)) > 1){
+    for(k in 2:length(unique(df_test$condition))){
+      # get required info
+      df_condition <- filter_condition(df_test, cond = k) # get data of condition k
+      perc_congr <- get_perc_congr(df_condition)
+      perc_neutral <- get_perc_neut(df_condition)
+      mean_obs_pp <- get_mean_obs_pp(df_condition)
+      n_obs <- get_n_obs(df_condition)
+      
+      # append to condition_table
+      pub[[2]][[i+2]]$condition_table[k, ] <- c(k, perc_congr, perc_neutral, 
+                                                          mean_obs_pp, n_obs)
+    }
+  }
 }
+
+
+
+
+
+
+
+# 3.4 DATA LEVEL IF >1 STUDIES
+
+# for each study
+for(i in 1:entry$Number.of.studies){
+  # for each task in study i
+  for(j in 1:entry$Number.of.tasks){
+    
+    # create task_table 
+  
+    # create within_table 
+    
+    # create dataset_table 
+    
+    # create observations_table 
+  }
   
   
+  
+}
+# we need info about how many data frames a study has 
+# loop over each data frame
+# add overview and fill in the blanks 
+# add task info 
+# add within_info 
+# add raw data frame --> code condition column based on group and within!
   
   
   
