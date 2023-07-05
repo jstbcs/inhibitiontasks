@@ -4,15 +4,13 @@ source("./inject/compute_automatic_info.R")
 source("./inject/create_publication_level.R")
 source("./inject/create_study_level.R")
 source("./inject/start_data_level.R")
-source("./inject/test_publication.R")
-source("./inject/test_study.R")
-source("./inject/start_data.R")
+source("./inject/source_testing_scripts.R")
 
 # STEP 1: Manual work --------------------------------------------------------#
 
 # 1.1 download entry from wordpress and read in as csv
 #entry <- read.csv("C:/Users/Michael/Downloads/inhibition-data-base-2023-06-07(3).csv")
-entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-06-28.csv")
+entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-07-05.csv")
 
 # 1.2 If several entries appeared on that day: Extract entry of interest
 # entry <- entry[1, ]
@@ -56,7 +54,7 @@ pub <- create_study_level(pub, entry)
 
 # 3.3 START DATA LEVEL 
 # creates task_table, within_table, and dataset_table 
-pub <- start_data_level(pub, entry, n_studies = 1) # Note: adjust number of studies 
+pub <- start_data_level(pub, entry, n_studies = 3) # Note: adjust number of studies 
 
 # 3.4 MANUALLY COMPLETE DATA LEVEL 
 # NOTE. before running the following loops, make sure to load all datasets 

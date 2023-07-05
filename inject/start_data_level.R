@@ -117,7 +117,7 @@ start_data_level <- function(pub, entry, n_studies = 1){
   } else if (n_studies > 1){
     
     for(i in 1:entry$Number.of.studies){
-      n_inhibition_tasks <- paste("Number.of.inhibition.tasks...STUDY.",i, sep="")
+      n_inhibition_tasks <- entry[1, paste("Number.of.inhibition.tasks...STUDY.",i, sep="")]
       
       # for each task in study i
       for(j in 1:n_inhibition_tasks){
@@ -144,7 +144,7 @@ start_data_level <- function(pub, entry, n_studies = 1){
         # create within_table -----------------
         # reference correct column
         if(n_inhibition_tasks == 1){  # if only one task in study
-          within_manipulation_name <- paste("Within.subject.manipulation...STUDY.", i)
+          within_manipulation_name <- paste("Within.subject.manipulation...STUDY.", i, sep = "")
         } else {    # if more than one task in study 
           within_manipulation_name <- paste("Within.subject.manipulation...STUDY.", i, "...task.", j, sep="")
         }
