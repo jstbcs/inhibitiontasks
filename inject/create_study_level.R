@@ -121,8 +121,8 @@ create_study_level <- function(pub, entry){
       
       # insert into study_table 
       pub[[i+1]]$study_table <- data.frame(
-        n_groups = entry[, n_tasks_name], 
-        n_tasks = entry[, n_groups_name],
+        n_groups = entry[, n_groups_name], 
+        n_tasks = entry[, n_tasks_name],
         comment = entry[, comment_name]
       )
       
@@ -176,7 +176,7 @@ create_study_level <- function(pub, entry){
         
         # initialize between_table with first group 
         pub[[i+1]]$between_table <- data.frame(
-          between_name =  between_number,
+          between_name =  entry[1, between_number],
           mean_age = mean_age_value,
           pecentage_female = percentage_fem_value,
           n_members = NA,
@@ -184,7 +184,7 @@ create_study_level <- function(pub, entry){
         )
         
         # append one row for each following group 
-        for(j in 1:pub[[i+1]]$study_table$n_groups){
+        for(j in 2:pub[[i+1]]$study_table$n_groups){
           
           # get needed info of group j in study i 
           between_number <- paste("Between.value.of.group.", j, "..STUDY.",i, ".", sep = "")
@@ -192,6 +192,7 @@ create_study_level <- function(pub, entry){
           percentage_fem_name <- paste("Percentage.female...group.", j, "..STUDY.", i, sep = "" )
           group_description_name <- paste("Sample.description.of.group.", j, "...STUDY.", i, ".", sep = "")
           
+          between_number_value <- entry[1, between_number]
           mean_age_value <- ifelse(mean_age_name %in% colnames(entry), 
                                    entry[1, mean_age_name], 
                                    NA)
@@ -203,11 +204,11 @@ create_study_level <- function(pub, entry){
                                             NA)
           
           # add entry
-          pub[[i+1]]$between_table$between_name[j] <- between_number
-          pub[[i+1]]$between_table$mean_age[j] <- mean_age_value
-          pub[[i+1]]$between_table$percentage_female[j] <- percentage_fem_value
-          pub[[i+1]]$between_table$n_members[j] <- NA
-          pub[[i+1]]$between_table$group_description[j] <- group_description_value
+          pub[[i+1]][[2]][j, 1] <- between_number_value
+          pub[[i+1]][[2]][j, 2] <- mean_age_value
+          pub[[i+1]][[2]][j, 3]<- percentage_fem_value
+          pub[[i+1]][[2]][j, 4] <- NA
+          pub[[i+1]][[2]][j, 5] <- group_description_value
           
         }
       }
