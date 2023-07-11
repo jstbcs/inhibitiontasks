@@ -213,12 +213,12 @@ create_study_level <- function(pub, entry){
         }
       }
       
-      # add empty data list for each task in study i
-      for(k in 1:pub[[i+1]]$study_table$n_tasks){
+       #add empty data list for each task in study i
+      #for(k in 1:pub[[i+1]]$study_table$n_tasks){
         
-        pub[[2]]$data <- list()
-        names(pub[[2]])[k+2] <- paste("data", k, sep ="")
-      }
+      #  pub[[2]]$data <- list()
+      #  names(pub[[2]])[k+2] <- paste("data", k, sep ="")
+      #}
     }
   }
   

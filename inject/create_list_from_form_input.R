@@ -1,5 +1,6 @@
 # Test read in online form data 
 library(dplyr)
+library(xlsx)
 source("./inject/compute_automatic_info.R")
 source("./inject/create_publication_level.R")
 source("./inject/create_study_level.R")
@@ -11,6 +12,8 @@ source("./inject/source_testing_scripts.R")
 # 1.1 download entry from wordpress and read in as csv
 #entry <- read.csv("C:/Users/Michael/Downloads/inhibition-data-base-2023-06-07(3).csv")
 entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-07-05.csv")
+# or 
+# entry <- read.xlsx("~filepath")
 
 # 1.2 If several entries appeared on that day: Extract entry of interest
 # entry <- entry[1, ]
@@ -128,7 +131,7 @@ for(i in 1:entry$Number.of.studies){
   n_inhibition_tasks <- paste("Number.of.inhibition.tasks...STUDY.",i, sep="")
   
   # for each task in study i
-  for(j in 1:n_inhibition_tasks){
+  for(j in 1:entry[1, n_inhibition_tasks]){
     
     # create task_table -------------------
     # get relevant column names depending on n_tasks

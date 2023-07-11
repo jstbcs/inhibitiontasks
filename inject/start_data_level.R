@@ -6,6 +6,10 @@ start_data_level <- function(pub, entry, n_studies = 1){
     # if just one 
     for(i in 1:entry$Number.of.inhibition.tasks){
       
+      # create data list --------------------
+      pub[[2]]$data <- list()
+      names(pub[[2]])[i+2] <- paste("data", i, sep ="")
+      
       # create task_table -------------------
       # get relevant column names
       if(entry$Number.of.inhibition.tasks == 1){  # if only one task in study
@@ -117,10 +121,15 @@ start_data_level <- function(pub, entry, n_studies = 1){
   } else if (n_studies > 1){
     
     for(i in 1:entry$Number.of.studies){
+      
       n_inhibition_tasks <- entry[1, paste("Number.of.inhibition.tasks...STUDY.",i, sep="")]
       
       # for each task in study i
       for(j in 1:n_inhibition_tasks){
+        
+        # create data list 
+        pub[[i+1]]$data <- list()
+        names(pub[[i+1]])[j+2] <- paste("data", j, sep ="")
         
         # create task_table -------------------
         # get relevant column names depending on n_tasks
@@ -128,7 +137,7 @@ start_data_level <- function(pub, entry, n_studies = 1){
           task_name_value <- paste("Inhibition.task.type...STUDY.", i, sep = "")
           task_desc_name <-  paste("Inhibition.task.type...STUDY.", i, sep = "")
         } else {    # if more than one task in study 
-          task_name_value <- paste("Inhibition.task.type...STUDY.", i, "...task.", j, sep="")
+          task_name_value <- paste("Inhibition.task.type..Study.", i, "...task.", j, sep="")
           task_desc_name <- paste("Task.description...STUDY.", i, "...task.", j, sep="")
         }
         
