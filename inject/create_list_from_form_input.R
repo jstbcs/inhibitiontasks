@@ -206,7 +206,12 @@ for(i in 1:entry$Number.of.studies){
 }
 
 
-# STEP 4: AUTOMATIC CHECKS --------------------------------------------------#
+# STEP 4: OPTIONAL: ADD MISSING META-INFO -----------------------------------#
+# see manual for instructions
+# example: 
+pub[[1]]$authors <- "J. Example"
+
+# STEP 5: AUTOMATIC CHECKS --------------------------------------------------#
 
 
 
