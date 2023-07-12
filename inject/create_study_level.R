@@ -36,7 +36,7 @@ create_study_level <- function(pub, entry){
       pub[[2]]$between_table <- data.frame(
         between_name = 1,
         mean_age = mean_age_value,
-        pecentage_fem = percentage_fem_value,
+        percentage_female = percentage_fem_value,
         n_members = NA,
         group_description = group_description_value
       )
@@ -59,7 +59,7 @@ create_study_level <- function(pub, entry){
       pub[[2]]$between_table <- data.frame(
         between_name = 1,
         mean_age = mean_age_value,
-        pecentage_female = percentage_fem_value,
+        percentage_female = percentage_fem_value,
         n_members = NA,
         group_description = group_description_value
       )
@@ -150,7 +150,7 @@ create_study_level <- function(pub, entry){
         pub[[i+1]]$between_table <- data.frame(
           between_name =  1,
           mean_age = mean_age_value,
-          pecentage_female = percentage_fem_value,
+          percentage_female = percentage_fem_value,
           n_members = NA,
           group_description = group_description_value
         )
@@ -178,7 +178,7 @@ create_study_level <- function(pub, entry){
         pub[[i+1]]$between_table <- data.frame(
           between_name =  entry[1, between_number],
           mean_age = mean_age_value,
-          pecentage_female = percentage_fem_value,
+          percentage_female = percentage_fem_value,
           n_members = NA,
           group_description = group_description_value
         )

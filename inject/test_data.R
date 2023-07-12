@@ -50,15 +50,7 @@ correct_cols_in_task_table <- function(task_table){
   
   # stop if required column names are not present
   confirm_object_names(task_table, entry_list_info$task_table)
-  
-  # Check to see if task name is valid
-  task_name = task_table$task_name
-  if (!task_name %in% valid_task_names){
-    # valid_task_names is from "helper_functions.R". Contains all 3 valid names
-    msg = paste("Task name:", task_name, "is invalid. Please ensure you want to add that task name")
-    continue_after_warning(msg)
   }
-}
 
 
 # This function checks whether all optional columns of the dataset_table table 

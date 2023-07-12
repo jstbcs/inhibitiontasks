@@ -7,7 +7,7 @@ publication_table_columns <- c(
   "country",
   "contact",
   "keywords",
-  "apa_reference",
+  "APA_reference",
   "publication_code"
 ) 
 
@@ -28,14 +28,11 @@ dataset_table_columns <- c(
   "n_trials",
   "neutral_trials",
   "fixation_cross", 
-  "time_limit",
-  "github",
-  "comment"
+  "time_limit"
 )
 
 dataset_table_mandatory <- c(0, 0, 0, 0,
-                             0, 0, 0, 0,
-                             0)
+                             0, 0, 0)
 
 within_table_columns <- c(
   "within_name",

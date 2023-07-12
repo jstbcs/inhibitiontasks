@@ -76,24 +76,24 @@ pub <- start_data_level(pub, entry, n_studies = 3) # Note: adjust number of stud
 # RUN THIS IF JUST ONE STUDY WAS SUBMITTED 
 for(i in 1:entry$Number.of.inhibition.tasks){
   
-  # create observations_table  -----------------
+  # create observation_table  -----------------
   if(entry$Number.of.inhibition.tasks == 1){
     observations_name <- "processed_data_study1"
   } else {
     observations_name <- paste("processed_data_study1_task",i, sep="")
   }
   
-  pub[[2]][[i+2]]$observations_table <- eval(parse(text = observations_name))
+  pub[[2]][[i+2]]$observation_table <- eval(parse(text = observations_name))
   
   # add condition column to dataset 
   # (unique combinations of between and within column values)
-  pub[[2]][[i+2]]$observations_table <- code_condition(pub[[2]][[i+2]]$observations_table)
+  pub[[2]][[i+2]]$observation_table <- code_condition(pub[[2]][[i+2]]$observation_table)
   
   
   # Compute automatic info for dataset_table --------------
   
   # create data frame without trial blocks 
-  df_test <- remove_practice(pub[[2]][[i+2]]$observations_table)
+  df_test <- remove_practice(pub[[2]][[i+2]]$observation_table)
   # get info for dataset_table
   pub[[2]][[i+2]]$dataset_table$n_participants <- get_n(df_test)
   pub[[2]][[i+2]]$dataset_table$n_blocks <- get_n_blocks(df_test)
@@ -144,23 +144,23 @@ for(i in 1:entry$Number.of.studies){
   # for each task in study i
   for(j in 1:n_inhibition_tasks){
     
-    # create observations_table ------------------------
+    # create observation_table ------------------------
     if(n_inhibition_tasks == 1){
       observations_name <- paste("processed_data_study",i, sep="")
     } else {
       observations_name <- paste("processed_data_study",i,"_task",j, sep="")
     }
     
-    pub[[i+1]][[j+2]]$observations_table <- eval(parse(text = observations_name))
+    pub[[i+1]][[j+2]]$observation_table <- eval(parse(text = observations_name))
     
     # add condition column to dataset 
     # (unique combinations of between and within column values)
-    pub[[i+1]][[j+2]]$observations_table <- code_condition(pub[[i+1]][[j+2]]$observations_table)
+    pub[[i+1]][[j+2]]$observation_table <- code_condition(pub[[i+1]][[j+2]]$observation_table)
     
     # Compute automatic info for dataset_table --------------
     
     # create data frame without trial blocks 
-    df_test <- remove_practice(pub[[i+1]][[j+2]]$observations_table)
+    df_test <- remove_practice(pub[[i+1]][[j+2]]$observation_table)
     # get info for dataset_table
     pub[[i+1]][[j+2]]$dataset_table$n_participants <- get_n(df_test)
     pub[[i+1]][[j+2]]$dataset_table$n_blocks <- get_n_blocks(df_test)
@@ -212,7 +212,27 @@ for(i in 1:entry$Number.of.studies){
 pub[[1]]$authors <- "J. Example"
 
 # STEP 5: AUTOMATIC CHECKS --------------------------------------------------#
+# check publication level 
+check_publication_level_structure(pub)  
 
+# check study level 
+for(i in 1:entry$Number.of.studies){
+  print(paste("evaluating", paste("study", i, sep =" ")))
+  
+  check_study_level_structure(pub[[i+1]])
+  
+  print("passed.")
+}
+
+# check data level 
+for(i in 1:entry$Number.of.studies){ 
+  n_data <- sum(grepl("data", names(pub[[i+1]])))
+  for(j in 1:n_data){
+    print(paste("testing data", j, "study", i, sep=""))
+    check_data_level_structure(pub[[i+1]][[j+2]])
+    print("passed.")
+  }
+}
 
 
 
