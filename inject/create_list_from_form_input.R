@@ -11,12 +11,12 @@ source("./inject/source_testing_scripts.R")
 
 # 1.1 download entry from wordpress and read in as csv
 #entry <- read.csv("C:/Users/Michael/Downloads/inhibition-data-base-2023-06-07(3).csv")
-entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-07-05.csv")
+entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-07-13.csv")
 # or 
 # entry <- read.xlsx("~filepath")
 
 # 1.2 If several entries appeared on that day: Extract entry of interest
-# entry <- entry[1, ]
+entry <- entry[1, ] # latest entry is in first row
 
 # 1.3 download the actual data file(s)
   # finding non-empty "Upload.data" entries
@@ -25,19 +25,29 @@ download_links <- entry %>%
   select(upload_columns[which(!is.na(entry[1, upload_columns]))])
   # based on the download_links data frame download all data sets by entering the
   # link in your browser and reading it into R (see manual for naming conventions)
-processed_data_study1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset1.csv")
-processed_data_study1 <- processed_data_study1[,2:10]
-processed_data_study2_task1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset2.csv")
-processed_data_study2_task1 <- processed_data_study2_task1[,2:10]
-processed_data_study2_task2 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset4.csv")
-processed_data_study2_task2 <- processed_data_study2_task2[,2:10]
-processed_data_study3_task1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset49.csv")
-processed_data_study3_task1 <- processed_data_study3_task1[,2:10]
-processed_data_study3_task2 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset42.csv")
-processed_data_study3_task2 <- processed_data_study3_task2[,2:10]
+#processed_data_study1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset1.csv")
+#processed_data_study1 <- processed_data_study1[,2:10]
+#processed_data_study2_task1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset2.csv")
+#processed_data_study2_task1 <- processed_data_study2_task1[,2:10]
+#processed_data_study2_task2 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset4.csv")
+#processed_data_study2_task2 <- processed_data_study2_task2[,2:10]
+#processed_data_study3_task1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset49.csv")
+#processed_data_study3_task1 <- processed_data_study3_task1[,2:10]
+#processed_data_study3_task2 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset42.csv")
+#processed_data_study3_task2 <- processed_data_study3_task2[,2:10]
+
+
 
 # 1.4 create the publication code 
 pub_code <- "tang_2022_dual"  # see naming conventions in manual 
+
+# 1.5 Check if data for same publication has already been submitted
+entry$Have.you.already.submitted.data.for.this.reference.in.the.past.
+## if no: just proceed
+## if yes: get publication_id with respective pub_code from db
+### take list object which was used to read in data (github inject folder)
+## create new list object with code below
+## append new list to old list and change name of study (e.g., study1 becomes study3)
 
 
 # 1.5 delete all non-used columns 
@@ -67,7 +77,7 @@ pub <- create_study_level(pub, entry)
 
 # 3.3 START DATA LEVEL 
 # creates task_table, within_table, and dataset_table 
-pub <- start_data_level(pub, entry, n_studies = 3) # Note: adjust number of studies 
+pub <- start_data_level(pub, entry, n_studies = 1) # Note: adjust number of studies 
 
 # 3.4 MANUALLY COMPLETE DATA LEVEL 
 # NOTE. before running the following loops, make sure to load all datasets 
@@ -206,14 +216,13 @@ for(i in 1:entry$Number.of.studies){
 }
 
 
-# STEP 4: OPTIONAL: ADD MISSING META-INFO -----------------------------------#
+# STEP 4: OPTIONAL- ADD MISSING META-INFO -----------------------------------#
 # see manual for instructions
-# example: 
-pub[[1]]$authors <- "J. Example"
+# e.g.: pub[[1]]$authors <- "J. Example"
 
 # STEP 5: AUTOMATIC CHECKS --------------------------------------------------#
 # check publication level 
-check_publication_level_structure(pub)  
+check_publication_level_structure(pub)
 
 # check study level 
 for(i in 1:entry$Number.of.studies){

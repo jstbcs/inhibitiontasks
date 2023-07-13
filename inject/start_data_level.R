@@ -14,7 +14,7 @@ start_data_level <- function(pub, entry, n_studies = 1){
       # get relevant column names
       if(entry$Number.of.inhibition.tasks == 1){  # if only one task in study
         task_name_value <- "Inhibition.task.type...STUDY.1"
-        task_desc_name <- "Inhibition.task.type...STUDY.1"
+        task_desc_name <- "Task.description...STUDY.1"
       } else {    # if more than one task in study 
         task_name_value <- paste("Inhibition.task.type...task.", i, sep="")
         task_desc_name <- paste("Task.description...task.", i, sep="")
@@ -28,6 +28,16 @@ start_data_level <- function(pub, entry, n_studies = 1){
         task_name = entry[1, task_name_value],
         task_description = task_desc_value
       )
+      
+      if(entry[1, task_name_value] == "Other"){
+        alternative_task_name <- ifelse(entry$Number.of.inhibition.tasks == 1, 
+                                        paste("Alternative.task.type...STUDY.1"),
+                                        paste("Alternative.task.type...task.", i, sep="")) #TODO: change
+        
+        alternative_name_value <- paste("Other:", entry[1, alternative_task_name])
+        
+        pub[[2]][[i+2]][[1]]$task_name <- alternative_name_value
+      }
       
       # create within_table    ---------------
       # reference correct column
@@ -78,8 +88,8 @@ start_data_level <- function(pub, entry, n_studies = 1){
             within_descr_name <- paste("Within.description.condition.", j, "...task.", i, sep="")
           }
           
-          pub[[2]][[i+2]]$within_table$within_name[j] <- entry[1, within_name]
-          pub[[2]][[i+2]]$within_table$within_description[j] <- entry[1, within_descr_name]
+          pub[[2]][[i+2]][[2]][j,1] <-  entry[1, within_name]
+          pub[[2]][[i+2]][[2]][j,2] <-  entry[1, within_descr_name]
         }
       }
       
@@ -88,11 +98,11 @@ start_data_level <- function(pub, entry, n_studies = 1){
       if(entry$Number.of.inhibition.tasks == 1){
         data_excl_name <- "Data.exclusion.criteria...STUDY.1"
         fix_cross_name <- "Fixation.point...STUDY.1"
-        #time_limit_name <- paste()
+        time_limit_name <- "Time.limit.STUDY.1"
       } else {
         data_excl_name <- paste("Data.exclusion.criteria...task.", i, sep="")
         fix_cross_name <- paste("Fixation.point...task.", i, sep="")
-        #time_limit_name <- paste()
+        time_limit_name <- paste("Time.limit...task.", i, sep="")
       }
       
       # get input, else put NA 
@@ -102,7 +112,9 @@ start_data_level <- function(pub, entry, n_studies = 1){
       fix_cross_value <- ifelse(fix_cross_name %in% colnames(entry), 
                                 entry[1, fix_cross_name], 
                                 NA)
-      #time_limit_value <- ifelse()
+      time_limit_value <- ifelse(time_limit_name %in% colnames(entry),
+                                 entry[1, time_limit_name],
+                                 NA)
       
       # insert into dataset_table 
       pub[[2]][[i+2]]$dataset_table <- data.frame(
@@ -111,8 +123,8 @@ start_data_level <- function(pub, entry, n_studies = 1){
         n_blocks = NA, # computed later
         n_trials = NA, # computed later
         neutral_trials= NA, # computed later
-        fixation_cross = fix_cross_value
-        # time_limit = NA
+        fixation_cross = fix_cross_value,
+        time_limit = time_limit_value
       )
       
     }
@@ -132,23 +144,36 @@ start_data_level <- function(pub, entry, n_studies = 1){
         names(pub[[i+1]])[j+2] <- paste("data", j, sep ="")
         
         # create task_table -------------------
+        
         # get relevant column names depending on n_tasks
         if(n_inhibition_tasks == 1){  # if only one task in study
           task_name_value <- paste("Inhibition.task.type...STUDY.", i, sep = "")
-          task_desc_name <-  paste("Inhibition.task.type...STUDY.", i, sep = "")
+          task_desc_name <-  paste("Task.description...STUDY.", i, sep = "")
         } else {    # if more than one task in study 
           task_name_value <- paste("Inhibition.task.type..Study.", i, "...task.", j, sep="")
           task_desc_name <- paste("Task.description...STUDY.", i, "...task.", j, sep="")
         }
         
+        # insert NA if no info task description submitted
         task_desc_value <- ifelse(task_desc_name %in% colnames(entry),
                                   entry[1, task_desc_name] , 
                                   NA)
         
+        # fill in task_table
         pub[[i+1]][[j+2]]$task_table<- data.frame(
           task_name = entry[1, task_name_value],
           task_description = task_desc_value
         )
+        
+        # If task type is other, add info to task_name
+        if(pub[[i+1]][[j+2]][[1]]$task_name == "Other"){
+          alternative_task_name <- ifelse(n_inhibition_tasks == 1, 
+                                          paste("Alternative.task.type...STUDY.",i,sep=""),
+                                          paste("Alternative.task.type...Study.",i,"...task.",j,sep=""))
+          alternative_name_value <- paste("Other:", entry[1, alternative_task_name])
+          
+          pub[[i+1]][[j+2]][[1]]$task_name <- alternative_name_value
+        }
         
         # create within_table -----------------
         # reference correct column
@@ -170,8 +195,12 @@ start_data_level <- function(pub, entry, n_studies = 1){
         } else if(entry[1, within_manipulation_name] == "Yes"){
           
           # set up data frame with first condition
-          within_name <- paste("Within.value.of.condition.1...STUDY.",i,"...task.",j, sep="")
-          within_descr_name <- paste("Within.description.condition.1...STUDY.",i, "...task.", j, sep="")
+          within_name <- ifelse(n_inhibition_tasks == 1,
+                                "Within.value.of.condition.1",
+                                      paste("Within.value.of.condition.1...STUDY.",i,"...task.",j, sep=""))
+          within_descr_name <- ifelse(n_inhibition_tasks == 1, 
+                                      "Within.description..condition.1",
+                                      paste("Within.description.condition.1...STUDY.",i, "...task.", j, sep=""))
           
           pub[[i+1]][[j+2]]$within_table <- data.frame(
             within_name = entry[1, within_name], 
@@ -195,8 +224,9 @@ start_data_level <- function(pub, entry, n_studies = 1){
               within_descr_name <- paste("Within.description.condition.", k, "...STUDY.", i, "...task.", j, sep="")
             }
             
-            pub[[i+1]][[j+2]]$within_table$within_name[k] <- entry[1, within_name]
-            pub[[i+1]][[j+2]]$within_table$within_description[k] <- entry[1, within_descr_name]
+            pub[[i+1]][[j+2]][[2]][k,1] <-  entry[1, within_name]
+            pub[[i+1]][[j+2]][[2]][k,2] <-  entry[1, within_descr_name]
+       
           }
         }
         
@@ -205,11 +235,11 @@ start_data_level <- function(pub, entry, n_studies = 1){
         if(n_inhibition_tasks == 1){
           data_excl_name <- paste("Data.exclusion.criteria...STUDY.", i, sep="")
           fix_cross_name <- paste("Fixation.point...STUDY.", i, sep="")
-          #time_limit_name <- paste()
+          time_limit_name <- paste("Time.limit.STUDY.1", i, sep="")
         } else {
           data_excl_name <- paste("Data.exclusion.criteria....STUDY.", i, "...task.", j, sep="")
           fix_cross_name <- paste("Fixation.point...STUDY.", i, "...task.", j, sep="")
-          #time_limit_name <- paste()
+          time_limit_name <- paste("Time.limit...STUDY.", i, "...task.", j, sep = "")
         }
         
         # get input, else put NA 
@@ -219,7 +249,9 @@ start_data_level <- function(pub, entry, n_studies = 1){
         fix_cross_value <- ifelse(fix_cross_name %in% colnames(entry), 
                                   entry[1, fix_cross_name], 
                                   NA)
-        #time_limit_value <- ifelse()
+        time_limit_value <- ifelse(time_limit_name %in% colnames(entry),
+                                   entry[1, time_limit_name],
+                                   NA)
         
         # insert into dataset_table 
         pub[[i+1]][[j+2]]$dataset_table <- data.frame(
@@ -228,8 +260,8 @@ start_data_level <- function(pub, entry, n_studies = 1){
           n_blocks = NA, # computed later
           n_trials = NA, # computed later
           neutral_trials= NA, # computed later
-          fixation_cross = fix_cross_value
-          # time_limit = NA
+          fixation_cross = fix_cross_value,
+          time_limit = time_limit_value
         )
       }
     }

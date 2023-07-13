@@ -30,7 +30,7 @@ create_study_level <- function(pub, entry){
                                      NA)
       group_description_value <- ifelse("Sample.description" %in% colnames(entry),
                                         entry$Sample.description, 
-                                        "no within manipulation")
+                                        "no between manipulation")
       
       # insert into between_table 
       pub[[2]]$between_table <- data.frame(
@@ -92,15 +92,8 @@ create_study_level <- function(pub, entry){
       }
     }
     
-    # add empty data list for each task 
-    for(i in 1:pub[[2]]$study_table$n_tasks){
-      
-      pub[[2]]$data <- list()
-      names(pub[[2]])[i+2] <- paste("data", i, sep ="")
-    }
     
   # STUDY LEVEL IF NUMBER OF STUDIES > 1 ------------------- #
-    # TODO: test this
   } else if (entry$Number.of.studies > 1){
   
   
@@ -144,7 +137,7 @@ create_study_level <- function(pub, entry){
                                        NA)
         group_description_value <- ifelse(group_description_name %in% colnames(entry),
                                           entry[1, group_description_name] , 
-                                          NA)
+                                          "No between manipulation")
         
         # fill in between_table
         pub[[i+1]]$between_table <- data.frame(
@@ -212,13 +205,6 @@ create_study_level <- function(pub, entry){
           
         }
       }
-      
-       #add empty data list for each task in study i
-      #for(k in 1:pub[[i+1]]$study_table$n_tasks){
-        
-      #  pub[[2]]$data <- list()
-      #  names(pub[[2]])[k+2] <- paste("data", k, sep ="")
-      #}
     }
   }
   
