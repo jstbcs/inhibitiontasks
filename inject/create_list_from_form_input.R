@@ -11,7 +11,7 @@ source("./inject/source_testing_scripts.R")
 
 # 1.1 download entry from wordpress and read in as csv
 #entry <- read.csv("C:/Users/Michael/Downloads/inhibition-data-base-2023-06-07(3).csv")
-entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-07-13.csv")
+entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-07-18.csv")
 # or 
 # entry <- read.xlsx("~filepath")
 
@@ -25,7 +25,7 @@ download_links <- entry %>%
   select(upload_columns[which(!is.na(entry[1, upload_columns]))])
   # based on the download_links data frame download all data sets by entering the
   # link in your browser and reading it into R (see manual for naming conventions)
-#processed_data_study1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset1.csv")
+processed_data_study1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset42.csv")
 #processed_data_study1 <- processed_data_study1[,2:10]
 #processed_data_study2_task1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset2.csv")
 #processed_data_study2_task1 <- processed_data_study2_task1[,2:10]
@@ -35,7 +35,6 @@ download_links <- entry %>%
 #processed_data_study3_task1 <- processed_data_study3_task1[,2:10]
 #processed_data_study3_task2 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset42.csv")
 #processed_data_study3_task2 <- processed_data_study3_task2[,2:10]
-
 
 
 # 1.4 create the publication code 
@@ -144,6 +143,13 @@ for(i in 1:entry$Number.of.inhibition.tasks){
                                                 mean_obs_pp, n_obs)
     }
   }
+  
+  # last: compute n_members for each group
+  for(j in 1:pub[[2]][[1]]$n_groups){
+    n_members <- get_n_members(pub = pub, study = 1, task = i, between_value = j)
+    # place it in right place in nested list
+    pub[[2]][[2]][j,4] <- n_members
+  }
 }
 
 # RUN THIS IF SEVERAL STUDIES WERE SUBMITTED AT ONCE
@@ -210,6 +216,13 @@ for(i in 1:entry$Number.of.studies){
         pub[[i+1]][[j+2]]$condition_table[n, ] <- c(n, perc_congr, perc_neutral, 
                                                   mean_obs_pp, n_obs)
       }
+    }
+    
+    # last: compute n_members for each group
+    for(k in 1:pub[[i+1]][[j+2]]$n_groups){
+      n_members <- get_n_members(pub = pub, study = i, task = j, between_value = k)
+      # place it in right place in nested list
+      pub[[i+1]][[j+2]][k,4] <- n_members
     }
     
   }

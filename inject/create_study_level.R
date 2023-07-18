@@ -70,7 +70,7 @@ create_study_level <- function(pub, entry){
         # get needed needed info 
         between_number <- paste("Between.value.of.group.", j, sep ="")
         mean_age_name <- paste("Mean.age.group.", j, sep = "")
-        percentage_fem_name <- paste("Percentage.female.group.", j, sep =)
+        percentage_fem_name <- paste("Percentage.female.group.", j, sep = "")
         group_description_name <- paste("Sample.description.of.group.", j, sep = "")
         
         mean_age_value <- ifelse(mean_age_name %in% colnames(entry), 
@@ -83,13 +83,14 @@ create_study_level <- function(pub, entry){
                                           entry[1, group_description_name] , 
                                           NA)
         
-        # add entries 
-        pub[[2]]$between_table$between_name[j] <- between_number
-        pub[[2]]$between_table$mean_age[j] <- mean_age_value
-        pub[[2]]$between_table$percentage_female[j] <- percentage_fem_value
-        pub[[2]]$between_table$n_members[j] <- NA
-        pub[[2]]$between_table$group_description[j] <- group_description_value
-      }
+        # add entries
+        # add entry
+        pub[[2]][[2]][j, 1] <- entry[1, between_number]
+        pub[[2]][[2]][j, 2] <- mean_age_value
+        pub[[2]][[2]][j, 3] <- percentage_fem_value
+        pub[[2]][[2]][j, 4] <- NA
+        pub[[2]][[2]][j, 5] <- group_description_value
+        }
     }
     
     
