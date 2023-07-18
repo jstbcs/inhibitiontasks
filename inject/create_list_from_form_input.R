@@ -224,7 +224,6 @@ for(i in 1:entry$Number.of.studies){
       # place it in right place in nested list
       pub[[i+1]][[j+2]][k,4] <- n_members
     }
-    
   }
 }
 
