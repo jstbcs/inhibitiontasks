@@ -1,8 +1,8 @@
 # create task_table, within_table, and dataset_table for data level
-start_data_level <- function(pub, entry, n_studies = 1){
+start_data_level <- function(pub, entry){
   
   # IF JUST ONE STUDY 
-  if(n_studies == 1){
+  if(entry$Number.of.studies == 1){
     # if just one 
     for(i in 1:entry$Number.of.inhibition.tasks){
       
@@ -130,7 +130,7 @@ start_data_level <- function(pub, entry, n_studies = 1){
     }
    
   # FOR ENTRIES WITH MORE THAN 1 STUDY     
-  } else if (n_studies > 1){
+  } else if (entry$Number.of.studies > 1){
     
     for(i in 1:entry$Number.of.studies){
       
@@ -146,12 +146,20 @@ start_data_level <- function(pub, entry, n_studies = 1){
         # create task_table -------------------
         
         # get relevant column names depending on n_tasks
-        if(n_inhibition_tasks == 1){  # if only one task in study
-          task_name_value <- paste("Inhibition.task.type...STUDY.", i, sep = "")
-          task_desc_name <-  paste("Task.description...STUDY.", i, sep = "")
-        } else {    # if more than one task in study 
-          task_name_value <- paste("Inhibition.task.type..Study.", i, "...task.", j, sep="")
-          task_desc_name <- paste("Task.description...STUDY.", i, "...task.", j, sep="")
+        if(i == 1){  # column names for first study 
+          task_name_value <- ifelse(n_inhibition_tasks == 1, 
+                                    "Inhibition.task.type...STUDY.1",
+                                    paste("Inhibition.task.type...STUDY.", i, "...task.", j, sep = ""))
+          task_desc_name <-  ifelse(n_inhibition_tasks == 1, 
+                                    "Task.description...STUDY.1",
+                                    paste("Task.description...STUDY.", i, "...task.", j, sep = ""))
+        } else {    # column names for studies 2-5
+          task_name_value <- ifelse(n_inhibition_tasks == 1,
+                                    paste("Inhibition.task.type..Study.", i, sep=""),
+                                    paste("Inhibition.task.type..Study.", i, "...task.", j, sep=""))
+          task_desc_name <- ifelse(n_inhibition_tasks == 1,
+                                   paste("Task.description...STUDY.", i, sep=""),
+                                   paste("Task.description...STUDY.", i, "...task.", j, sep=""))
         }
         
         # insert NA if no info task description submitted
@@ -167,10 +175,19 @@ start_data_level <- function(pub, entry, n_studies = 1){
         
         # If task type is other, add info to task_name
         if(pub[[i+1]][[j+2]][[1]]$task_name == "Other"){
-          alternative_task_name <- ifelse(n_inhibition_tasks == 1, 
-                                          paste("Alternative.task.type...STUDY.",i,sep=""),
-                                          paste("Alternative.task.type...Study.",i,"...task.",j,sep=""))
-          alternative_name_value <- paste("Other:", entry[1, alternative_task_name])
+          if(i == 1){
+            # TODO: test 
+            alternative_task_name <- ifelse(n_inhibition_tasks == 1, 
+                                            "Alternative.task.type...STUDY.1",
+                                            paste("Alternative.task.type...Study.1...task.",j,sep=""))
+            alternative_name_value <- paste("Other:", entry[1, alternative_task_name])
+          } else{
+            alternative_task_name <- ifelse(n_inhibition_tasks == 1, 
+                                            paste("Alternative.task.type...study.",i,sep=""),
+                                            paste("Alternative.task.type...Study.",i,"...task.",j,sep=""))
+            alternative_name_value <- paste("Other:", entry[1, alternative_task_name])
+          }
+          
           
           pub[[i+1]][[j+2]][[1]]$task_name <- alternative_name_value
         }
@@ -195,12 +212,24 @@ start_data_level <- function(pub, entry, n_studies = 1){
         } else if(entry[1, within_manipulation_name] == "Yes"){
           
           # set up data frame with first condition
-          within_name <- ifelse(n_inhibition_tasks == 1,
-                                "Within.value.of.condition.1",
-                                      paste("Within.value.of.condition.1...STUDY.",i,"...task.",j, sep=""))
-          within_descr_name <- ifelse(n_inhibition_tasks == 1, 
-                                      "Within.description..condition.1",
-                                      paste("Within.description.condition.1...STUDY.",i, "...task.", j, sep=""))
+          # reference correct column names
+          if(i == 1){ # column names of study 1
+            # TODO: test
+            within_name <- ifelse(n_inhibition_tasks == 1,
+                                  "Within.value.of.condition.1",
+                                  paste("Within.value.of.condition.1...STUDY.",i,"...task.",j, sep=""))
+            within_descr_name <- ifelse(n_inhibition_tasks == 1, 
+                                        "Within.description..condition.1",
+                                        paste("Within.description.condition.1...STUDY.",i, "...task.", j, sep=""))
+          } else{ # column names of studies 2-5
+            within_name <- ifelse(n_inhibition_tasks == 1,
+                                  paste("Within.value.of.condition.1...STUDY.",i, sep=""),
+                                  paste("Within.value.of.condition.1...STUDY.",i,"...task.",j, sep=""))
+            within_descr_name <- ifelse(n_inhibition_tasks == 1, 
+                                        paste("Within.description.condition.1...STUDY.",i, sep=""),
+                                        paste("Within.description.condition.1..STUDY.",i, "...task.", j, sep=""))
+          }
+          
           
           pub[[i+1]][[j+2]]$within_table <- data.frame(
             within_name = entry[1, within_name], 
@@ -211,17 +240,21 @@ start_data_level <- function(pub, entry, n_studies = 1){
           if(n_inhibition_tasks == 1){ # reference column name
             number_withincon_name <- paste("Number.of.within.conditions...STUDY.", i, sep="")
           } else {
-            number_withincon_name <- paste("Number.of.within.conditions...STUDY.", i, "..task.", j, sep="")
+            number_withincon_name <- paste("Number.of.within.conditions...STUDY.", i, "...task.", j, sep="")
           }
           
           for(k in 2:entry[1, number_withincon_name]){
             # again, make sure to reference the right column names
             if(n_inhibition_tasks == 1){ # column names if just one task
-              within_name <- paste("Within.value.of.condition.", k, sep="")
-              within_descr_name <- paste("Within.description..condition.", k, sep="")
+              within_name <- ifelse(i == 1,
+                                    paste("Within.value.of.condition.", k, sep=""),
+                                    paste("Within.value.of.condition.", k, "...STUDY.", i, sep=""))
+              within_descr_name <- ifelse(i == 1,
+                                          paste("Within.description..condition.", k, sep=""),
+                                          paste("Within.description.condition.", k, "...STUDY.", i, sep=""))
             } else{  # column names when several tasks
               within_name <- paste("Within.value.of.condition.", k, "...STUDY.", i, "...task.", j, sep="")
-              within_descr_name <- paste("Within.description.condition.", k, "...STUDY.", i, "...task.", j, sep="")
+              within_descr_name <- paste("Within.description.condition.", k, "..STUDY.", i, "...task.", j, sep="")
             }
             
             pub[[i+1]][[j+2]][[2]][k,1] <-  entry[1, within_name]

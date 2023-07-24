@@ -156,7 +156,7 @@ create_study_level <- function(pub, entry){
         between_number <- paste("Between.value.of.group.1..STUDY.",i, ".", sep = "")
         mean_age_name <- paste("Mean.age...group.1..STUDY.", i, ".", sep = "")
         percentage_fem_name <- paste("Percentage.female...group.1..STUDY.", i, ".", sep = "" )
-        group_description_name <- paste("Sample.description.of.group.1...STUDY.", i, ".", sep = "")
+        group_description_name <- paste("Sample.description.of.group.1..STUDY.", i, ".", sep = "")
         
         mean_age_value <- ifelse(mean_age_name %in% colnames(entry), 
                                  entry[1, mean_age_name], 
@@ -183,8 +183,8 @@ create_study_level <- function(pub, entry){
           # get needed info of group j in study i 
           between_number <- paste("Between.value.of.group.", j, "..STUDY.",i, ".", sep = "")
           mean_age_name <- paste("Mean.age...group.", j, "..STUDY.", i, ".", sep = "")
-          percentage_fem_name <- paste("Percentage.female...group.", j, "..STUDY.", i, sep = "" )
-          group_description_name <- paste("Sample.description.of.group.", j, "...STUDY.", i, ".", sep = "")
+          percentage_fem_name <- paste("Percentage.female...group.", j, "..STUDY.", i, ".", sep = "" )
+          group_description_name <- paste("Sample.description.of.group.", j, "..STUDY.", i, ".", sep = "")
           
           between_number_value <- entry[1, between_number]
           mean_age_value <- ifelse(mean_age_name %in% colnames(entry), 
