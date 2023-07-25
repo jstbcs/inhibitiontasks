@@ -221,10 +221,10 @@ for(i in 1:entry$Number.of.studies){
     }
     
     # last: compute n_members for each group
-    for(k in 1:pub[[i+1]][[j+2]]$n_groups){
+    for(k in 1:pub[[i+1]][[1]]$n_groups){
       n_members <- get_n_members(pub = pub, study = i, task = j, between_value = k)
       # place it in right place in nested list
-      pub[[i+1]][[j+2]][k,4] <- n_members
+      pub[[i+1]][[2]][k,4] <- n_members
     }
   }
 }

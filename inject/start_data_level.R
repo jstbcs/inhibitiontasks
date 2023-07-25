@@ -31,8 +31,8 @@ start_data_level <- function(pub, entry){
       
       if(entry[1, task_name_value] == "Other"){
         alternative_task_name <- ifelse(entry$Number.of.inhibition.tasks == 1, 
-                                        paste("Alternative.task.type...STUDY.1"),
-                                        paste("Alternative.task.type...task.", i, sep="")) #TODO: change
+                                        "Alternative.task.type...STUDY.1",
+                                        paste("Alternative.task.type...task.", i, sep=""))
         
         alternative_name_value <- paste("Other:", entry[1, alternative_task_name])
         
@@ -127,6 +127,16 @@ start_data_level <- function(pub, entry){
         time_limit = time_limit_value
       )
       
+      # if custom fixation point: insert description as fixation_cross
+      if(fix_cross_value == "Yes, but something other than a cross appeared."){
+        alternative_fix_name <- ifelse(entry$Number.of.inhibition.tasks == 1, 
+                                        "Type.of.other.fixation.point",
+                                        paste("Type.of.other.fixation.point...task.", i, sep="")) 
+        
+        alternative_fix_value <- entry[1, alternative_fix_name]
+        
+        pub[[2]][[i+2]][[3]]$fixation_cross <- alternative_fix_value
+      }
     }
    
   # FOR ENTRIES WITH MORE THAN 1 STUDY     
@@ -183,7 +193,7 @@ start_data_level <- function(pub, entry){
             alternative_name_value <- paste("Other:", entry[1, alternative_task_name])
           } else{
             alternative_task_name <- ifelse(n_inhibition_tasks == 1, 
-                                            paste("Alternative.task.type...study.",i,sep=""),
+                                            paste("Alternative.task.type...Study.",i,sep=""),
                                             paste("Alternative.task.type...Study.",i,"...task.",j,sep=""))
             alternative_name_value <- paste("Other:", entry[1, alternative_task_name])
           }
@@ -217,7 +227,7 @@ start_data_level <- function(pub, entry){
             # TODO: test
             within_name <- ifelse(n_inhibition_tasks == 1,
                                   "Within.value.of.condition.1",
-                                  paste("Within.value.of.condition.1...STUDY.",i,"...task.",j, sep=""))
+                                  paste("Within.value.of.condition.1...STUDY.1...task.",j, sep=""))
             within_descr_name <- ifelse(n_inhibition_tasks == 1, 
                                         "Within.description..condition.1",
                                         paste("Within.description.condition.1...STUDY.",i, "...task.", j, sep=""))
@@ -227,7 +237,7 @@ start_data_level <- function(pub, entry){
                                   paste("Within.value.of.condition.1...STUDY.",i,"...task.",j, sep=""))
             within_descr_name <- ifelse(n_inhibition_tasks == 1, 
                                         paste("Within.description.condition.1...STUDY.",i, sep=""),
-                                        paste("Within.description.condition.1..STUDY.",i, "...task.", j, sep=""))
+                                        paste("Within.description.condition.1...STUDY.",i, "...task.", j, sep=""))
           }
           
           
@@ -250,11 +260,11 @@ start_data_level <- function(pub, entry){
                                     paste("Within.value.of.condition.", k, sep=""),
                                     paste("Within.value.of.condition.", k, "...STUDY.", i, sep=""))
               within_descr_name <- ifelse(i == 1,
-                                          paste("Within.description..condition.", k, sep=""),
+                                          paste("Within.description.condition.", k, sep=""),
                                           paste("Within.description.condition.", k, "...STUDY.", i, sep=""))
             } else{  # column names when several tasks
               within_name <- paste("Within.value.of.condition.", k, "...STUDY.", i, "...task.", j, sep="")
-              within_descr_name <- paste("Within.description.condition.", k, "..STUDY.", i, "...task.", j, sep="")
+              within_descr_name <- paste("Within.description.condition.", k, "...STUDY.", i, "...task.", j, sep="")
             }
             
             pub[[i+1]][[j+2]][[2]][k,1] <-  entry[1, within_name]
@@ -266,9 +276,13 @@ start_data_level <- function(pub, entry){
         # create dataset_table -----------------
         # relevant column names
         if(n_inhibition_tasks == 1){
-          data_excl_name <- paste("Data.exclusion.criteria...STUDY.", i, sep="")
+          data_excl_name <- ifelse(i == 1, # different name for study1
+                                   "Data.exclusion.criteria...STUDY.1", 
+                                   paste("Data.exclusion.criteria....STUDY.", i, sep=""))
           fix_cross_name <- paste("Fixation.point...STUDY.", i, sep="")
-          time_limit_name <- paste("Time.limit.STUDY.1", i, sep="")
+          time_limit_name <- ifelse(i == 1,
+                                    "Time.limit.STUDY.1",
+                                    paste("Time.limit...STUDY.", i, sep=""))
         } else {
           data_excl_name <- paste("Data.exclusion.criteria....STUDY.", i, "...task.", j, sep="")
           fix_cross_name <- paste("Fixation.point...STUDY.", i, "...task.", j, sep="")
@@ -296,6 +310,25 @@ start_data_level <- function(pub, entry){
           fixation_cross = fix_cross_value,
           time_limit = time_limit_value
         )
+        
+        # if custom fixation point: insert description as fixation_cross
+        if(fix_cross_value == "Yes, but something other than a cross appeared."){
+          if(i == 1){ # column name for study 1 differs from other column names
+            alternative_fix_name <- ifelse(n_inhibition_tasks == 1, 
+                                           "Type.of.other.fixation.point",
+                                           paste("Type.of.other.fixation.point...STUDY.1...task.", i, sep=""))
+          } else{
+            alternative_fix_name <- ifelse(n_inhibition_tasks == 1, 
+                                           paste("Type.of.other.fixation.point...STUDY.",i,sep=""),
+                                           paste("Type.of.other.fixation.point...STUDY.",i,"...task.", j, sep="")) 
+          }
+          
+          
+          alternative_fix_value <- entry[1, alternative_fix_name]
+          
+          pub[[i+1]][[j+2]][[3]]$fixation_cross <- alternative_fix_value
+        }
+        
       }
     }
   }
