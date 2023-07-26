@@ -10,11 +10,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, echo = F}
 library(dplyr)
-source("./inject/compute_automatic_info.R")
-source("./inject/create_publication_level.R")
-source("./inject/create_study_level.R")
-source("./inject/start_data_level.R")
-source("./inject/source_testing_scripts.R")
+source("./compute_automatic_info.R")
+source("./create_publication_level.R")
+source("./create_study_level.R")
+source("./start_data_level.R")
+source("./source_testing_scripts.R")
 ```
 
 This scripts guides you through the steps of getting submissions from the inhibition task online form and creating a nested list which can then be used to automatically insert the data into the data base. 
@@ -73,7 +73,7 @@ Now, load the data frames into R following the naming conventions:
 - If several tasks have been submitted for the same study, name the data file `processed_data_study[STUDYNUMBER]_task[TASKNUMBER]`
 
 ```{r}
-processed_data_study1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset42.csv")
+processed_data_study1 <- read.csv("~/data.csv")
 ```
 
 ## 1.3 Create the publication code
@@ -94,6 +94,7 @@ pub_code <- "tang_2022_dual"
 ```{r}
 entry$Have.you.already.submitted.data.for.this.reference.in.the.past.
 ```
+
 **If "No"**: All clear, just proceed with this script.
 
 **If "Yes"**: We have to make sure that this new submission to the data base is in line with the publicationID, studyIDs, betweenIDs etc. of the existing entries:
@@ -169,7 +170,7 @@ Please check if pub now contains `data[tasknumber]` lists within each study list
 
 Now finish the nested data by running one of the following 2 loops. 
 
-You can find out the numer of studies by running: 
+You can find out the number of studies by running: 
 ```{r}
 entry$Number.of.studies
 ```
