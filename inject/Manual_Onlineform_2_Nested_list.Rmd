@@ -29,7 +29,7 @@ At the bottom of the page, select the last date at which data was downloaded as 
 Read it into R: 
 ```{r}
 # note: data format might also be xlsx, txt, or Rdata
-entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-07-18.csv")
+entry <- read.csv("~/-data-base-YEAR-MONTH-DAY.csv")
 ```
 
 The data is in long format. Each entry appears as one row. In case several entries have been submitted since the last time data was read in, run the following script for each of these entries seperately. The latest submission appears in the first row. If necessary, choose the submission you want to read in:
