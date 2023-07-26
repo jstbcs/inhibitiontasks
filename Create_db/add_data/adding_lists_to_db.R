@@ -3,7 +3,8 @@ library(dplyr)
 library(RSQLite)
 library(DBI)
 
-# Getting info on lists
+# Getting info on lists -------
+# NOTE: adjust this code to select only those list objects you want to newly add to the db
 data_folder_path = "./Create_db/add_data/"
 
 list_files = list.files(data_folder_path, "(list).*(RData)", full.names = TRUE)
@@ -16,18 +17,13 @@ for (i in seq_along(list_files)){
 
 names(lists) = paste0("publication", seq_along(list_files))
 
-# Now checking all structures
 
-# Sourcing scripts
-source("./inject/source_testing_scripts.R")
-
-# Testing list items
-check_overall_structure(lists)
+# Adding lists ------
 
 # Source adding scripts
 source("./inject/source_adding_scripts.R")
 
-# Adding lists
+
 db_conn = DBI::dbConnect(RSQLite::SQLite(), "inhibitiontasks.db")
 
 add_object(db_conn, lists)

@@ -1,0 +1,379 @@
+---
+title: "Prepare_online_form_data"
+output: html_document
+date: "2023-07-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = F}
+library(dplyr)
+source("./inject/compute_automatic_info.R")
+source("./inject/create_publication_level.R")
+source("./inject/create_study_level.R")
+source("./inject/start_data_level.R")
+source("./inject/source_testing_scripts.R")
+```
+
+This scripts guides you through the steps of getting submissions from the inhibition task online form and creating a nested list which can then be used to automatically insert the data into the data base. 
+
+# Step 1: Manual steps
+
+## 1.1 Download data from wordpress
+
+In wordpress, navigate to `Forms > Import/Export`, then select the Inhibition data base form and select all fields. 
+At the bottom of the page, select the last date at which data was downloaded as the start date and the current day as the end date; then download the export file. 
+
+Read it into R: 
+```{r}
+# note: data format might also be xlsx, txt, or Rdata
+entry <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/inhibition-data-base-2023-07-18.csv")
+```
+
+The data is in long format. Each entry appears as one row. In case several entries have been submitted since the last time data was read in, run the following script for each of these entries seperately. The latest submission appears in the first row. If necessary, choose the submission you want to read in:
+
+```{r}
+entry <- entry[1, ]  # e.g., select most recent submission 
+```
+
+
+## 1.2 Download the raw data files 
+
+This is not done automatically by exporting the submission. Instead, the `entry` data frame contains a column for each study-task-combination which contains a download link. 
+
+Run the following code to select the relevant (non-empty) download links: 
+```{r}
+upload_columns <- which(grepl("Upload", colnames(entry)))
+download_links <- entry %>%
+  select(upload_columns[which(!is.na(entry[1, upload_columns]))])
+download_links
+```
+
+For each data file, run the respective link in your browser and it will automatically be saved to your local machine. 
+
+**NOTE** The data might have to be processed before inserting it into the data base to make it compatible with the data base's format. Therefore, first check whether the files meet the following criteria: 
+
+- The file is in long format where each row equals one observation 
+- It contains a participants ID variable named `subject` 
+- It contains a `block` and a `trial` column, indicating the block and trial number of each observation
+- It contains a congruency variable called `congruency`; 1 indicating congruent, 0 incongruent, and 2 neutral 
+- It contains a `between` variable indicating which between condition an observation (i.e., the participant) belonged to. In case there is no between manipulation, each entry of this column should be NA
+- It contains a `within` variable indicating which within condition an observation belonged to (also put NA in all rows in case there was no  manipulation within participants)
+- It contains an `accuracy` column which indicates whether a response was accurate (1) or inaccurate (0)
+- An `rt` variable showing the reaction time in milliseconds
+
+In case you first need to process the data file(s), insert the code in the `Create_db/add_data/reformat_datasets.R` file.
+---
+
+Now, load the data frames into R following the naming conventions: 
+
+- If a study only consists of 1 inhibition task, name the data file `processed_data_study[STUDYNUMBER]`; e.g., `processed_data_study1` for study 1
+- If several tasks have been submitted for the same study, name the data file `processed_data_study[STUDYNUMBER]_task[TASKNUMBER]`
+
+```{r}
+processed_data_study1 <- read.csv("C:/Users/Michael/OneDrive - UvA/RA_Mathematical_Psychology/Online_form/test_observation_tables/dataset42.csv")
+```
+
+## 1.3 Create the publication code
+
+The publication code is composed of the last name of the first author + underscore + year of publication + first word of title (excluding words such as "the")
+
+The publication code is written in lower case. 
+
+You can find the relevant information in the `entry$APA.reference` column. 
+
+```{r}
+# example
+pub_code <- "tang_2022_dual" 
+```
+
+## 1.4 Check if data for the same publication is already part of data base
+
+```{r}
+entry$Have.you.already.submitted.data.for.this.reference.in.the.past.
+```
+**If "No"**: All clear, just proceed with this script.
+
+**If "Yes"**: We have to make sure that this new submission to the data base is in line with the publicationID, studyIDs, betweenIDs etc. of the existing entries:
+  1. In the data base, check which publication_id corresponds to the respective publication code
+  2. Get the nested list object which was used to load the existing publication entry into the data base. You can      find them in the `Create_db/add_data` folder as `.RData` objects. Read it into R.
+  3. Create a nested list object of the new entry by following this script
+  4. Append the new nested list to the old one
+  
+## 1.5 Reduce the entry.csv to relevant columns only 
+
+```{r}
+not_all_na <- function(x) any(!is.na(x) & x!="")
+entry <- entry %>%
+  select(where(not_all_na))
+```
+
+
+# Step 2: Create nested list object 
+
+The nested list will have the following structure: 
+
+```{r}
+# pub{                      # publication level 
+#   publication_table, 
+
+#   study1 {                  # study level 
+#     study_table,
+#     between_table,
+
+#     data1{                    # data level 
+#       task_table,
+#       within_table,
+#       dataset_table, 
+#       observation_table, 
+#       condition_table 
+#     },
+#     data2{
+#       ...
+#     }
+#   },
+#   study2{
+#     ...
+#   },
+#   etc.
+# }
+```
+
+
+## 2.2 Create publication level 
+
+```{r}
+pub <- create_pub_level(entry)
+```
+
+Check if `pub` list exists, and whetther it contains a `publication_table` (a data frame of 1 row) including the relevant columns (i.e., `authors`, `conducted`, `added`, `country`, `contact`, `keywords`, `APA_reference`, `publication_code`). Some information might be NAs since these fields are not mandatory in the online form. We will fill this in at the very end of the script. 
+
+## 2.2 Create study level 
+
+```{r}
+pub <- create_study_level(pub, entry)
+```
+
+Again, check if study[studynumber] list(s) have been added to `pub`. Each should contain a `study_table` (a data frame of one row containing a `n_groups`, `n_tasks`, and `comment` column), and a `between_table` (a dataframe with as many rows as groups; columns should be `between_name`, `mean_age`, `percentage_female`, `n_members`, and `group_description`). 
+
+## 2.3 Create data level 
+
+```{r}
+# creates task_table, within_table, and dataset_table 
+pub <- start_data_level(pub, entry)
+```
+
+Please check if pub now contains `data[tasknumber]` lists within each study list. They should each consist of a `task_table` (1 row; columns are `task_name` and `task_description`), a `within_table` (as many rows as within conditions, columns are `within_name` and `within_description`), and a `dataset_table` (1 row, columns are `data_excl`, `n_participants`, `n_blocks`, `n_trials`, `neutral_trails`, `fixation_cross`, and `time_limit`). 
+
+Now finish the nested data by running one of the following 2 loops. 
+
+You can find out the numer of studies by running: 
+```{r}
+entry$Number.of.studies
+```
+
+**If the entry consists of only 1 study, run this:**
+```{r}
+# RUN THIS IF JUST ONE STUDY WAS SUBMITTED 
+for(i in 1:entry$Number.of.inhibition.tasks){
+  
+  # create observation_table  -----------------
+  if(entry$Number.of.inhibition.tasks == 1){
+    observations_name <- "processed_data_study1"
+  } else {
+    observations_name <- paste("processed_data_study1_task",i, sep="")
+  }
+  
+  pub[[2]][[i+2]]$observation_table <- eval(parse(text = observations_name))
+  
+  # add condition column to dataset 
+  # (unique combinations of between and within column values)
+  pub[[2]][[i+2]]$observation_table <- code_condition(pub[[2]][[i+2]]$observation_table)
+  
+  
+  # Compute automatic info for dataset_table --------------
+  
+  # create data frame without trial blocks 
+  df_test <- remove_practice(pub[[2]][[i+2]]$observation_table)
+  # get info for dataset_table
+  pub[[2]][[i+2]]$dataset_table$n_participants <- get_n(df_test)
+  pub[[2]][[i+2]]$dataset_table$n_blocks <- get_n_blocks(df_test)
+  pub[[2]][[i+2]]$dataset_table$n_trials <- get_n_trials(df_test)
+  pub[[2]][[i+2]]$dataset_table$neutral_trials <- get_neutral_trials(df_test)
+  
+  # create condition_table --------------------------
+  
+  # initiate with first condition
+  # get required info
+  df_condition1 <- filter_condition(df_test, cond = 1) # get data of condition 1
+  perc_congr <- get_perc_congr(df_condition1)
+  perc_neutral <- get_perc_neut(df_condition1)
+  mean_obs_pp <- get_mean_obs_pp(df_condition1)
+  n_obs <- get_n_obs(df_condition1)
+  
+  # fill table
+  pub[[2]][[i+2]]$condition_table <- data.frame(
+    condition_name = 1, 
+    percentage_congruent = perc_congr, 
+    percentage_neutral = perc_neutral, 
+    mean_obs_per_participant = mean_obs_pp,
+    n_obs = n_obs
+  )
+  
+  # if more than 1 condition: fill in following ones
+  if(length(unique(df_test$condition)) > 1){
+    for(k in 2:length(unique(df_test$condition))){
+      # get required info
+      df_condition <- filter_condition(df_test, cond = k) # get data of condition k
+      perc_congr <- get_perc_congr(df_condition)
+      perc_neutral <- get_perc_neut(df_condition)
+      mean_obs_pp <- get_mean_obs_pp(df_condition)
+      n_obs <- get_n_obs(df_condition)
+      
+      # append to condition_table
+      pub[[2]][[i+2]]$condition_table[k, ] <- c(k, perc_congr, perc_neutral, 
+                                                mean_obs_pp, n_obs)
+    }
+  }
+  
+  # last: compute n_members for each group
+  for(j in 1:pub[[2]][[1]]$n_groups){
+    n_members <- get_n_members(pub = pub, study = 1, task = i, between_value = j)
+    # place it in right place in nested list
+    pub[[2]][[2]][j,4] <- n_members
+  }
+}
+```
+
+**If the entry consists of more than one study, run this:** 
+```{r}
+for(i in 1:entry$Number.of.studies){
+  n_inhibition_tasks <- paste("Number.of.inhibition.tasks...STUDY.",i, sep="")
+  n_inhibition_tasks <- entry[1, n_inhibition_tasks]
+  
+  # for each task in study i
+  for(j in 1:n_inhibition_tasks){
+    
+    # create observation_table ------------------------
+    if(n_inhibition_tasks == 1){
+      observations_name <- paste("processed_data_study",i, sep="")
+    } else {
+      observations_name <- paste("processed_data_study",i,"_task",j, sep="")
+    }
+    
+    pub[[i+1]][[j+2]]$observation_table <- eval(parse(text = observations_name))
+    
+    # add condition column to dataset 
+    # (unique combinations of between and within column values)
+    pub[[i+1]][[j+2]]$observation_table <- code_condition(pub[[i+1]][[j+2]]$observation_table)
+    
+    # Compute automatic info for dataset_table --------------
+    
+    # create data frame without trial blocks 
+    df_test <- remove_practice(pub[[i+1]][[j+2]]$observation_table)
+    # get info for dataset_table
+    pub[[i+1]][[j+2]]$dataset_table$n_participants <- get_n(df_test)
+    pub[[i+1]][[j+2]]$dataset_table$n_blocks <- get_n_blocks(df_test)
+    pub[[i+1]][[j+2]]$dataset_table$n_trials <- get_n_trials(df_test)
+    pub[[i+1]][[j+2]]$dataset_table$neutral_trials <- get_neutral_trials(df_test)
+    
+    # create condition_table --------------------------
+    
+    # initiate with first condition
+    # get required info
+    df_condition1 <- filter_condition(df_test, cond = 1) # get data of condition 1
+    perc_congr <- get_perc_congr(df_condition1)
+    perc_neutral <- get_perc_neut(df_condition1)
+    mean_obs_pp <- get_mean_obs_pp(df_condition1)
+    n_obs <- get_n_obs(df_condition1)
+    
+    # fill table
+    pub[[i+1]][[j+2]]$condition_table <- data.frame(
+      condition_name = 1, 
+      percentage_congruent = perc_congr, 
+      percentage_neutral = perc_neutral, 
+      mean_obs_per_participant = mean_obs_pp,
+      n_obs = n_obs
+    )
+    
+    # if more than 1 condition: fill in following ones
+    if(length(unique(df_test$condition)) > 1){
+      for(n in 2:length(unique(df_test$condition))){
+        # get required info
+        df_condition <- filter_condition(df_test, cond = n) # get data of condition k
+        perc_congr <- get_perc_congr(df_condition)
+        perc_neutral <- get_perc_neut(df_condition)
+        mean_obs_pp <- get_mean_obs_pp(df_condition)
+        n_obs <- get_n_obs(df_condition)
+        
+        # append to condition_table
+        pub[[i+1]][[j+2]]$condition_table[n, ] <- c(n, perc_congr, perc_neutral, 
+                                                  mean_obs_pp, n_obs)
+      }
+    }
+    
+    # last: compute n_members for each group
+    for(k in 1:pub[[i+1]][[1]]$n_groups){
+      n_members <- get_n_members(pub = pub, study = i, task = j, between_value = k)
+      # place it in right place in nested list
+      pub[[i+1]][[2]][k,4] <- n_members
+    }
+  }
+}
+```
+
+Each data list should now contain an `observation_table`, containing the inhibition task data, and a `condition_table` including automatically computed information (as many rows as within x between condition combinations; columns are `condition_name`, `percentage_congruent`, `percentage_neutral`, `mean_obs_per_participant`, `n_obs`). 
+
+# Step 3: Optional- Add missing Meta-Info on publiction level 
+
+For instance, if the author names, year of publication, or keywords were not provided, we can research this information and add it to the nested list. 
+
+```{r}
+# e.g.: pub[[1]]$authors <- "J. Example"
+```
+
+# Step 4: Run automatic checks 
+
+Check publication level 
+```{r}
+check_publication_level_structure(pub)
+```
+
+Check study level 
+```{r}
+for(i in 1:entry$Number.of.studies){
+  print(paste("evaluating", paste("study", i, sep =" ")))
+  
+  check_study_level_structure(pub[[i+1]])
+  
+  print("passed.")
+}
+```
+
+Check data level 
+```{r}
+for(i in 1:entry$Number.of.studies){ 
+  n_data <- sum(grepl("data", names(pub[[i+1]])))
+  for(j in 1:n_data){
+    print(paste("testing data", j, "study", i, sep=""))
+    check_data_level_structure(pub[[i+1]][[j+2]])
+    print("passed.")
+  }
+}
+```
+
+# Step 5: Save as RData object 
+
+If all checks run smoothly, save the nested list as an RData object in the `Create_db/add_data` folder.
+Make sure to adjust the name of the list by replacing FIRSTAUTHOR with the respective name:
+
+```{r}
+# saveRDS(pub, file="Create_db/add_data/FIRSTAUHOR_list.RData")
+```
+
+You can now proceed by running the code in `Create_db/add_dataadding_lists_to_db.R`
+
+
+
