@@ -10,10 +10,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, echo = F}
 library(dplyr)
+source("./download_raw_data.R")
 source("./compute_automatic_info.R")
 source("./create_publication_level.R")
 source("./create_study_level.R")
 source("./start_data_level.R")
+source("./finish_data_level.R")
 source("./source_testing_scripts.R")
 ```
 
@@ -43,15 +45,16 @@ entry <- entry[1, ]  # e.g., select most recent submission
 
 This is not done automatically by exporting the submission. Instead, the `entry` data frame contains a column for each study-task-combination which contains a download link. 
 
-Run the following code to select the relevant (non-empty) download links: 
+The following function automatically downloads the respective datasets and names them according to the following naming conventions: 
+- If a study only consists of 1 inhibition task, name the data file `processed_data_study[STUDYNUMBER]`; e.g., `processed_data_study1` for study 1
+- If several tasks have been submitted for the same study, name the data file `processed_data_study[STUDYNUMBER]_task[TASKNUMBER]`,  e.g., `processed_data_study1_task2`
+
+Run the following function and insert the path of the folder on your local machine where you want to save the datasets (e.g., C:/Users/Madlen/Downloads"): 
 ```{r}
-upload_columns <- which(grepl("Upload", colnames(entry)))
-download_links <- entry %>%
-  select(upload_columns[which(!is.na(entry[1, upload_columns]))])
-download_links
+dataframe_list <- download_datasets(entry, download_folder = "C:/Users/YOURNAME/Downloads")
 ```
 
-For each data file, run the respective link in your browser and it will automatically be saved to your local machine. 
+This results in a list of data frames. 
 
 **NOTE** The data might have to be processed before inserting it into the data base to make it compatible with the data base's format. Therefore, first check whether the files meet the following criteria: 
 
@@ -65,16 +68,8 @@ For each data file, run the respective link in your browser and it will automati
 - An `rt` variable showing the reaction time in milliseconds
 
 In case you first need to process the data file(s), insert the code in the `Create_db/add_data/reformat_datasets.R` file.
+
 ---
-
-Now, load the data frames into R following the naming conventions: 
-
-- If a study only consists of 1 inhibition task, name the data file `processed_data_study[STUDYNUMBER]`; e.g., `processed_data_study1` for study 1
-- If several tasks have been submitted for the same study, name the data file `processed_data_study[STUDYNUMBER]_task[TASKNUMBER]`,  e.g., `processed_data_study1_task2`
-
-```{r}
-processed_data_study1 <- read.csv("~/data.csv")
-```
 
 ## 1.3 Create the publication code
 
@@ -168,161 +163,14 @@ pub <- start_data_level(pub, entry)
 
 Please check if pub now contains `data[tasknumber]` lists within each study list. They should each consist of a `task_table` (1 row; columns are `task_name` and `task_description`), a `within_table` (as many rows as within conditions, columns are `within_name` and `within_description`), and a `dataset_table` (1 row, columns are `data_excl`, `n_participants`, `n_blocks`, `n_trials`, `neutral_trails`, `fixation_cross`, and `time_limit`). 
 
-Now finish the nested data by running one of the following 2 loops. 
-
+**Now** finish the nested data by running one of the following function. You now need to additionally provide the `dataframe_list` created in step 1.2 and to manually adjust the number of studies using the n_studies argument.
 You can find out the number of studies by running: 
 ```{r}
 entry$Number.of.studies
 ```
 
-**If the entry consists of only 1 study, run this:**
 ```{r}
-# RUN THIS IF JUST ONE STUDY WAS SUBMITTED 
-for(i in 1:entry$Number.of.inhibition.tasks){
-  
-  # create observation_table  -----------------
-  if(entry$Number.of.inhibition.tasks == 1){
-    observations_name <- "processed_data_study1"
-  } else {
-    observations_name <- paste("processed_data_study1_task",i, sep="")
-  }
-  
-  pub[[2]][[i+2]]$observation_table <- eval(parse(text = observations_name))
-  
-  # add condition column to dataset 
-  # (unique combinations of between and within column values)
-  pub[[2]][[i+2]]$observation_table <- code_condition(pub[[2]][[i+2]]$observation_table)
-  
-  
-  # Compute automatic info for dataset_table --------------
-  
-  # create data frame without trial blocks 
-  df_test <- remove_practice(pub[[2]][[i+2]]$observation_table)
-  # get info for dataset_table
-  pub[[2]][[i+2]]$dataset_table$n_participants <- get_n(df_test)
-  pub[[2]][[i+2]]$dataset_table$n_blocks <- get_n_blocks(df_test)
-  pub[[2]][[i+2]]$dataset_table$n_trials <- get_n_trials(df_test)
-  pub[[2]][[i+2]]$dataset_table$neutral_trials <- get_neutral_trials(df_test)
-  
-  # create condition_table --------------------------
-  
-  # initiate with first condition
-  # get required info
-  df_condition1 <- filter_condition(df_test, cond = 1) # get data of condition 1
-  perc_congr <- get_perc_congr(df_condition1)
-  perc_neutral <- get_perc_neut(df_condition1)
-  mean_obs_pp <- get_mean_obs_pp(df_condition1)
-  n_obs <- get_n_obs(df_condition1)
-  
-  # fill table
-  pub[[2]][[i+2]]$condition_table <- data.frame(
-    condition_name = 1, 
-    percentage_congruent = perc_congr, 
-    percentage_neutral = perc_neutral, 
-    mean_obs_per_participant = mean_obs_pp,
-    n_obs = n_obs
-  )
-  
-  # if more than 1 condition: fill in following ones
-  if(length(unique(df_test$condition)) > 1){
-    for(k in 2:length(unique(df_test$condition))){
-      # get required info
-      df_condition <- filter_condition(df_test, cond = k) # get data of condition k
-      perc_congr <- get_perc_congr(df_condition)
-      perc_neutral <- get_perc_neut(df_condition)
-      mean_obs_pp <- get_mean_obs_pp(df_condition)
-      n_obs <- get_n_obs(df_condition)
-      
-      # append to condition_table
-      pub[[2]][[i+2]]$condition_table[k, ] <- c(k, perc_congr, perc_neutral, 
-                                                mean_obs_pp, n_obs)
-    }
-  }
-  
-  # last: compute n_members for each group
-  for(j in 1:pub[[2]][[1]]$n_groups){
-    n_members <- get_n_members(pub = pub, study = 1, task = i, between_value = j)
-    # place it in right place in nested list
-    pub[[2]][[2]][j,4] <- n_members
-  }
-}
-```
-
-**If the entry consists of more than one study, run this:** 
-```{r}
-for(i in 1:entry$Number.of.studies){
-  n_inhibition_tasks <- paste("Number.of.inhibition.tasks...STUDY.",i, sep="")
-  n_inhibition_tasks <- entry[1, n_inhibition_tasks]
-  
-  # for each task in study i
-  for(j in 1:n_inhibition_tasks){
-    
-    # create observation_table ------------------------
-    if(n_inhibition_tasks == 1){
-      observations_name <- paste("processed_data_study",i, sep="")
-    } else {
-      observations_name <- paste("processed_data_study",i,"_task",j, sep="")
-    }
-    
-    pub[[i+1]][[j+2]]$observation_table <- eval(parse(text = observations_name))
-    
-    # add condition column to dataset 
-    # (unique combinations of between and within column values)
-    pub[[i+1]][[j+2]]$observation_table <- code_condition(pub[[i+1]][[j+2]]$observation_table)
-    
-    # Compute automatic info for dataset_table --------------
-    
-    # create data frame without trial blocks 
-    df_test <- remove_practice(pub[[i+1]][[j+2]]$observation_table)
-    # get info for dataset_table
-    pub[[i+1]][[j+2]]$dataset_table$n_participants <- get_n(df_test)
-    pub[[i+1]][[j+2]]$dataset_table$n_blocks <- get_n_blocks(df_test)
-    pub[[i+1]][[j+2]]$dataset_table$n_trials <- get_n_trials(df_test)
-    pub[[i+1]][[j+2]]$dataset_table$neutral_trials <- get_neutral_trials(df_test)
-    
-    # create condition_table --------------------------
-    
-    # initiate with first condition
-    # get required info
-    df_condition1 <- filter_condition(df_test, cond = 1) # get data of condition 1
-    perc_congr <- get_perc_congr(df_condition1)
-    perc_neutral <- get_perc_neut(df_condition1)
-    mean_obs_pp <- get_mean_obs_pp(df_condition1)
-    n_obs <- get_n_obs(df_condition1)
-    
-    # fill table
-    pub[[i+1]][[j+2]]$condition_table <- data.frame(
-      condition_name = 1, 
-      percentage_congruent = perc_congr, 
-      percentage_neutral = perc_neutral, 
-      mean_obs_per_participant = mean_obs_pp,
-      n_obs = n_obs
-    )
-    
-    # if more than 1 condition: fill in following ones
-    if(length(unique(df_test$condition)) > 1){
-      for(n in 2:length(unique(df_test$condition))){
-        # get required info
-        df_condition <- filter_condition(df_test, cond = n) # get data of condition k
-        perc_congr <- get_perc_congr(df_condition)
-        perc_neutral <- get_perc_neut(df_condition)
-        mean_obs_pp <- get_mean_obs_pp(df_condition)
-        n_obs <- get_n_obs(df_condition)
-        
-        # append to condition_table
-        pub[[i+1]][[j+2]]$condition_table[n, ] <- c(n, perc_congr, perc_neutral, 
-                                                  mean_obs_pp, n_obs)
-      }
-    }
-    
-    # last: compute n_members for each group
-    for(k in 1:pub[[i+1]][[1]]$n_groups){
-      n_members <- get_n_members(pub = pub, study = i, task = j, between_value = k)
-      # place it in right place in nested list
-      pub[[i+1]][[2]][k,4] <- n_members
-    }
-  }
-}
+pub <- finish_data_level(pub, entry, dataframe_list, n_studies = 5)
 ```
 
 Each data list should now contain an `observation_table`, containing the inhibition task data, and a `condition_table` including automatically computed information (as many rows as within x between condition combinations; columns are `condition_name`, `percentage_congruent`, `percentage_neutral`, `mean_obs_per_participant`, `n_obs`). 
