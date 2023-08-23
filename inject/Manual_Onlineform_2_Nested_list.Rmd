@@ -70,7 +70,7 @@ In case you first need to process the data file(s), insert the code in the `Crea
 Now, load the data frames into R following the naming conventions: 
 
 - If a study only consists of 1 inhibition task, name the data file `processed_data_study[STUDYNUMBER]`; e.g., `processed_data_study1` for study 1
-- If several tasks have been submitted for the same study, name the data file `processed_data_study[STUDYNUMBER]_task[TASKNUMBER]`
+- If several tasks have been submitted for the same study, name the data file `processed_data_study[STUDYNUMBER]_task[TASKNUMBER]`,  e.g., `processed_data_study1_task2`
 
 ```{r}
 processed_data_study1 <- read.csv("~/data.csv")
@@ -99,7 +99,7 @@ entry$Have.you.already.submitted.data.for.this.reference.in.the.past.
 
 **If "Yes"**: We have to make sure that this new submission to the data base is in line with the publicationID, studyIDs, betweenIDs etc. of the existing entries:
   1. In the data base, check which publication_id corresponds to the respective publication code
-  2. Get the nested list object which was used to load the existing publication entry into the data base. You can      find them in the `Create_db/add_data` folder as `.RData` objects. Read it into R.
+  2. Get the nested list object which was used to load the existing publication entry into the data base. You can find them in the `Create_db/add_data` folder as `.RData` objects. Read it into R.
   3. Create a nested list object of the new entry by following this script
   4. Append the new nested list to the old one
   
