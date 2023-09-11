@@ -45,7 +45,7 @@ entry <- entry[1, ]  # e.g., select most recent submission
 
 This is not done automatically by exporting the submission. Instead, the `entry` data frame contains a column for each study-task-combination which contains a download link. 
 
-The following function automatically downloads the respective datasets and names them according to the following naming conventions: 
+The following function automatically downloads the respective datasets and names them according to **the following naming conventions**: 
 - If a study only consists of 1 inhibition task, name the data file `processed_data_study[STUDYNUMBER]`; e.g., `processed_data_study1` for study 1
 - If several tasks have been submitted for the same study, name the data file `processed_data_study[STUDYNUMBER]_task[TASKNUMBER]`,  e.g., `processed_data_study1_task2`
 
