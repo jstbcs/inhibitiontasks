@@ -4,6 +4,7 @@
 #
 
 library(shiny)
+source("shiny/helper_file_shiny.R")
 
 
 server <- function(input, output){
@@ -41,6 +42,31 @@ server <- function(input, output){
       tagList()
     }
   })
+  
+  # SIDEBAR PANELS 
+  
+  # tab 1
+  # conditional panel to choose 1st operator based on criterion1
+  output$operator1 <- renderUI({
+    conditionalPanel(
+      condition = "input.criterion1 != 'Select' & input.criterion1 != 'Neutral stimuli included?' &  input.criterion1 != 'Existence of between-subject manipulation' & input.criterion1 != 'Existence of within-subject manipulation (besides congruency)'",
+      selectInput(inputId = "operator1",
+                  label = "Choose operator",
+                  choices =  c("Select", "less", "greater", "between", "equal")))
+  })
+  
+  # conditional panel to choose 1st value based on operator
+  output$value1 <- renderUI({
+    conditionalPanel(
+      condition = "input.operator1 != 'Select'",
+      numericInput(
+        inputId = "value1",
+        label = "Choose value",
+        value = get_default_value(input$criterion1), # TODO: get this running
+        min = 0,
+        max = 1000)
+    ) 
+  }) 
   
    
   
