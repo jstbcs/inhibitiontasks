@@ -53,8 +53,8 @@ ui <- fluidPage(
       tabPanel("Find dataset", h3("What kind of data are you looking for?"),
                
                # choose task type ---
-               #fluidRow(
-                # column(6,
+               fluidRow(
+                 column(6,
                         # radio buttons to choose task type
                         radioButtons(inputId = "task_type", 
                                      label = "Choose task type:",
@@ -62,11 +62,11 @@ ui <- fluidPage(
                                        "Simon task" = "simon",
                                        "Flanker task" = "flanker",
                                        "Other" = "other")),
-                 #       ),
+                       ),
                  
-              #   column(6) # empty 
+                 column(6) # empty 
                  
-              # ),
+               ),
                
                # add 1st argument ---
                fluidRow(    # split sidebar into 3 columns 
@@ -92,32 +92,52 @@ ui <- fluidPage(
                  
                  column(4),  # empty 
                  
-                 column(4), 
+                 column(4, 
                         # conditional second value for "between" operator
-                        uiOutput("value1b"),
+                        uiOutput("value1b"))
                  
                ), # end fluid row
+              
                
-               # TODO: option to add second argument
+               # add second argument ---
+              fluidRow(
+                 column(4, 
+                        # conditional drop down menu for criterion 2
+                        uiOutput("criterion2")), 
+                 
+                 column(4, 
+                        # conditional operator for criterion 2
+                        uiOutput("operator2")),
+                 
+                 column(4, 
+                        # conditional value for criterion 2
+                        uiOutput("value2"))
+              ), 
+              
+              fluidRow(
+                column(4),  # empty 
+                
+                column(4),  # empty 
+                
+                column(4, 
+                       # conditional second value for "between" operator
+                       uiOutput("value2b"))
+                
+              ), 
+              
+              # option to add argument 
               fluidRow(
                 column(4, 
                        actionButton("action_second_arg", "+ Add argument")), 
-               
+                
                 column(4),  # empty 
                 
                 column(4),  # empty 
                 
               ), # end fluid row
-               
-               # add second argument ---
-               #fluidRow(
-               #  column(4, 
-               #         # conditional drop down menu for criterion 2))
-               #
-              # )
                  
             ), # end tab
-                 
+            
            
       # tab 2
       tabPanel("Info about specific dataset", h3("Get info about specific dataset"))       
