@@ -4,7 +4,9 @@
 #
 
 library(shiny)
-source("shiny/helper_file_shiny.R")
+source("./shiny/helper_file_shiny.R")
+source("./shiny/ui.R")
+
 
 
 server <- function(input, output, session){

@@ -138,7 +138,7 @@ ui <- fluidPage(
       tabPanel("Descriptives"),
       
       # tab 3
-      tabPanel("R Code to get data")
+      tabPanel("Get the data")
       
       # tab 4
       # tabPanel("Download data)

@@ -3,14 +3,12 @@
 # 
 
 
-# verctor storing criteria to be chosen
-criteria <- c(#"Task type",
-              "Mean reaction time (in ms)", "Mean accuracy", "Number of participants",
+# vector storing criteria to be chosen
+criteria <- c("Mean reaction time (in ms)", "Mean accuracy", "Number of participants",
               "Number of blocks per participant", "Number of trials per block",
               "Neutral stimuli included?", "Time limit for responses (in ms)",
               "Existence of between-subject manipulation", 
-              "Existence of within-subject manipulation (besides congruency)",
-              #"Conducted (Year of Publication)"
+              "Existence of within-subject manipulation (besides congruency)"
               )
 
 
@@ -21,7 +19,7 @@ get_default_value <- function(criterion, operator){
                           "Mean reaction time (in ms)" = 700, 
                           "Mean accuracy" = 0.8, 
                           "Number of participants" = 100, 
-                          "Number of blocks per participant" = 4, 
+                          "Number of blocks per participant" = 5, 
                           "Number of trials per block" = 30, 
                           "Time limit for responses (in ms)" = 2000,
                           #"Conducted (Year of Publication" = 2010
