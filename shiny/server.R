@@ -7,7 +7,9 @@ library(shiny)
 source("shiny/helper_file_shiny.R")
 
 
-server <- function(input, output){
+server <- function(input, output, session){
+  
+  # FOR INTRO ---
   
   # print short intro text
   output$short_intro <- renderUI({
@@ -43,9 +45,11 @@ server <- function(input, output){
     }
   })
   
-  # SIDEBAR PANELS 
+  # SIDEBAR PANELS ---
   
   # tab 1
+  
+  # add arguments
   # conditional panel to choose 1st operator based on criterion1
   output$operator1 <- renderUI({
     conditionalPanel(
@@ -55,16 +59,15 @@ server <- function(input, output){
                   choices =  c("Select", "less", "greater", "between", "equal")))
   })
   
-  # conditional panel to choose 1st value based on operator
+  # conditional panel to choose value based on operator
   output$value1 <- renderUI({
     conditionalPanel(
       condition = "input.operator1 != 'Select'",
       numericInput(
         inputId = "value1",
         label = "Choose value",
-        value = get_default_value(input$criterion1, input$operator1)[1], 
-        min = 0,
-        max = 1000)
+        value = get_default_value(input$criterion1, input$operator1)[1]
+        )
     ) 
   }) 
   
@@ -75,13 +78,44 @@ server <- function(input, output){
       numericInput(
         inputId = "value1b",
         label = "and",
-        value = get_default_value(input$criterion1, input$operator1)[2] , 
-        min = 0,
-        max = 1000)
+        value = get_default_value(input$criterion1, input$operator1)[2])
     ) 
   }) 
   
-   
+  
+  # logic behind adding new argument to argument summary --
+  
+  # create df as reactive value
+  argument_df <- data.frame(
+    criertion = NA,
+    operator = NA, 
+    value = NA
+  )
+  
+  rv <- reactiveValues(x = argument_df)
+  
+  # specify action whenever "Add argument to list" is clicked
+  observeEvent(input$action_second_arg, {
+    # add current choices to argument dataframe 
+    new_entry <- data.frame(criterion = input$criterion1,
+                            operator = input$operator1,
+                            value = input$value1)
+    
+    rv$argument_df <- rbind(rv$argument_df, new_entry)
+    
+    # reset drop down menu for criterion choice
+    updateSelectInput(session, 
+                      inputId = "criterion1", 
+                      selected = "Select")
+    
+    updateSelectInput(session, 
+                      inputId = "operator1", 
+                      selected = "Select")
+    
+  })
+  
+  # print summary df of chosen arguments
+  output$summary <- renderTable(rv$argument_df)
   
 }
 

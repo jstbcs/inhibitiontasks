@@ -68,12 +68,12 @@ ui <- fluidPage(
                  
                ),
                
-               # add 1st argument ---
+               # add argument ---
                fluidRow(    # split sidebar into 3 columns 
                  column(4, 
                         # drop down menu criterion
                         selectInput(inputId = "criterion1",
-                                    label = "Choose criterion to filter datasets",
+                                    label = "Choose new criterion to filter datasets",
                                     choices = c("Select", criteria),
                                     selected = "Select")), 
                  
@@ -98,43 +98,20 @@ ui <- fluidPage(
                  
                ), # end fluid row
               
-               
-               # add second argument ---
-              fluidRow(
-                 column(4, 
-                        # conditional drop down menu for criterion 2
-                        uiOutput("criterion2")), 
-                 
-                 column(4, 
-                        # conditional operator for criterion 2
-                        uiOutput("operator2")),
-                 
-                 column(4, 
-                        # conditional value for criterion 2
-                        uiOutput("value2"))
-              ), 
-              
-              fluidRow(
-                column(4),  # empty 
-                
-                column(4),  # empty 
-                
-                column(4, 
-                       # conditional second value for "between" operator
-                       uiOutput("value2b"))
-                
-              ), 
-              
-              # option to add argument 
+              # option to add argument ---
               fluidRow(
                 column(4, 
-                       actionButton("action_second_arg", "+ Add argument")), 
+                       actionButton("action_second_arg", "Add argument to list")), 
                 
                 column(4),  # empty 
                 
                 column(4),  # empty 
                 
               ), # end fluid row
+              
+              # summary of chosen arguments --- 
+              
+              tableOutput("summary")
                  
             ), # end tab
             
