@@ -7,8 +7,10 @@ source("shiny/helper_file_shiny.R")
 
 ui <- fluidPage(
   
-  # title 
+  # TITLE 
   titlePanel("Information about data in inhibition data base"),
+  
+  # INTRO PART
   
   # short intro text
   fluidRow(
@@ -38,10 +40,10 @@ ui <- fluidPage(
   hr(),
   
 
-  # main part of shiny app: user input & output panels 
+  # MAIN PART OF SHINY APP: USER INPUT & OUTPUT PANELS  
   br(),
   
-  # side bar for user input
+  # SIDE BAR FOR USER INPUT
   sidebarPanel(
     # create tabs within sidebar
     shiny::tabsetPanel(
@@ -50,8 +52,24 @@ ui <- fluidPage(
       # tab 1
       tabPanel("Find dataset", h3("What kind of data are you looking for?"),
                
-               # split sidebar into 3 columns 
-               fluidRow(
+               # choose task type ---
+               #fluidRow(
+                # column(6,
+                        # radio buttons to choose task type
+                        radioButtons(inputId = "task_type", 
+                                     label = "Choose task type:",
+                                     c("Stroop task" = "stroop",
+                                       "Simon task" = "simon",
+                                       "Flanker task" = "flanker",
+                                       "Other" = "other")),
+                 #       ),
+                 
+              #   column(6) # empty 
+                 
+              # ),
+               
+               # add 1st argument ---
+               fluidRow(    # split sidebar into 3 columns 
                  column(4, 
                         # drop down menu criterion
                         selectInput(inputId = "criterion1",
@@ -67,9 +85,38 @@ ui <- fluidPage(
                         # drop value field 
                         uiOutput("value1")),
                  
-                 )# end fluid row
+                 ), # end fluid row
+               
+               fluidRow(
+                 column(4),  # empty 
                  
-                ), # end tab
+                 column(4),  # empty 
+                 
+                 column(4), 
+                        # conditional second value for "between" operator
+                        uiOutput("value1b"),
+                 
+               ), # end fluid row
+               
+               # TODO: option to add second argument
+              fluidRow(
+                column(4, 
+                       actionButton("action_second_arg", "+ Add argument")), 
+               
+                column(4),  # empty 
+                
+                column(4),  # empty 
+                
+              ), # end fluid row
+               
+               # add second argument ---
+               #fluidRow(
+               #  column(4, 
+               #         # conditional drop down menu for criterion 2))
+               #
+              # )
+                 
+            ), # end tab
                  
            
       # tab 2
@@ -102,3 +149,4 @@ ui <- fluidPage(
     ) # end tabset 
   ) # end main bar
 )
+

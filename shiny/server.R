@@ -62,7 +62,20 @@ server <- function(input, output){
       numericInput(
         inputId = "value1",
         label = "Choose value",
-        value = get_default_value(input$criterion1), # TODO: get this running
+        value = get_default_value(input$criterion1, input$operator1)[1], 
+        min = 0,
+        max = 1000)
+    ) 
+  }) 
+  
+  # conditional panel to choose value for between operator
+  output$value1b <- renderUI({
+    conditionalPanel(
+      condition = "input.operator1 == 'between'",
+      numericInput(
+        inputId = "value1b",
+        label = "and",
+        value = get_default_value(input$criterion1, input$operator1)[2] , 
         min = 0,
         max = 1000)
     ) 
