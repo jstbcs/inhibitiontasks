@@ -16,7 +16,12 @@ server <- function(input, output, session){
   # print short intro text
   output$short_intro <- renderUI({
     HTML(paste(
-      "[xxx]",
+      "This shiny app provides an overview over datasets in the inhibition task data base. <br><br>
+      
+      If you want to find all datasets that fulfill certsin criteria, choose the first input tab on the left to specify those filter criteria.<br>
+      If you already have a specific dataset in mind, use the second input tab to access it. <br>
+      
+      The app will give you...",
       " ", " ", sep="<br/>"))
   })
   
@@ -25,8 +30,10 @@ server <- function(input, output, session){
     # show text when number of clicks is uneven; hide if even
     if(input$action_explain_db %% 2 == 1){
       updateActionButton(inputId = "action_explain_db", label = "Got it!")
-      renderUI({HTML("[xxx]. <br> <br>"
-        # <img src='db_structure.png' alt='Structure of inhibition db' width='400' height='400'>"
+      renderUI({HTML("The inhibition task data base contains inhibition task data (i.e., stroop, flanker or simon task) from over 40 datasets as well as information about the respective studies and publications. <br>
+                     It is meant to enhance access to open inhibition task data. <br>
+                     Data can be accessed either via SQL or our R package (?). <br> <br>
+                     <img src='db_structure.png' alt='Structure of inhibition task db' width='400' height='400'>"
         )})
     } else {
       updateActionButton(inputId = "action_explain_db", label = "What is the inhibition task data base?")
@@ -39,7 +46,7 @@ server <- function(input, output, session){
     # show text when number of clicks is uneven; hide if even
     if(input$action_contribute %% 2 == 1){
       updateActionButton(inputId = "action_contribute", label = "Got it!")
-      renderUI({HTML("[xxx]. <br> <br>"
+      renderUI({HTML("[Link to form]. <br> <br>"
                      )})
     } else {
       updateActionButton(inputId = "action_contribute", label = "How can I contribute my data to the data base?")
@@ -55,10 +62,11 @@ server <- function(input, output, session){
   # conditional panel to choose 1st operator based on criterion1
   output$operator1 <- renderUI({
     conditionalPanel(
-      condition = "input.criterion1 != 'Select' & input.criterion1 != 'Neutral stimuli included?' &  input.criterion1 != 'Existence of between-subject manipulation' & input.criterion1 != 'Existence of within-subject manipulation (besides congruency)'",
+      condition = "input.criterion1 != 'Select' & input.criterion1 != 'Neutral stimuli included?' &  input.criterion1 != 'Existence of between-subject manipulation?' & input.criterion1 != 'Existence of within-subject manipulation (besides congruency)?'",
       selectInput(inputId = "operator1",
                   label = "Choose operator",
-                  choices =  c("Select", "less", "greater", "between", "equal")))
+                  choices =  c("Select", "less", "greater", "between", "equal"))
+      )
   })
   
   # conditional panel to choose value based on operator
@@ -68,8 +76,7 @@ server <- function(input, output, session){
       numericInput(
         inputId = "value1",
         label = "Choose value",
-        value = get_default_value(input$criterion1, input$operator1)[1]
-        )
+        value = get_default_value(input$criterion1, input$operator1)[1])
     ) 
   }) 
   
@@ -81,6 +88,16 @@ server <- function(input, output, session){
         inputId = "value1b",
         label = "and",
         value = get_default_value(input$criterion1, input$operator1)[2])
+    ) 
+  }) 
+  
+  # conditional panel to answer yes/no questions in criterion field 
+  output$yes_no_choice <- renderUI({
+    conditionalPanel(
+      condition = "input.criterion1 == 'Neutral stimuli included?' |  input.criterion1 == 'Existence of between-subject manipulation?' | input.criterion1 == 'Existence of within-subject manipulation (besides congruency)?'",
+      selectInput(inputId = "yes_no",
+                  label = " ",
+                  choices =  c("Yes", "No")) # TODO: change outcome value to 1/0? (Sven)
     ) 
   }) 
   
@@ -98,10 +115,16 @@ server <- function(input, output, session){
   
   # specify action whenever "Add argument to list" is clicked
   observeEvent(input$action_second_arg, {
-    # add current choices to argument dataframe 
-    new_entry <- data.frame(criterion = input$criterion1,
-                            operator = input$operator1,
-                            value = input$value1)
+    # add current choices to argument data frame 
+    if(!is.na(input$operator1)){
+      new_entry <- data.frame(criterion = input$criterion1,
+                              operator = input$operator1,
+                              value = input$value1)
+    } else if(!is.na(input$yes_no)){
+      new_entry <- data.frame(criterion = input$criterion1,
+                              operator = "",
+                              value = input$yes_no)
+    }
     
     rv$argument_df <- rbind(rv$argument_df, new_entry)
     

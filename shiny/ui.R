@@ -82,8 +82,10 @@ ui <- fluidPage(
                         uiOutput("operator1")),
                  
                  column(4, 
-                        # drop value field 
-                        uiOutput("value1")),
+                        # conditional value field 
+                        uiOutput("value1"),
+                        # binary choice for yes/no questions
+                        uiOutput("yes_no_choice")),
                  
                  ), # end fluid row
                
