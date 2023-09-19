@@ -77,8 +77,8 @@ server <- function(input, output, session){
         inputId = "value1",
         label = "Choose value",
         value = get_default_value(input$criterion1, input$operator1)[1])
-    ) 
-  }) 
+    )
+  })
   
   # conditional panel to choose value for between operator
   output$value1b <- renderUI({
@@ -116,7 +116,7 @@ server <- function(input, output, session){
   # specify action whenever "Add argument to list" is clicked
   observeEvent(input$action_second_arg, {
     # add current choices to argument data frame 
-    if(!is.na(input$operator1)){
+    if(input$operator1 != "Select"){
       new_entry <- data.frame(criterion = input$criterion1,
                               operator = input$operator1,
                               value = input$value1)
