@@ -9,6 +9,7 @@ source("./shiny/ui.R")
 
 
 
+
 server <- function(input, output, session){
   
   # FOR INTRO ---
@@ -32,14 +33,22 @@ server <- function(input, output, session){
       updateActionButton(inputId = "action_explain_db", label = "Got it!")
       renderUI({HTML("The inhibition task data base contains inhibition task data (i.e., stroop, flanker or simon task) from over 40 datasets as well as information about the respective studies and publications. <br>
                      It is meant to enhance access to open inhibition task data. <br>
-                     Data can be accessed either via SQL or our R package (?). <br> <br>
-                     <img src='/.shiny/db_structure.png' alt='Structure of inhibition task db' width='400' height='400'>"
-        )})
+                     Data can be accessed either via SQL or our R package (?). <br> <br>"
+                    # <img src='shiny/www/db_structure.png' alt='Structure of inhibition task db' width='400' height='400'>"
+                     )
+        })
     } else {
       updateActionButton(inputId = "action_explain_db", label = "What is the inhibition task data base?")
       tagList()
     }
   })
+  
+  output$img_structure_db <- renderImage({
+      list(src = "shiny/www/structure_db.png",
+         width = "100%",
+         height = 330)
+    
+  }, deleteFile = F)
   
   # print description of how to contribute 
   output$explanation_contribute <- renderUI({
@@ -75,7 +84,7 @@ server <- function(input, output, session){
       condition = "input.operator1 != 'Select'",
       numericInput(
         inputId = "value1",
-        label = "Choose value",
+        label = "Choose ........ value",
         value = get_default_value(input$criterion1, input$operator1)[1])
     )
   })
@@ -107,7 +116,8 @@ server <- function(input, output, session){
   argument_df <- data.frame(
     criertion = NA,
     operator = NA, 
-    value = NA
+    value = NA,
+    value2 = NA
   )
   
   rv <- reactiveValues(x = argument_df)
@@ -115,15 +125,24 @@ server <- function(input, output, session){
   # specify action whenever "Add argument to list" is clicked
   observeEvent(input$action_add_arg, {
     # add current choices to argument data frame 
-    if(input$operator1 != "Select"){
+    if(input$operator1 != "Select" & input$operator1 != "between"){
       new_entry <- data.frame(criterion = input$criterion1,
                               operator = input$operator1,
-                              value = input$value1)
-    } else if(input$yes_no != "Select"){
+                              value = input$value1,
+                              value2 = "")
+      
+    } else if (input$operator1 == "between") {
+      new_entry <- data.frame(criterion = input$criterion1,
+                              operator = input$operator1,
+                              value = input$value1,
+                              value2 = input$value1b)
+      
+      } else if(input$yes_no != "Select"){
       new_entry <- data.frame(criterion = input$criterion1,
                               operator = "",
-                              value = input$yes_no)
-    }
+                              value = input$yes_no,
+                              value2 = "")
+    } 
     
     rv$argument_df <- rbind(rv$argument_df, new_entry)
     
@@ -165,6 +184,8 @@ server <- function(input, output, session){
                    style="color: #000000; border-color: #FF000")
     }
   }) 
+  
+  
   
 }
 

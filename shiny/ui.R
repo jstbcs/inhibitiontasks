@@ -24,10 +24,11 @@ ui <- fluidPage(
   fluidRow(
     column(12, 
            actionButton("action_explain_db", "What is the inhibition task data base?")),
-           htmlOutput("explanation_db")
+           htmlOutput("explanation_db"),
+           imageOutput("img_structure_db")
   ), 
   
-  hr(),
+  br(),
   
   # action button explaining how to contribute
   fluidRow(
@@ -55,13 +56,14 @@ ui <- fluidPage(
                # choose task type ---
                fluidRow(
                  column(6,
-                        # radio buttons to choose task type
-                        radioButtons(inputId = "task_type", 
-                                     label = "Choose task type:",
-                                     c("Stroop task" = "stroop",
-                                       "Simon task" = "simon",
-                                       "Flanker task" = "flanker",
-                                       "Other" = "other")),
+                        # check box to choose task type
+                        checkboxGroupInput(inputId = "task_type",
+                                           label = "Choose task type:",
+                                           choices = 
+                                             c("Stroop task" = "stroop",
+                                               "Simon task" = "simon",
+                                               "Flanker task" = "flanker",
+                                               "Other" = "other"))
                        ),
                  
                  column(6) # empty 
@@ -73,7 +75,7 @@ ui <- fluidPage(
                  column(4, 
                         # drop down menu criterion
                         selectInput(inputId = "criterion1",
-                                    label = "Choose new criterion to filter datasets",
+                                    label = "Choose criterion:",
                                     choices = c("Select", criteria),
                                     selected = "Select")), 
                  
@@ -133,9 +135,8 @@ ui <- fluidPage(
             
            
       # tab 2
-      tabPanel("Info about specific dataset", h3("Get info about specific dataset"))       
+      tabPanel("Info about specific dataset", h3("Get info about specific dataset")
                
-              
               ), # end tabSet
       
     
