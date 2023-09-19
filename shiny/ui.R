@@ -138,6 +138,7 @@ ui <- fluidPage(
       tabPanel("Info about specific dataset", h3("Get info about specific dataset")
                
               ), # end tabSet
+    )
       
     
   ), # end sidebarpanel
