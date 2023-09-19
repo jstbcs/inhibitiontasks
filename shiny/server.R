@@ -33,7 +33,7 @@ server <- function(input, output, session){
       renderUI({HTML("The inhibition task data base contains inhibition task data (i.e., stroop, flanker or simon task) from over 40 datasets as well as information about the respective studies and publications. <br>
                      It is meant to enhance access to open inhibition task data. <br>
                      Data can be accessed either via SQL or our R package (?). <br> <br>
-                     <img src='db_structure.png' alt='Structure of inhibition task db' width='400' height='400'>"
+                     <img src='/.shiny/db_structure.png' alt='Structure of inhibition task db' width='400' height='400'>"
         )})
     } else {
       updateActionButton(inputId = "action_explain_db", label = "What is the inhibition task data base?")
