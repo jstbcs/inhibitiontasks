@@ -103,7 +103,8 @@ ui <- fluidPage(
               # option to add argument ---
               fluidRow(
                 column(4, 
-                       actionButton("action_add_arg", "Add argument to list")), 
+                       actionButton("action_add_arg", "Add argument to list")
+                       ), 
                 
                 column(4),  # empty 
                 
@@ -117,11 +118,16 @@ ui <- fluidPage(
               
               fluidRow(
                 column(6,  # button remove recent argument
-                       actionButton("action_remove_recent", "Remove recent argument")),  
-                
+                       uiOutput("conditional_action_remove")
+                       #actionButton("action_remove_recent", "Remove recent argument")
+                       ),                               
+                        
                 column(6, # button reset list
-                       actionButton("action_reset_list", "Reset list")),
-              )
+                       uiOutput("conditional_action_reset")
+                       #actionButton("action_reset_list", "Reset list",
+                       #             style="color: #000000; border-color: #FF0000")
+                       )
+              ) # end fluid row
                  
             ), # end tab
             

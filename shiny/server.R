@@ -101,7 +101,6 @@ server <- function(input, output, session){
     ) 
   }) 
   
-  
   # logic behind adding new argument to argument summary --
   
   # create df as reactive value
@@ -145,12 +144,27 @@ server <- function(input, output, session){
   })
   
   # reset argument_df when 'action_reset_list' is clicked
-  observeEvent(input$action_reset_list{
+  observeEvent(input$action_reset_list, {
     rv$argument_df <- rv$argument_df[0,]
   })
   
   # print summary df of chosen arguments
   output$summary <- renderTable(rv$argument_df)
+  
+  # conditional action button to delete last entry to argument list 
+  output$conditional_action_remove <- renderUI({
+    if(!is.null(rv$argument_df[1,1])){ # show action button only after first argument was added
+      actionButton("action_remove_recent", "Remove recent argument")
+    }
+  }) 
+  
+  # conditional action button to reset list 
+  output$conditional_action_reset <- renderUI({
+    if(!is.null(rv$argument_df[1,1])){ # show action button only after first argument was added
+      actionButton("action_reset_list", "Reset list",
+                   style="color: #000000; border-color: #FF000")
+    }
+  }) 
   
 }
 
