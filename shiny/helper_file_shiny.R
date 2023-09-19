@@ -8,14 +8,15 @@ criteria <- c("Mean reaction time (in ms)", "Mean accuracy", "Number of particip
               "Number of blocks per participant", "Number of trials per block",
               "Neutral stimuli included?", "Time limit for responses (in ms)",
               "Existence of between-subject manipulation?", 
-              "Existence of within-subject manipulation (besides congruency)?"
+              "Existence of within-subject manipulation (besides congruency)?",
+              "Conducted (Year of Publication)"
               )
 
 
 # function to choose default value of "value" fields 
 get_default_value <- function(criterion, operator){
   # only execute once operator has been chosen
-  if(!is.na(operator)){
+  if(!is.null(operator)){
     
     # TODO: check
     default_value <- switch(criterion,
@@ -25,24 +26,18 @@ get_default_value <- function(criterion, operator){
                             "Number of blocks per participant" = 5, 
                             "Number of trials per block" = 30, 
                             "Time limit for responses (in ms)" = 2000,
-                            #"Conducted (Year of Publication" = 2010
+                            "Conducted (Year of Publication)" = 2010
     )
     
     # optionally: second default value for between operator 
     default_value_b <- ifelse(operator == "between",
-                              default_value * 1.2,
+                              ifelse(criterion == "Conducted (Year of Publication)", # for "conducted" choose current year
+                                     format(Sys.Date(), "%Y"),
+                                     default_value * 1.2),  # in all other cases: increase by 20%
                               NA)
     
     
-    #if(criterion == "Conducted (Year of Publication)" & operator == "between"){
-    #  default_value_b <- format(Sys.Date(), "%Y")
-    #  } else if (operator == "between"){
-    #  default_value_b <- default_value * 1.2 
-    #  } else {
-    #    default_value_b <- NA
-    #  }
-    #
-    return(c(default_value, default_value_b))
+        return(c(default_value, default_value_b))
     
   }
 }

@@ -97,7 +97,7 @@ server <- function(input, output, session){
       condition = "input.criterion1 == 'Neutral stimuli included?' |  input.criterion1 == 'Existence of between-subject manipulation?' | input.criterion1 == 'Existence of within-subject manipulation (besides congruency)?'",
       selectInput(inputId = "yes_no",
                   label = " ",
-                  choices =  c("Yes", "No")) # TODO: change outcome value to 1/0? (Sven)
+                  choices =  c("Select", "Yes", "No")) # TODO: change outcome value to 1/0? (Sven)
     ) 
   }) 
   
@@ -114,13 +114,13 @@ server <- function(input, output, session){
   rv <- reactiveValues(x = argument_df)
   
   # specify action whenever "Add argument to list" is clicked
-  observeEvent(input$action_second_arg, {
+  observeEvent(input$action_add_arg, {
     # add current choices to argument data frame 
     if(input$operator1 != "Select"){
       new_entry <- data.frame(criterion = input$criterion1,
                               operator = input$operator1,
                               value = input$value1)
-    } else if(!is.na(input$yes_no)){
+    } else if(input$yes_no != "Select"){
       new_entry <- data.frame(criterion = input$criterion1,
                               operator = "",
                               value = input$yes_no)
@@ -137,6 +137,16 @@ server <- function(input, output, session){
                       inputId = "operator1", 
                       selected = "Select")
     
+  })
+  
+  # remove last row from argument_df when 'action_remove_recent' is clicked
+  observeEvent(input$action_remove_recent, {
+    rv$argument_df <-  rv$argument_df[-nrow(rv$argument_df), ]
+  })
+  
+  # reset argument_df when 'action_reset_list' is clicked
+  observeEvent(input$action_reset_list{
+    rv$argument_df <- rv$argument_df[0,]
   })
   
   # print summary df of chosen arguments
