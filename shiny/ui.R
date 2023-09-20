@@ -24,8 +24,8 @@ ui <- fluidPage(
   fluidRow(
     column(12, 
            actionButton("action_explain_db", "What is the inhibition task data base?")),
-           htmlOutput("explanation_db"),
-           imageOutput("img_structure_db")
+           htmlOutput("explanation_db")
+          # imageOutput("img_structure_db")
   ), 
   
   br(),
@@ -46,29 +46,25 @@ ui <- fluidPage(
   
   # SIDE BAR FOR USER INPUT
   sidebarPanel(
-    # create tabs within sidebar
-    shiny::tabsetPanel(
-      type = "pills",
-      
-      # tab 1
-      tabPanel("Find dataset", h3("What kind of data are you looking for?"),
-               
+    # heading
+    h3("filter datasets"),
                # choose task type ---
-               fluidRow(
-                 column(6,
-                        # check box to choose task type
-                        checkboxGroupInput(inputId = "task_type",
-                                           label = "Choose task type:",
-                                           choices = 
-                                             c("Stroop task" = "stroop",
-                                               "Simon task" = "simon",
-                                               "Flanker task" = "flanker",
-                                               "Other" = "other"))
-                       ),
-                 
-                 column(6) # empty 
-                 
-               ),
+            # fluidRow(
+            #   column(6,
+            #          # check box to choose task type
+            #          checkboxGroupInput(inputId = "task_type",
+            #                             label = "Choose task type:",
+            #                             choices = 
+            #                               c("Stroop task" = "stroop",
+            #                                 "Simon task" = "simon",
+            #                                 "Flanker task" = "flanker",
+            #                                 "Other" = "other"))
+            #         ),
+            #   
+            #   column(6) # empty 
+            #   
+            # ),
+    
                
                # add argument ---
                fluidRow(    # split sidebar into 3 columns 
@@ -87,7 +83,10 @@ ui <- fluidPage(
                         # conditional value field 
                         uiOutput("value1"),
                         # binary choice for yes/no questions
-                        uiOutput("yes_no_choice")),
+                        uiOutput("yes_no_choice"),
+                        # choice of task type(s)
+                        uiOutput("choice_task_type")),
+                 
                  
                  ), # end fluid row
                
@@ -130,19 +129,8 @@ ui <- fluidPage(
                        #             style="color: #000000; border-color: #FF0000")
                        )
               ) # end fluid row
-                 
-            ), # end tab
-            
-           
-      # tab 2
-      tabPanel("Info about specific dataset", h3("Get info about specific dataset")
-               
-              ), # end tabSet
-    )
-      
-    
-  ), # end sidebarpanel
-  
+      ), # end sidebar
+
   # main panel for output
   mainPanel(
     # create tabs for main bar

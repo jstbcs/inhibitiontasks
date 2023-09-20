@@ -4,7 +4,8 @@
 
 
 # vector storing criteria to be chosen
-criteria <- c("Mean reaction time (in ms)", "Mean accuracy", "Number of participants",
+criteria <- c("Task type(s)",
+              "Mean reaction time (in ms)", "Mean accuracy", "Number of participants",
               "Number of blocks per participant", "Number of trials per block",
               "Neutral stimuli included?", "Time limit for responses (in ms)",
               "Existence of between-subject manipulation?", 

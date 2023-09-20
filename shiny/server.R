@@ -3,11 +3,8 @@
 # Defining server for the "inhibition data base" shiny app
 #
 
-library(shiny)
 source("./shiny/helper_file_shiny.R")
 source("./shiny/ui.R")
-
-
 
 
 server <- function(input, output, session){
@@ -18,11 +15,7 @@ server <- function(input, output, session){
   output$short_intro <- renderUI({
     HTML(paste(
       "This shiny app provides an overview over datasets in the inhibition task data base. <br><br>
-      
-      If you want to find all datasets that fulfill certsin criteria, choose the first input tab on the left to specify those filter criteria.<br>
-      If you already have a specific dataset in mind, use the second input tab to access it. <br>
-      
-      The app will give you...",
+      ...",
       " ", " ", sep="<br/>"))
   })
   
@@ -71,7 +64,7 @@ server <- function(input, output, session){
   # conditional panel to choose 1st operator based on criterion1
   output$operator1 <- renderUI({
     conditionalPanel(
-      condition = "input.criterion1 != 'Select' & input.criterion1 != 'Neutral stimuli included?' &  input.criterion1 != 'Existence of between-subject manipulation?' & input.criterion1 != 'Existence of within-subject manipulation (besides congruency)?'",
+      condition = "input.criterion1 != 'Select' & input.criterion1 != 'Task type(s)' & input.criterion1 != 'Neutral stimuli included?' &  input.criterion1 != 'Existence of between-subject manipulation?' & input.criterion1 != 'Existence of within-subject manipulation (besides congruency)?'",
       selectInput(inputId = "operator1",
                   label = "Choose operator",
                   choices =  c("Select", "less", "greater", "between", "equal"))
@@ -110,6 +103,21 @@ server <- function(input, output, session){
     ) 
   }) 
   
+  # conditional panel to choose task types
+  output$choice_task_type <- renderUI({
+    conditionalPanel(
+      condition = "input.criterion1 == 'Task type(s)'",
+      checkboxGroupInput(inputId = "task_type",
+                         label = "Choose task type:",
+                         choices = 
+                           c("Select",
+                             "Stroop task" = "stroop",
+                             "Simon task" = "simon",
+                             "Flanker task" = "flanker",
+                             "Other" = "other"))
+    ) 
+  }) 
+  
   # logic behind adding new argument to argument summary --
   
   # create df as reactive value
@@ -138,11 +146,19 @@ server <- function(input, output, session){
                               value2 = input$value1b)
       
       } else if(input$yes_no != "Select"){
-      new_entry <- data.frame(criterion = input$criterion1,
+        new_entry <- data.frame(criterion = input$criterion1,
                               operator = "",
                               value = input$yes_no,
                               value2 = "")
-    } 
+      
+      } else if(!is.null(input$task_type)){
+      
+        new_entry <-  data.frame(criterion = input$criterion1,
+                                operator = "",
+                                value = input$task_type,
+                                value2 = "")
+        
+    }
     
     rv$argument_df <- rbind(rv$argument_df, new_entry)
     
