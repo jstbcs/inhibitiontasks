@@ -13,10 +13,7 @@ server <- function(input, output, session){
   
   # print short intro text
   output$short_intro <- renderUI({
-    HTML(paste(
-      "This shiny app provides an overview over datasets in the inhibition task data base. <br><br>
-      ...",
-      " ", " ", sep="<br/>"))
+    HTML("This shiny app provides an overview over datasets in the inhibition task data base.")
   })
   
   # print explanation of project 
@@ -230,6 +227,11 @@ server <- function(input, output, session){
     n_conditions = c(2, 1, 3)
   )
   output$descriptives <- renderTable(descriptives_df)
+  
+  # print R Code to access data ----
+  output$Rcode <- renderPrint({
+    cat("library(inhibitiontasks)", "some query code", sep = "\n")
+  })
   
   
 }

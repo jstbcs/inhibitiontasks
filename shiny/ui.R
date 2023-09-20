@@ -123,7 +123,15 @@ ui <- fluidPage(
                tableOutput("descriptives")),
       
       # TAB 3
-      tabPanel("Get the data"),
+      tabPanel("Get the data",
+               
+               # print R code
+               h2("Use this code to access the data directly in R:"),
+               verbatimTextOutput("Rcode"),
+               
+               # option to download data as csv file
+               h2("Or download it directly as a csv file:")
+               ),
       
       # TAB 4
       tabPanel("List of all publications & datasets")
