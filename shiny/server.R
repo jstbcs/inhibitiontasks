@@ -201,6 +201,35 @@ server <- function(input, output, session){
     }
   }) 
   
+  # MAIN PANEL 
+  
+  # TAB 1
+  # print dataframe of suited data sets ----
+  suited_data_df <- data.frame(
+    publication_id = c(1,1,3),
+    authors = c("Whitehead et al.", "Whitehead et al.", "Snijder et al."),
+    conducted = c(2010, 2010, 2022),
+    dataset_id = c(1,2,3),
+    between_manipulation = c("Yes", "No", "No"), 
+    within_manipulation = c("No", "No", "Yes"), 
+    n_participants = c(220, 100, 57), 
+    n_blocks = c(5, 4, 6), 
+    n_trials = c(30, 30, 35), 
+    time_limit = c(2000, 2000, NA), 
+    data_excl = c("None", "None", "Participants with accuracy below 30%")
+  )
+  output$suited_datasets <- renderTable(suited_data_df)
+  
+  # print dataframe of descriptives ----
+  descriptives_df <- data.frame(
+    dataset_id = c(1,2,3), 
+    trials_pp = c(150, 120, 210),
+    percentage_congruent = c(0.5, 0.33, 0.66),
+    mean_rt = c(700, 723, 650),
+    mean_accuracy = c(0.8, 0.79, 0.94),
+    n_conditions = c(2, 1, 3)
+  )
+  output$descriptives <- renderTable(descriptives_df)
   
   
 }

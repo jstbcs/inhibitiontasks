@@ -46,108 +46,87 @@ ui <- fluidPage(
   
   # SIDE BAR FOR USER INPUT
   sidebarPanel(
-    # heading
+    # heading ---
     h3("filter datasets"),
-               # choose task type ---
-            # fluidRow(
-            #   column(6,
-            #          # check box to choose task type
-            #          checkboxGroupInput(inputId = "task_type",
-            #                             label = "Choose task type:",
-            #                             choices = 
-            #                               c("Stroop task" = "stroop",
-            #                                 "Simon task" = "simon",
-            #                                 "Flanker task" = "flanker",
-            #                                 "Other" = "other"))
-            #         ),
-            #   
-            #   column(6) # empty 
-            #   
-            # ),
     
-               
-               # add argument ---
-               fluidRow(    # split sidebar into 3 columns 
-                 column(4, 
-                        # drop down menu criterion
-                        selectInput(inputId = "criterion1",
-                                    label = "Choose criterion:",
-                                    choices = c("Select", criteria),
-                                    selected = "Select")), 
-                 
-                 column(4, 
-                        # conditional operator
-                        uiOutput("operator1")),
-                 
-                 column(4, 
-                        # conditional value field 
-                        uiOutput("value1"),
-                        # binary choice for yes/no questions
-                        uiOutput("yes_no_choice"),
-                        # choice of task type(s)
-                        uiOutput("choice_task_type")),
-                 
-                 
-                 ), # end fluid row
-               
-               fluidRow(
-                 column(4),  # empty 
-                 
-                 column(4),  # empty 
-                 
-                 column(4, 
-                        # conditional second value for "between" operator
-                        uiOutput("value1b"))
-                 
-               ), # end fluid row
-              
-              # option to add argument ---
-              fluidRow(
-                column(4, 
-                       actionButton("action_add_arg", "Add argument to list")
-                       ), 
-                
-                column(4),  # empty 
-                
-                column(4),  # empty 
-                
-              ), # end fluid row
-              
-              # summary of chosen arguments --- 
-              
-              tableOutput("summary"),
-              
-              fluidRow(
-                column(6,  # button remove recent argument
-                       uiOutput("conditional_action_remove")
-                       #actionButton("action_remove_recent", "Remove recent argument")
-                       ),                               
-                        
-                column(6, # button reset list
-                       uiOutput("conditional_action_reset")
-                       #actionButton("action_reset_list", "Reset list",
-                       #             style="color: #000000; border-color: #FF0000")
-                       )
-              ) # end fluid row
-      ), # end sidebar
-
-  # main panel for output
+    # add argument ---
+    fluidRow(    # split sidebar into 3 columns 
+      column(4, 
+             # drop down menu criterion
+             selectInput(inputId = "criterion1",
+                         label = "Choose criterion:",
+                         choices = c("Select", criteria),
+                         selected = "Select")), 
+      
+      column(4, 
+             # conditional operator
+             uiOutput("operator1")),
+      
+      column(4, 
+             # conditional value field 
+             uiOutput("value1"),
+             # binary choice for yes/no questions
+             uiOutput("yes_no_choice"),
+             # choice of task type(s)
+             uiOutput("choice_task_type"))
+      ), # end fluid row
+    
+    
+    fluidRow(
+      column(4),  # empty 
+      
+      column(4),  # empty 
+      
+      column(4, 
+             # conditional second value for "between" operator
+             uiOutput("value1b"))
+      ), # end fluid row
+    
+    # option to add argument ---
+    fluidRow(
+      column(4, 
+             actionButton("action_add_arg", "Add argument to list")),
+      
+      column(4),  # empty 
+      
+      column(4)  # empty 
+      ), # end fluid row
+    
+    # summary of chosen arguments ---
+    
+    tableOutput("summary"),
+    
+    fluidRow(
+      column(6,  # button remove recent argument
+             uiOutput("conditional_action_remove")),   
+      
+      column(6, # button reset list
+             uiOutput("conditional_action_reset"))
+      ) # end fluid row
+    
+    ), # end sidebar
+  
+  # MAIN PANEL FOR OUTPUT
   mainPanel(
     # create tabs for main bar
     shiny::tabsetPanel(
       type = "pills",
       
-      # tab 1
-      tabPanel("Overview of suited datasets"),
+      # TAB 1
+      tabPanel("Overview of suited datasets",
+               
+               tableOutput("suited_datasets")),
       
-      # tab 2
-      tabPanel("Descriptives"),
+      # TAB 2
+      tabPanel("Descriptives",
+               
+               tableOutput("descriptives")),
       
-      # tab 3
-      tabPanel("Get the data")
+      # TAB 3
+      tabPanel("Get the data"),
       
-      # tab 4
-      # tabPanel("Download data)
+      # TAB 4
+      tabPanel("List of all publications & datasets")
     
     ) # end tabset 
   ) # end main bar
