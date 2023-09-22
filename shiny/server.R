@@ -21,10 +21,10 @@ server <- function(input, output, session){
     # show text when number of clicks is uneven; hide if even
     if(input$action_explain_db %% 2 == 1){
       updateActionButton(inputId = "action_explain_db", label = "Got it!")
-      renderUI({HTML("The inhibition task data base contains inhibition task data (i.e., stroop, flanker or simon task) from over 40 datasets as well as information about the respective studies and publications. <br>
+      renderUI({HTML("The inhibition task data base contains attentional control task data (i.e., stroop, flanker or simon task) from over 40 datasets as well as information about the respective studies and publications. <br>
                      It is meant to enhance access to open inhibition task data. <br>
-                     Data can be accessed either via SQL or our R package (?). <br> <br>"
-                    # <img src='shiny/www/db_structure.png' alt='Structure of inhibition task db' width='400' height='400'>"
+                     Data can be accessed either via SQL or our R package (?). <br> <br>
+                     <img src='/shiny/www/db_structure.png' alt='Structure of inhibition task db' width='400' height='400'>"
                      )
         })
     } else {
@@ -45,7 +45,18 @@ server <- function(input, output, session){
     # show text when number of clicks is uneven; hide if even
     if(input$action_contribute %% 2 == 1){
       updateActionButton(inputId = "action_contribute", label = "Got it!")
-      renderUI({HTML("[Link to form]. <br> <br>"
+      renderUI({HTML("If you have data on attention control tasks that you would like to make available to other researchers, we would be happy to include it in our data base. <br>
+                     Note that the study/ studies which data were collected must have been published (this includes preprints). <br>
+                     Furthermore, suited data must fulfill include the following information: <ul>
+                     <li>An ID variable</li> 
+                     <li>A congruency variable, indicating stimuli were congruent or conflicting </li> 
+                     <li>Reaction time of each trial, in milliseconds </li>
+                     <li>Accuracyof each trials (correct/ incorrect)</li>
+                     <li>A between variable indicating between subject manipulation (if applicable)</li>
+                     <li>A within variable indicating within subject manipulation (if applicable)</li>
+                     <br> 
+                     You can submit your data via <a href=http://www.ampl-psych.com/inhibition-database/ target='_blank' rel='noopener noreferrer'>this</a> online form. <br>
+                     In case you have any questions, feel free to contact <a href = 'mailto: j.m.haaf@uva.nl'>j.m.haaf@uva.nl</a>.</div>"
                      )})
     } else {
       updateActionButton(inputId = "action_contribute", label = "How can I contribute my data to the data base?")
