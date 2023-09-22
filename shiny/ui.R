@@ -46,64 +46,85 @@ ui <- fluidPage(
   
   # SIDE BAR FOR USER INPUT
   sidebarPanel(
-    # heading ---
-    h3("filter datasets"),
     
-    # add argument ---
-    fluidRow(    # split sidebar into 3 columns 
-      column(4, 
-             # drop down menu criterion
-             selectInput(inputId = "criterion1",
-                         label = "Choose criterion:",
-                         choices = c("Select", criteria),
-                         selected = "Select")), 
+    # create tabs
+    shiny::tabsetPanel(
+      type = "pills",
       
-      column(4, 
-             # conditional operator
-             uiOutput("operator1")),
+      # TAB 1
+      tabPanel("Filter datasets",
+               
+               # add argument ---
+               fluidRow(    # split sidebar into 3 columns 
+                 column(4, 
+                        # drop down menu criterion
+                        selectInput(inputId = "criterion1",
+                                    label = "Choose criterion:",
+                                    choices = c("Select", criteria),
+                                    selected = "Select")), 
+                 
+                 column(4, 
+                        # conditional operator
+                        uiOutput("operator1")),
+                 
+                 column(4, 
+                        # conditional value field 
+                        uiOutput("value1"),
+                        # binary choice for yes/no questions
+                        uiOutput("yes_no_choice"),
+                        # choice of task type(s)
+                        uiOutput("choice_task_type"))
+               ), # end fluid row
+               
+               
+               fluidRow(
+                 column(4),  # empty 
+                 
+                 column(4),  # empty 
+                 
+                 column(4, 
+                        # conditional second value for "between" operator
+                        uiOutput("value1b"))
+               ), # end fluid row
+               
+               # option to add argument ---
+               fluidRow(
+                 column(4, 
+                        actionButton("action_add_arg", "Add argument to list")),
+                 
+                 column(4),  # empty 
+                 
+                 column(4)  # empty 
+               ), # end fluid row
+               
+               # summary of chosen arguments ---
+               
+               tableOutput("summary"),
+               
+               fluidRow(
+                 column(6,  # button remove recent argument
+                        uiOutput("conditional_action_remove")),   
+                 
+                 column(6, # button reset list
+                        uiOutput("conditional_action_reset"))
+               ) # end fluid row
+               
+               ),
       
-      column(4, 
-             # conditional value field 
-             uiOutput("value1"),
-             # binary choice for yes/no questions
-             uiOutput("yes_no_choice"),
-             # choice of task type(s)
-             uiOutput("choice_task_type"))
-      ), # end fluid row
-    
-    
-    fluidRow(
-      column(4),  # empty 
+      # TAB 2
+      tabPanel("Filter data",
+               h3("Filter data across all datasets")
+               
+      ), 
       
-      column(4),  # empty 
+      # TAB 3
+      tabPanel("Publication list",
+               h3("List of all publications & datasets included")
+               
+      ), 
       
-      column(4, 
-             # conditional second value for "between" operator
-             uiOutput("value1b"))
-      ), # end fluid row
-    
-    # option to add argument ---
-    fluidRow(
-      column(4, 
-             actionButton("action_add_arg", "Add argument to list")),
-      
-      column(4),  # empty 
-      
-      column(4)  # empty 
-      ), # end fluid row
-    
-    # summary of chosen arguments ---
-    
-    tableOutput("summary"),
-    
-    fluidRow(
-      column(6,  # button remove recent argument
-             uiOutput("conditional_action_remove")),   
-      
-      column(6, # button reset list
-             uiOutput("conditional_action_reset"))
-      ) # end fluid row
-    
+    ) # end tabsetpanel 
+  
     ), # end sidebar
   
   # MAIN PANEL FOR OUTPUT
