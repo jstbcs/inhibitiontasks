@@ -61,17 +61,17 @@ server <- function(input, output, session){
   # conditional panel to choose 1st operator based on criterion1
   output$operator1 <- renderUI({
     conditionalPanel(
-      condition = "input.criterion1 != 'Select' & input.criterion1 != 'Task type(s)' & input.criterion1 != 'Neutral stimuli included?' &  input.criterion1 != 'Existence of between-subject manipulation?' & input.criterion1 != 'Existence of within-subject manipulation (besides congruency)?'",
+      condition = "input.criterion1 != ' ' & input.criterion1 != 'Task type(s)' & input.criterion1 != 'Publication Code' & input.criterion1 != 'Neutral stimuli included?' &  input.criterion1 != 'Existence of between-subject manipulation?' & input.criterion1 != 'Existence of within-subject manipulation (besides congruency)?'",
       selectInput(inputId = "operator1",
                   label = "Choose operator",
-                  choices =  c("Select", "less", "greater", "between", "equal"))
+                  choices =  c("", "less", "greater", "between", "equal"))
       )
   })
   
   # conditional panel to choose value based on operator
   output$value1 <- renderUI({
     conditionalPanel(
-      condition = "input.operator1 != 'Select'",
+      condition = "input.operator1 != ''",
       numericInput(
         inputId = "value1",
         label = "Choose ........ value",
@@ -96,7 +96,7 @@ server <- function(input, output, session){
       condition = "input.criterion1 == 'Neutral stimuli included?' |  input.criterion1 == 'Existence of between-subject manipulation?' | input.criterion1 == 'Existence of within-subject manipulation (besides congruency)?'",
       selectInput(inputId = "yes_no",
                   label = " ",
-                  choices =  c("Select", "Yes", "No")) # TODO: change outcome value to 1/0? (Sven)
+                  choices =  c("", "Yes", "No")) # TODO: change outcome value to 1/0? (Sven)
     ) 
   }) 
   
@@ -115,6 +115,16 @@ server <- function(input, output, session){
     ) 
   }) 
   
+  # conditional panel to choose publication code
+  output$choice_pubcode <- renderUI({
+    conditionalPanel(
+      condition = "input.criterion1 == 'Publication Code'",
+      selectInput(inputId = "pub_code",
+                  label = "Choose publiction code",
+                  choices = c("", sort(publication_codes)))
+    ) 
+  }) 
+  
   # logic behind adding new argument to argument summary --
   
   # create df as reactive value
@@ -130,7 +140,7 @@ server <- function(input, output, session){
   # specify action whenever "Add argument to list" is clicked
   observeEvent(input$action_add_arg, {
     # add current choices to argument data frame 
-    if(input$operator1 != "Select" & input$operator1 != "between"){
+    if(input$operator1 != "" & input$operator1 != "between"){
       new_entry <- data.frame(criterion = input$criterion1,
                               operator = input$operator1,
                               value = input$value1,
@@ -142,19 +152,24 @@ server <- function(input, output, session){
                               value = input$value1,
                               value2 = input$value1b)
       
-      } else if(input$yes_no != "Select"){
+      } else if(input$yes_no != ""){
         new_entry <- data.frame(criterion = input$criterion1,
                               operator = "",
                               value = input$yes_no,
                               value2 = "")
       
       } else if(!is.null(input$task_type)){
-      
         new_entry <-  data.frame(criterion = input$criterion1,
                                 operator = "",
                                 value = input$task_type,
                                 value2 = "")
         
+      } else if (!is.null(input$pub_code)){
+        new_entry <-  data.frame(criterion = input$criterion1,
+                                 operator = "",
+                                 value = input$pub_code,
+                                 value2 = "")
+      
     }
     
     rv$argument_df <- rbind(rv$argument_df, new_entry)
@@ -162,11 +177,11 @@ server <- function(input, output, session){
     # reset drop down menu for criterion choice
     updateSelectInput(session, 
                       inputId = "criterion1", 
-                      selected = "Select")
+                      selected = "")
     
     updateSelectInput(session, 
                       inputId = "operator1", 
-                      selected = "Select")
+                      selected = "")
     
   })
   
@@ -201,37 +216,51 @@ server <- function(input, output, session){
   # MAIN PANEL 
   
   # TAB 1
-  # print dataframe of suited data sets ----
+  # print data frame of suited data sets ----
   suited_data_df <- data.frame(
-    publication_id = c(1,1,3),
-    authors = c("Whitehead et al.", "Whitehead et al.", "Snijder et al."),
-    conducted = c(2010, 2010, 2022),
-    dataset_id = c(1,2,3),
-    between_manipulation = c("Yes", "No", "No"), 
-    within_manipulation = c("No", "No", "Yes"), 
-    n_participants = c(220, 100, 57), 
-    n_blocks = c(5, 4, 6), 
-    n_trials = c(30, 30, 35), 
-    time_limit = c(2000, 2000, NA), 
-    data_excl = c("None", "None", "Participants with accuracy below 30%")
+    pub_code = "hedge_2018_reliability",
+    authors = "Hedge et al.",
+    conducted = 2018,
+    dataset_id = 32,
+    between_manipulation = "None", 
+    within_manipulation = "Time of measurement", 
+    n_participants = 200,
+    n_blocks = 5, 
+    n_trials = 30
   )
+  colnames(suited_data_df) <- colnames_suited
+  
   output$suited_datasets <- renderTable(suited_data_df)
   
   # print dataframe of descriptives ----
   descriptives_df <- data.frame(
-    dataset_id = c(1,2,3), 
-    trials_pp = c(150, 120, 210),
-    percentage_congruent = c(0.5, 0.33, 0.66),
-    mean_rt = c(700, 723, 650),
-    mean_accuracy = c(0.8, 0.79, 0.94),
-    n_conditions = c(2, 1, 3)
+    dataset_id = 32,
+    trials_pp = 150,
+    percentage_congruent = 0.66,
+    mean_rt = 750, 
+    mean_accuracy = 0.94, 
+    n_conditions = 2, 
+    time_limit = 2000, 
+    data_excl = "None"
   )
+  colnames(descriptives_df) <- colnames_descriptives
+  
   output$descriptives <- renderTable(descriptives_df)
   
   # print R Code to access data ----
   output$Rcode <- renderPrint({
     cat("library(inhibitiontasks)", "some query code", sep = "\n")
   })
+  
+  # logic behind download button
+  output$downloadData <- downloadHandler(
+       filename = function() {
+         paste('inhibition_task_data-', Sys.Date(), '.csv', sep='')
+       },
+       content = function(con) {
+         write.csv(descriptives_df, con)
+       }
+     )
   
   
 }
@@ -240,3 +269,4 @@ server <- function(input, output, session){
 
 #
 shinyApp(ui = ui, server = server)
+

@@ -60,8 +60,8 @@ ui <- fluidPage(
                         # drop down menu criterion
                         selectInput(inputId = "criterion1",
                                     label = "Choose criterion:",
-                                    choices = c("Select", criteria),
-                                    selected = "Select")), 
+                                    choices = c(" ", criteria),
+                                    selected = "")), 
                  
                  column(4, 
                         # conditional operator
@@ -73,7 +73,10 @@ ui <- fluidPage(
                         # binary choice for yes/no questions
                         uiOutput("yes_no_choice"),
                         # choice of task type(s)
-                        uiOutput("choice_task_type"))
+                        uiOutput("choice_task_type"),
+                        # choice of pub_code
+                        uiOutput("choice_pubcode")
+                        )
                ), # end fluid row
                
                
@@ -119,7 +122,7 @@ ui <- fluidPage(
       
       # TAB 3
       tabPanel("Publication list",
-               h3("List of all publications & datasets included")
+               h3("List of all publications & datasets")
                
       ), 
       
@@ -151,11 +154,9 @@ ui <- fluidPage(
                verbatimTextOutput("Rcode"),
                
                # option to download data as csv file
-               h2("Or download it directly as a csv file:")
-               ),
-      
-      # TAB 4
-      tabPanel("List of all publications & datasets")
+               h2("Or download it directly as a csv file:"), 
+               downloadLink("downloadData", "Download csv file")
+      )
     
     ) # end tabset 
   ) # end main bar
